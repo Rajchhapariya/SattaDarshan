@@ -12,7 +12,10 @@ export const revalidate = 3600; // 1 hr cache
 
 export default async function LokSabhaPage() {
   await connectDB();
-  const mps = await Politician.find({ chamber: "Lok Sabha" }).sort({ state: 1, name: 1 }).lean();
+  const mps = await Politician.find({ chamber: "Lok Sabha" })
+    .select("name slug state partyName photo constituency")
+    .sort({ state: 1, name: 1 })
+    .lean();
 
   return (
     <div className="space-y-6">
@@ -70,7 +73,7 @@ export default async function LokSabhaPage() {
                       </TableCell>
                       <TableCell>
                          <div className="flex items-center gap-2">
-                            <StateIcon stateName={mp.state} className="w-5 h-5 text-slate-400" />
+                            <StateIcon stateName={mp.state} mode="simple" className="w-5 h-5 text-slate-400" />
                             <span className="text-slate-700">{mp.state}</span>
                          </div>
                       </TableCell>

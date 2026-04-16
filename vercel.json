@@ -4,5 +4,8 @@
     "bom1"
   ],
   "buildCommand": "next build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "VERCEL_BYPASS_FALLBACK_OVERSIZED_ERROR": "1"
+  }
 }
