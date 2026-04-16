@@ -10,9 +10,7 @@ export async function GET(req: NextRequest) {
   const filter: any = {};
   if (q) filter.$or = [
     { name: { $regex: q, $options: "i" } },
-    { nameHindi: { $regex: q, $options: "i" } },
-    { rulingParty: { $regex: q, $options: "i" } },
-    { cm: { $regex: q, $options: "i" } },
+    { slug: { $regex: q, $options: "i" } },
   ];
   const states = await State.find(filter).sort({ name: 1 }).lean();
   return NextResponse.json(states);
@@ -26,7 +24,6 @@ export async function POST(req: NextRequest) {
   const state = await State.create({
     slug: slugify(String(body.slug || name)),
     name,
-    nameHindi: body.nameHindi,
     capital: body.capital,
     region: body.region,
     rulingParty: body.rulingParty,

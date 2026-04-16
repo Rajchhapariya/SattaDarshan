@@ -27,7 +27,7 @@ type PoliticianDetails = {
 };
 
 type PoliticianPageProps = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
 async function getPolitician(slug: string): Promise<PoliticianDetails | null> {
@@ -45,7 +45,7 @@ async function getPolitician(slug: string): Promise<PoliticianDetails | null> {
   }
 }
 export async function generateMetadata({ params }: PoliticianPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const p = await getPolitician(slug);
   if(!p) return {title:"Not Found"};
   return {
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: PoliticianPageProps) {
   };
 }
 export default async function PoliticianPage({ params }: PoliticianPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const p = await getPolitician(slug);
   if(!p) notFound();
   return (

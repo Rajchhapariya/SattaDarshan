@@ -38,7 +38,7 @@ export default async function RajyaSabhaPage() {
           </Card>
           <div className="col-span-3 bg-white border border-slate-200/60 shadow-sm rounded-xl p-4 flex items-center text-sm text-slate-600 gap-3">
              <Info className="w-5 h-5 text-indigo-500 shrink-0" />
-             <p>The Rajya Sabha, India's upper house of Parliament, has a current, active strength of 245 members. This includes 233 representatives from states and Union territories (including Delhi, Puducherry, and Jammu & Kashmir) and 12 members nominated by the President. The maximum permissible strength is 250 members. Data is securely synchronized from <strong className="text-slate-800">sansad.in/rs/members</strong> endpoints.</p>
+             <p>The Rajya Sabha, India&apos;s upper house of Parliament, has a current, active strength of 245 members. This includes 233 representatives from states and Union territories (including Delhi, Puducherry, and Jammu &amp; Kashmir) and 12 members nominated by the President. The maximum permissible strength is 250 members. Data is securely synchronized from <strong className="text-slate-800">sansad.in/rs/members</strong> endpoints.</p>
           </div>
        </div>
 

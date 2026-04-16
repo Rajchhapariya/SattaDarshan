@@ -8,7 +8,6 @@ import Politician from "@/models/Politician";
 type Leader = {
   slug: string;
   name: string;
-  nameHindi?: string;
   photo?: string;
   role?: string;
   partyName?: string;
@@ -31,7 +30,7 @@ type PartyDetails = {
 };
 
 type PartyPageProps = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
 async function getParty(slug: string): Promise<PartyDetails | null> {
@@ -46,7 +45,7 @@ async function getParty(slug: string): Promise<PartyDetails | null> {
   }
 }
 export async function generateMetadata({ params }: PartyPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const p = await getParty(slug);
   return p ? {
     title:p.name+" — Political Party",
@@ -54,7 +53,7 @@ export async function generateMetadata({ params }: PartyPageProps) {
   } : {title:"Not Found"};
 }
 export default async function PartyPage({ params }: PartyPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const p = await getParty(slug);
   if(!p) notFound();
   return (

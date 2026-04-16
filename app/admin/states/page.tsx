@@ -29,8 +29,7 @@ export default function AdminStatesPage() {
           <div key={s.slug} className="bg-white rounded-2xl border border-gray-100 p-4">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div>
-                <h3 className="font-semibold">{s.name}</h3>
-                <p className="text-xs text-gray-500 mt-1">{s.nameHindi}</p>
+                <h4 className="font-semibold text-gray-900">{s.name}</h4>
               </div>
               <div className="flex gap-2">
                 <Link href={`/admin/states/${s.slug}`} className="text-xs text-indigo-600 hover:underline">Edit</Link>

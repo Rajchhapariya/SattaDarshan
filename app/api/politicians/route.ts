@@ -17,8 +17,9 @@ export async function GET(req: NextRequest) {
   const filter: any = {};
   if (q) filter.$or = [
     { name: { $regex: q, $options: "i" } },
-    { nameHindi: { $regex: q, $options: "i" } },
+    { slug: { $regex: q, $options: "i" } },
     { constituency: { $regex: q, $options: "i" } },
+    { partyName: { $regex: q, $options: "i" } },
   ];
   if (role && role !== "All") {
     const roles = role.split(",").map((item) => item.trim()).filter(Boolean);
@@ -45,7 +46,6 @@ export async function POST(req: NextRequest) {
   const politician = await Politician.create({
     slug,
     name,
-    nameHindi: body.nameHindi,
     photo: body.photo,
     dob: body.dob,
     gender: body.gender,
@@ -53,10 +53,8 @@ export async function POST(req: NextRequest) {
     status: body.status || "Active",
     party: body.party,
     partyName: body.partyName,
-    partyHindi: body.partyHindi,
     state: body.state,
     constituency: body.constituency,
-    constituencyHindi: body.constituencyHindi,
     chamber: body.chamber,
     termStart: body.termStart,
     termEnd: body.termEnd,
@@ -64,7 +62,6 @@ export async function POST(req: NextRequest) {
     assets: body.assets,
     criminalCases: body.criminalCases ?? 0,
     bio: body.bio,
-    bioHindi: body.bioHindi,
     socialLinks: body.socialLinks,
     tags: body.tags || [],
   });

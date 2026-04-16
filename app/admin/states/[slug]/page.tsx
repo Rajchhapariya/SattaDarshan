@@ -53,7 +53,7 @@ export default function EditStatePage() {
       </div>
       <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-2xl border border-gray-100 p-6">
         {error ? <div className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</div> : null}
-        {[["name","Name"],["slug","Slug"],["nameHindi","Hindi Name"],["capital","Capital"],["region","Region"],["rulingParty","Ruling Party"],["rulingPartySlug","Ruling Party Slug"],["cm","Chief Minister"],["cmSlug","CM Slug"]].map(([key,label]) => (
+        {[["name","Name"],["slug","Slug"],["capital","Capital"],["region","Region"],["rulingParty","Ruling Party"],["rulingPartySlug","Ruling Party Slug"],["cm","Chief Minister"],["cmSlug","CM Slug"]].map(([key,label]) => (
           <div key={key as string}>
             <label className="text-sm font-medium text-gray-700 block mb-1">{label}</label>
             <input value={form[key as string] || ""} onChange={(e) => handleChange(key as string, e.target.value)} className="w-full rounded-xl border border-gray-200 h-10 px-3 text-sm" />

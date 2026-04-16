@@ -3,12 +3,12 @@ import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import Party from "@/models/Party";
 
-export async function GET(_: Request, { params }: { params: Promise<{ type: string; slug: string }> }) {
+export async function GET(_: Request, { params }: { params: { type: string; slug: string } }) {
   let title = "SattaDarshan";
   let subtitle = "India's Political Transparency Platform";
   try {
     await connectDB();
-    const resolvedParams = await params;
+    const resolvedParams = params;
     if (resolvedParams.type === "politician") {
       const p = await Politician.findOne({ slug: resolvedParams.slug }).lean();
       if (p) {

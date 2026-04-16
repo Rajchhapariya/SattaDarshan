@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
   const party = await Party.create({
     slug: slugify(String(body.slug || name)),
     name,
-    nameHindi: body.nameHindi,
     abbr: body.abbr,
     tier: body.tier,
     status: body.status || "Active",

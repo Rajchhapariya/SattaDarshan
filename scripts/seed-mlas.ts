@@ -116,6 +116,34 @@ async function fetchAndParsePage(wikiPage: string): Promise<Array<{ name: string
   return uniqueMembers;
 }
 
+async function fetchPhotosForMembers(members: any[]): Promise<Record<string, string>> {
+  const photoMap: Record<string, string> = {};
+  // Process in batches of 50 (MediaWiki limit)
+  for (let i = 0; i < members.length; i += 50) {
+    const batch = members.slice(i, i + 50);
+    const titles = batch.map(m => m.name).join("|");
+    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles)}&prop=pageimages&format=json&pithumbsize=500&origin=*`;
+    
+    try {
+      const res = await fetch(url, { headers: { "User-Agent": "SattaDarshan/1.0" } });
+      if (!res.ok) continue;
+      const json = await res.json() as any;
+      const pages = json.query?.pages || {};
+      
+      for (const pageId in pages) {
+        const page = pages[pageId];
+        if (page.thumbnail?.source) {
+          photoMap[page.title] = page.thumbnail.source;
+        }
+      }
+    } catch (e) {
+      console.log(`   ⚠️ Photo batch error: ${e}`);
+    }
+    await sleep(200);
+  }
+  return photoMap;
+}
+
 async function main() {
   await connectDB();
   console.log("🚀 Starting MLA ingestion from Wikipedia Election Pages...\n");
@@ -131,6 +159,9 @@ async function main() {
     try {
       const members = await fetchAndParsePage(stateInfo.wikiPage);
       console.log(`   Parsed ${members.length} unique MLA entries.`);
+      console.log(`   📸 Fetching photos for ${stateInfo.stateName} MLAs...`);
+      const photoMap = await fetchPhotosForMembers(members);
+      console.log(`   Found ${Object.keys(photoMap).length} photos.`);
 
       let stateImported = 0;
       for (const m of members) {
@@ -148,6 +179,7 @@ async function main() {
                 status: "Active",
                 party: partySlug,
                 partyName: m.party,
+                photo: photoMap[m.name] || "",
                 state: stateInfo.stateName,
                 constituency: m.constituency,
                 chamber: "Vidhan Sabha",

@@ -19,7 +19,7 @@ type StateDetails = {
 };
 
 type StatePageProps = {
-  params: Promise<{ state: string }>;
+  params: { state: string };
 };
 
 function slugToStateRegex(slug: string) {
@@ -43,13 +43,13 @@ async function getStatePoliticians(stateSlug: string) {
 }
 
 export async function generateMetadata({ params }: StatePageProps) {
-  const { state } = await params;
+  const { state } = params;
   const s = await getState(state);
   return { title: s ? s.name + " — State" : "Not Found" };
 }
 
 export default async function StatePage({ params }: StatePageProps) {
-  const { state } = await params;
+  const { state } = params;
   const s = await getState(state);
   if (!s) notFound();
   const politicians = await getStatePoliticians(state);

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 const initialForm = {
   name: "",
   slug: "",
-  nameHindi: "",
   capital: "",
   region: "",
   rulingParty: "",
@@ -52,7 +51,7 @@ export default function NewStatePage() {
       </div>
       <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-2xl border border-gray-100 p-6">
         {error ? <div className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</div> : null}
-        {["name","slug","nameHindi","capital","region","rulingParty","rulingPartySlug","cm","cmSlug"].map((key) => (
+        {["name","slug","capital","region","rulingParty","rulingPartySlug","cm","cmSlug"].map((key) => (
           <div key={key}>
             <label className="text-sm font-medium text-gray-700 block mb-1">{key.charAt(0).toUpperCase() + key.slice(1)}</label>
             <input value={(form as any)[key]} onChange={(e) => handleChange(key, e.target.value)} className="w-full rounded-xl border border-gray-200 h-10 px-3 text-sm" />
