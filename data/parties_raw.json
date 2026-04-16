@@ -1,0 +1,530 @@
+[
+  {
+    "slug": "aam-aadmi-party",
+    "name": "Aam Aadmi Party",
+    "tier": "National",
+    "logoFile": "Aam Aadmi Party flag (2).svg",
+    "founded": "2020",
+    "status": "Active"
+  },
+  {
+    "slug": "bahujan-samaj-party",
+    "name": "Bahujan Samaj Party",
+    "tier": "National",
+    "logoFile": "Elephant electoral symbol.svg",
+    "founded": "2018",
+    "status": "Active"
+  },
+  {
+    "slug": "bharatiya-janata-party",
+    "name": "Bharatiya Janata Party",
+    "tier": "National",
+    "logoFile": "BJP Flag.svg",
+    "founded": "1992",
+    "status": "Active"
+  },
+  {
+    "slug": "communist-party-of-india-marxist",
+    "name": "Communist Party of India (Marxist)",
+    "tier": "National",
+    "logoFile": "CPI-M-flag.svg",
+    "founded": "2019",
+    "status": "Active"
+  },
+  {
+    "slug": "indian-national-congress",
+    "name": "Indian National Congress",
+    "tier": "National",
+    "logoFile": "Indian National Congress Flag.svg",
+    "founded": "2021",
+    "status": "Active"
+  },
+  {
+    "slug": "national-people-s-party-india",
+    "name": "National People's Party (India)",
+    "tier": "National",
+    "logoFile": "NPP Flag.jpg",
+    "founded": "2023",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-trinamool-congress",
+    "name": "All India Trinamool Congress",
+    "tier": "State",
+    "logoFile": "All India Trinamool Congress flag (2).svg",
+    "founded": "2021",
+    "status": "Active"
+  },
+  {
+    "slug": "communist-party-of-india",
+    "name": "Communist Party of India",
+    "tier": "State",
+    "logoFile": "CPI symbol.svg",
+    "founded": "1925",
+    "status": "Active"
+  },
+  {
+    "slug": "janata-dal-secular",
+    "name": "Janata Dal (Secular)",
+    "tier": "State",
+    "logoFile": "JD(S) Flag.png",
+    "founded": "1999",
+    "status": "Active"
+  },
+  {
+    "slug": "janata-dal-united",
+    "name": "Janata Dal (United)",
+    "tier": "State",
+    "logoFile": "Janata Dal (United) Flag.svg",
+    "founded": "2003",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-anna-dravida-munnetra-kazhagam",
+    "name": "All India Anna Dravida Munnetra Kazhagam",
+    "tier": "State",
+    "logoFile": "AIADMK Flag.svg",
+    "founded": "1972",
+    "status": "Active"
+  },
+  {
+    "slug": "dravida-munnetra-kazhagam",
+    "name": "Dravida Munnetra Kazhagam",
+    "tier": "State",
+    "logoFile": "Flag DMK.svg",
+    "founded": "1949",
+    "status": "Active"
+  },
+  {
+    "slug": "naga-people-s-front",
+    "name": "Naga People's Front",
+    "tier": "State",
+    "logoFile": "Flag of the Naga People's Front.png",
+    "founded": "1963",
+    "status": "Active"
+  },
+  {
+    "slug": "nationalist-congress-party",
+    "name": "Nationalist Congress Party",
+    "tier": "State",
+    "logoFile": "Flag of Nationalist Congress Party.svg",
+    "founded": "1999",
+    "status": "Active"
+  },
+  {
+    "slug": "nationalist-congress-party-sharadchandra-pawar",
+    "name": "Nationalist Congress Party – Sharadchandra Pawar",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Man Blowing Turha.png",
+    "founded": "2024",
+    "status": "Active"
+  },
+  {
+    "slug": "rashtriya-janata-dal",
+    "name": "Rashtriya Janata Dal",
+    "tier": "State",
+    "logoFile": "RJD Flag.svg",
+    "founded": "1997",
+    "status": "Active"
+  },
+  {
+    "slug": "telugu-desam-party",
+    "name": "Telugu Desam Party",
+    "tier": "State",
+    "logoFile": "Telugu Desam Party Flag.png",
+    "founded": "1982",
+    "status": "Active"
+  },
+  {
+    "slug": "ysr-congress-party",
+    "name": "YSR Congress Party",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Ceiling Fan.svg",
+    "founded": "2011",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-forward-bloc",
+    "name": "All India Forward Bloc",
+    "tier": "State",
+    "logoFile": "All India Forward Bloc flag.svg",
+    "founded": "1939",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-majlis-e-ittehadul-muslimeen",
+    "name": "All India Majlis-e-Ittehadul Muslimeen",
+    "tier": "State",
+    "logoFile": "AIMIM FLAG.png",
+    "founded": "1927",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-n-r-congress",
+    "name": "All India N.R. Congress",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Jug.svg",
+    "founded": "2011",
+    "status": "Active"
+  },
+  {
+    "slug": "all-india-united-democratic-front",
+    "name": "All India United Democratic Front",
+    "tier": "State",
+    "logoFile": "AIUDF logo.webp",
+    "founded": "2005",
+    "status": "Active"
+  },
+  {
+    "slug": "all-jharkhand-students-union",
+    "name": "All Jharkhand Students Union",
+    "tier": "State",
+    "logoFile": "ANSU Party flag.jpg",
+    "founded": "1986",
+    "status": "Active"
+  },
+  {
+    "slug": "apna-dal-soneylal",
+    "name": "Apna Dal (Soneylal)",
+    "tier": "State",
+    "logoFile": "Apna dal Flag.svg",
+    "founded": "2016",
+    "status": "Active"
+  },
+  {
+    "slug": "asom-gana-parishad",
+    "name": "Asom Gana Parishad",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Elephant.png",
+    "founded": "1985",
+    "status": "Active"
+  },
+  {
+    "slug": "bharat-rashtra-samithi",
+    "name": "Bharat Rashtra Samithi",
+    "tier": "State",
+    "logoFile": "Flag of Bharat Rashtra Samithi new.svg",
+    "founded": "2001",
+    "status": "Active"
+  },
+  {
+    "slug": "biju-janata-dal",
+    "name": "Biju Janata Dal",
+    "tier": "State",
+    "logoFile": "Biju Janata Dal flag.svg",
+    "founded": "1997",
+    "status": "Active"
+  },
+  {
+    "slug": "bodoland-people-s-front",
+    "name": "Bodoland People's Front",
+    "tier": "State",
+    "logoFile": "BPF-Flag.svg",
+    "founded": "2005",
+    "status": "Active"
+  },
+  {
+    "slug": "communist-party-of-india-marxist-leninist-liberation",
+    "name": "Communist Party of India (Marxist–Leninist) Liberation",
+    "tier": "State",
+    "logoFile": "CPIML LIBERATION FLAG.png",
+    "founded": "1974",
+    "status": "Active"
+  },
+  {
+    "slug": "desiya-murpokku-dravida-kazhagam",
+    "name": "Desiya Murpokku Dravida Kazhagam",
+    "tier": "State",
+    "logoFile": "Flag DMDK.png",
+    "founded": "2005",
+    "status": "Active"
+  },
+  {
+    "slug": "goa-forward-party",
+    "name": "Goa Forward Party",
+    "tier": "State",
+    "logoFile": "Goa Forward Party Flag.jpg",
+    "founded": "2016",
+    "status": "Active"
+  },
+  {
+    "slug": "hill-state-people-s-democratic-party",
+    "name": "Hill State People's Democratic Party",
+    "tier": "State",
+    "logoFile": "Hill State People's Democratic Party flag.jpg",
+    "founded": "1968",
+    "status": "Active"
+  },
+  {
+    "slug": "indian-national-lok-dal",
+    "name": "Indian National Lok Dal",
+    "tier": "State",
+    "logoFile": "INLD1.svg",
+    "founded": "1996",
+    "status": "Active"
+  },
+  {
+    "slug": "indian-union-muslim-league",
+    "name": "Indian Union Muslim League",
+    "tier": "State",
+    "logoFile": "Flag of the Indian Union Muslim League.svg",
+    "founded": "1948",
+    "status": "Active"
+  },
+  {
+    "slug": "indigenous-people-s-front-of-tripura",
+    "name": "Indigenous People's Front of Tripura",
+    "tier": "State",
+    "logoFile": "Flag green yellow.svg",
+    "founded": "2009",
+    "status": "Active"
+  },
+  {
+    "slug": "jammu-kashmir-national-conference",
+    "name": "Jammu & Kashmir National Conference",
+    "tier": "State",
+    "logoFile": "JKNC-flag.svg",
+    "founded": "1932",
+    "status": "Active"
+  },
+  {
+    "slug": "jammu-and-kashmir-national-panthers-party",
+    "name": "Jammu and Kashmir National Panthers Party",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Cycle.png",
+    "founded": "1982",
+    "status": "Active"
+  },
+  {
+    "slug": "jammu-and-kashmir-peoples-democratic-party",
+    "name": "Jammu and Kashmir Peoples Democratic Party",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Ink Pot and Pen.png",
+    "founded": "1999",
+    "status": "Active"
+  },
+  {
+    "slug": "janasena-party",
+    "name": "Janasena Party",
+    "tier": "State",
+    "logoFile": "Janasena Party Flag.png",
+    "founded": "2014",
+    "status": "Active"
+  },
+  {
+    "slug": "jannayak-janta-party",
+    "name": "Jannayak Janta Party",
+    "tier": "State",
+    "logoFile": "Jannayak Janta Party flag (1).svg",
+    "founded": "2018",
+    "status": "Active"
+  },
+  {
+    "slug": "janta-congress-chhattisgarh",
+    "name": "Janta Congress Chhattisgarh",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Farmer Ploughing (within Square).jpg",
+    "founded": "2016",
+    "status": "Active"
+  },
+  {
+    "slug": "jharkhand-mukti-morcha",
+    "name": "Jharkhand Mukti Morcha",
+    "tier": "State",
+    "logoFile": "Jharkhand Mukti Morcha flag.svg",
+    "founded": "1972",
+    "status": "Active"
+  },
+  {
+    "slug": "kerala-congress",
+    "name": "Kerala Congress",
+    "tier": "State",
+    "logoFile": "Kerala-Congress-flag.svg",
+    "founded": "1964",
+    "status": "Active"
+  },
+  {
+    "slug": "kerala-congress-m",
+    "name": "Kerala Congress (M)",
+    "tier": "State",
+    "logoFile": "Kerala-Congress-flag.svg",
+    "founded": "1979",
+    "status": "Active"
+  },
+  {
+    "slug": "lok-janshakti-party",
+    "name": "Lok Janshakti Party",
+    "tier": "State",
+    "logoFile": "Lok Janshakti Party Flag.svg",
+    "founded": "2000",
+    "status": "Active"
+  },
+  {
+    "slug": "lok-janshakti-party-ram-vilas",
+    "name": "Lok Janshakti Party (Ram Vilas)",
+    "tier": "State",
+    "logoFile": null,
+    "founded": "2021",
+    "status": "Active"
+  },
+  {
+    "slug": "maharashtra-navnirman-sena",
+    "name": "Maharashtra Navnirman Sena",
+    "tier": "State",
+    "logoFile": "Maharashtra Navnirman Sena Official Flag.jpg",
+    "founded": "2006",
+    "status": "Active"
+  },
+  {
+    "slug": "maharashtrawadi-gomantak-party",
+    "name": "Maharashtrawadi Gomantak Party",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Lion.svg",
+    "founded": "1963",
+    "status": "Active"
+  },
+  {
+    "slug": "naam-tamilar-katchi",
+    "name": "Naam Tamilar Katchi",
+    "tier": "State",
+    "logoFile": null,
+    "founded": "1958",
+    "status": "Active"
+  },
+  {
+    "slug": "mizo-national-front",
+    "name": "Mizo National Front",
+    "tier": "State",
+    "logoFile": "Election Symbol Star.svg",
+    "founded": "1961",
+    "status": "Active"
+  },
+  {
+    "slug": "people-s-party-of-arunachal",
+    "name": "People's Party of Arunachal",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Maize.svg",
+    "founded": "1977",
+    "status": "Active"
+  },
+  {
+    "slug": "rashtriya-loktantrik-party",
+    "name": "Rashtriya Loktantrik Party",
+    "tier": "State",
+    "logoFile": "Logo Rashtriya Loktantrik party.png",
+    "founded": "2018",
+    "status": "Active"
+  },
+  {
+    "slug": "revolutionary-goans-party",
+    "name": "Revolutionary Goans Party",
+    "tier": "State",
+    "logoFile": "Revolutionary Goans Party Symbol.jpg",
+    "founded": "2022",
+    "status": "Active"
+  },
+  {
+    "slug": "revolutionary-socialist-party-india",
+    "name": "Revolutionary Socialist Party (India)",
+    "tier": "State",
+    "logoFile": "RSP-flag.svg",
+    "founded": "1940",
+    "status": "Active"
+  },
+  {
+    "slug": "samajwadi-party",
+    "name": "Samajwadi Party",
+    "tier": "State",
+    "logoFile": "Samajwadi Party New Flag.png",
+    "founded": "1992",
+    "status": "Active"
+  },
+  {
+    "slug": "shiromani-akali-dal",
+    "name": "Shiromani Akali Dal",
+    "tier": "State",
+    "logoFile": "SAD flag.svg",
+    "founded": "1920",
+    "status": "Active"
+  },
+  {
+    "slug": "sikkim-democratic-front",
+    "name": "Sikkim Democratic Front",
+    "tier": "State",
+    "logoFile": "Sikkim-Democratic-Front-flag.svg",
+    "founded": "1993",
+    "status": "Active"
+  },
+  {
+    "slug": "sikkim-krantikari-morcha",
+    "name": "Sikkim Krantikari Morcha",
+    "tier": "State",
+    "logoFile": "Sikkim Krantikari Morcha flag.svg",
+    "founded": "2013",
+    "status": "Active"
+  },
+  {
+    "slug": "shiv-sena-2022-present",
+    "name": "Shiv Sena (2022–present)",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Bow And Arrow.svg",
+    "founded": "2022",
+    "status": "Active"
+  },
+  {
+    "slug": "shiv-sena-ubt",
+    "name": "Shiv Sena (UBT)",
+    "tier": "State",
+    "logoFile": "SS(UBT) flag.png",
+    "founded": "2022",
+    "status": "Active"
+  },
+  {
+    "slug": "tipra-motha-party",
+    "name": "Tipra Motha Party",
+    "tier": "State",
+    "logoFile": "Tipra Logo.jpg",
+    "founded": "2019",
+    "status": "Active"
+  },
+  {
+    "slug": "united-democratic-party-meghalaya",
+    "name": "United Democratic Party (Meghalaya)",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Drums.png",
+    "founded": "1997",
+    "status": "Active"
+  },
+  {
+    "slug": "united-people-s-party-liberal",
+    "name": "United People's Party Liberal",
+    "tier": "State",
+    "logoFile": "UPPL Election Symbol.png",
+    "founded": "2015",
+    "status": "Active"
+  },
+  {
+    "slug": "voice-of-the-people-party-meghalaya",
+    "name": "Voice of the People Party (Meghalaya)",
+    "tier": "State",
+    "logoFile": "Winnower Symbol.png",
+    "founded": "2021",
+    "status": "Active"
+  },
+  {
+    "slug": "zoram-nationalist-party",
+    "name": "Zoram Nationalist Party",
+    "tier": "State",
+    "logoFile": "Indian Election Symbol Sun without Rays.png",
+    "founded": "1997",
+    "status": "Active"
+  },
+  {
+    "slug": "zoram-people-s-movement",
+    "name": "Zoram People's Movement",
+    "tier": "State",
+    "logoFile": null,
+    "founded": "2017",
+    "status": "Active"
+  }
+]
