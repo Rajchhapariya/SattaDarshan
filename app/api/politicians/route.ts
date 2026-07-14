@@ -34,10 +34,7 @@ export async function GET(req: NextRequest) {
   const rawPoliticians = await Politician.find(filter)
     .skip((page - 1) * limit).limit(limit).lean();
 
-  const politicians = rawPoliticians.map((p: any) => ({
-    ...p,
-    statePath: p.state ? getStatePath(p.state) : undefined,
-  }));
+  const politicians = rawPoliticians;
 
   return NextResponse.json({ politicians, total, page, pages: Math.ceil(total / limit) });
 }

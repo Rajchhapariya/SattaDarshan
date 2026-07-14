@@ -23,10 +23,7 @@ export default async function RajyaSabhaPage() {
     .sort({ state: 1, name: 1 })
     .lean();
 
-  const mps = JSON.parse(JSON.stringify(rawMps.map((mp: any) => ({
-    ...mp,
-    statePath: mp.state ? getStatePath(mp.state) : undefined,
-  }))));
+  const mps = rawMps;
 
   return (
     <Ledger>
@@ -76,7 +73,7 @@ export default async function RajyaSabhaPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2.5">
-                      <StateIcon stateName={mp.state} statePath={mp.statePath} mode="detailed" className="w-4 h-4 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
+                      <StateIcon stateName={mp.state} mode="simple" className="w-4 h-4 text-muted-foreground group-hover:text-indigo-500 transition-colors" />
                       <span className="text-xs font-bold text-foreground uppercase tracking-tight">{mp.state}</span>
                     </div>
                   </TableCell>
