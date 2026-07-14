@@ -1,104 +1,73 @@
-# SattaDarshan — सत्ता दर्शन
-> India's Political Transparency Platform
+# SattaDarshan
 
-A full-stack Next.js 14 web application to track Indian politicians, political parties, state governments, and parliament members.
+**Sovereign Political Intelligence Ledger**
+
+SattaDarshan is a high-precision, verified legislative data platform tracking the Indian parliamentary matrix. It aggregates, normalizes, and presents comprehensive records of Indian politicians, political parties, state assemblies, and parliamentary chambers (Lok Sabha & Rajya Sabha).
 
 ---
 
-## Quick Start
+## 🏛️ Features
 
-### 1. Install Dependencies
+- **Parliamentary Directory:** Verified data for both Lok Sabha and Rajya Sabha members, updated regularly from official government portals (`sansad.in`).
+- **Leadership Tracking:** Dedicated filters for Prime Minister, Chief Ministers, Cabinet Ministers, Governors, and prominent MLAs.
+- **Geospatial Visualization:** Interactive map of India highlighting political states and constituencies.
+- **Deep Politician Profiles:** Rich dossier pages for individual politicians including their term dates, party affiliations, contact details, and historical data.
+- **Robust Data Pipeline:** Custom-built TypeScript scrapers powered by Puppeteer and Wikipedia APIs to securely fetch, validate, and normalize complex political records.
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js (App Router) & React
+- **Styling:** Tailwind CSS & Radix UI (Shadcn-like components)
+- **Database:** MongoDB & Mongoose
+- **Data Ingestion:** Puppeteer, Cheerio, fetch APIs
+- **Deployment:** Vercel Ready
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js >= 18.0.0
+- A running MongoDB cluster (e.g., MongoDB Atlas)
+
+### 1. Installation
+Clone the repository and install dependencies:
 ```bash
+git clone https://github.com/your-repo/sattadarshan.git
+cd sattadarshan
 npm install
 ```
 
-### 2. Configure Environment
-Edit `.env.local` with your credentials:
-- **MongoDB Atlas** — free at [mongodb.com/atlas](https://mongodb.com/atlas)
-- **NextAuth Secret** — generate with: `openssl rand -base64 32`
-- **NewsData.io** — free at [newsdata.io](https://newsdata.io)
-- **Upstash Redis** — free at [upstash.com](https://upstash.com)
-
-### 3. Add RUPP Data
-Place `rupps_india.json` in the project root (extracted from the ECI PDF).
-
-Format expected:
-```json
-[
-  { "name": "Party Name", "status": "Active", "headquartersAddress": "...", "pincode": "..." }
-]
+### 2. Environment Setup
+Create a `.env.local` file in the root directory and add your MongoDB connection string:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.example.mongodb.net/sattadarshan?retryWrites=true&w=majority
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 4. Seed the Database
+### 3. Data Synchronization
+The platform relies on external data sources for its ledgers. You can seed the local database using the custom built pipelines:
 ```bash
+# Seed the core states, parties, and basic political structure
 npm run seed
-```
-This runs all 5 seed scripts:
-- `seed-admin` — Creates admin user
-- `seed-states` — All 36 states & UTs
-- `seed-parties` — 15 major parties
-- `seed-politicians` — 10 key leaders
-- `seed-rupps` — All RUPPs from JSON
 
-### 5. Start Development Server
+# Specifically synchronize all current Lok Sabha & Rajya Sabha members from official sources
+npm run sync:parliament
+```
+
+### 4. Running Locally
+Start the development server:
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-Admin panel: [http://localhost:3000/admin](http://localhost:3000/admin)
+## 📦 Deployment (Vercel)
 
----
+SattaDarshan is optimized for zero-config Vercel deployment.
+1. Push your repository to GitHub.
+2. Import the project into your Vercel dashboard.
+3. Add the `MONGODB_URI` to your Vercel Environment Variables.
+4. Click **Deploy**. Vercel will automatically run `npm run build` and provision your application on a `.vercel.app` domain.
 
-## Deployment (Vercel)
-```bash
-npm i -g vercel
-vercel --prod
-```
-Add all `.env.local` variables in Vercel dashboard.
-Project auto-deploys to **Mumbai (bom1)** region for low India latency.
-
----
-
-## Project Structure
-```
-sattadarshan/
-├── app/                    # Next.js 14 App Router
-│   ├── api/                # REST API routes
-│   ├── admin/              # CMS (add manually - see below)
-│   ├── politicians/        # Browse + [slug] detail
-│   ├── parties/            # Browse + [slug] detail
-│   ├── states/             # All 36 + [state] detail
-│   └── parliament/         # Lok Sabha + Rajya Sabha
-├── components/             # React components
-│   ├── ui/                 # Badge, Button, SearchBar, Pagination
-│   ├── layout/             # Navbar, Footer
-│   ├── home/               # Hero, Stats, Featured sections
-│   └── politician/         # PoliticianCard, NewsSection
-├── lib/                    # db, redis, news, utils
-├── models/                 # Mongoose schemas
-├── scripts/                # Seed scripts
-├── types/                  # TypeScript interfaces
-└── rupps_india.json        # Add manually from PDF
-```
-
----
-
-## API Reference
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/politicians` | List politicians (filter: q, state, party, role, chamber, page) |
-| GET | `/api/politicians/:slug` | Politician detail |
-| POST | `/api/politicians` | Create politician |
-| PUT | `/api/politicians/:slug` | Update politician |
-| DELETE | `/api/politicians/:slug` | Delete politician |
-| GET | `/api/parties` | List parties (filter: tier, q, state) |
-| GET | `/api/parties/:slug` | Party detail + leaders |
-| GET | `/api/states` | All states |
-| GET | `/api/news/:politician` | Latest news for politician |
-| GET | `/api/stats` | Dashboard stats |
-
----
-
-Built with ❤️ for political transparency in India 🇮🇳
+## 🛡️ Data Integrity & SEO
+- **Data Deduplication:** Scrapers are equipped with normalization logic to catch name formatting discrepancies (e.g., merging "Shri Narendra Modi" and "Narendra Modi").
+- **SEO Ready:** Fully configured with `robots.txt`, dynamic `sitemap.ts`, and comprehensive OpenGraph / Twitter metadata tags out of the box.
