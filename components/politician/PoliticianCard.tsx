@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/Avatar";
 import { StateIcon } from "@/components/ui/StateIcon";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { ShieldCheck, MapPin, Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type PoliticianCardProps = {
   slug: string;
@@ -10,29 +13,73 @@ type PoliticianCardProps = {
   partyName?: string;
   constituency?: string;
   state?: string;
+  statePath?: string;
+  className?: string;
 };
 
-export function PoliticianCard({ slug, name, photo, role, partyName, constituency, state }: PoliticianCardProps) {
+export function PoliticianCard({ 
+  slug, 
+  name, 
+  photo, 
+  role, 
+  partyName, 
+  constituency, 
+  state, 
+  statePath,
+  className
+}: PoliticianCardProps) {
   return (
-    <Link href={"/politicians/"+slug} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-4 group">
-      <div className="w-14 h-14 rounded-full bg-gray-100 mx-auto mb-3 overflow-hidden flex items-center justify-center">
-        <Avatar className="w-full h-full">
-          <AvatarImage src={photo} alt={name} className="w-full h-full object-cover" />
-          <AvatarFallback className="text-2xl font-bold text-gray-300">
+    <Link 
+      href={`/politicians/${slug}`} 
+      className={cn(
+        "group flex flex-col bg-background border border-border rounded-md transition-all hover:border-primary/50 hover:shadow-sm overflow-hidden",
+        className
+      )}
+    >      
+      <div className="relative aspect-[4/5] w-full bg-muted overflow-hidden">
+        <Avatar className="h-full w-full rounded-none grayscale group-hover:grayscale-0 transition-all duration-700">
+          <AvatarImage src={photo} alt={name} className="object-cover h-full w-full" />
+          <AvatarFallback className="text-4xl font-black text-muted-foreground/30 rounded-none bg-muted flex items-center justify-center">
             {name.charAt(0)}
           </AvatarFallback>
         </Avatar>
-      </div>
-      <h3 className="font-semibold text-sm text-gray-900 text-center line-clamp-2 group-hover:text-orange-600">{name}</h3>
-      <div className="mt-2 text-center"><span className="text-xs bg-orange-50 text-orange-700 font-semibold px-2 py-0.5 rounded-md">{role}</span></div>
-      <p className="text-xs text-gray-500 text-center mt-1.5">{partyName}</p>
-      {state && (
-        <div className="flex items-center justify-center gap-1 mt-1 text-xs text-gray-500">
-          <StateIcon stateName={state} className="w-3.5 h-3.5 text-gray-400" />
-          <span>{state}</span>
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <Badge className="bg-primary text-white border-none shadow-none text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm">
+            {role || "Politician"}
+          </Badge>
         </div>
-      )}
-      {constituency&&<p className="text-xs text-gray-400 text-center mt-0.5">{constituency}</p>}
+        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-background/90 backdrop-blur-sm p-1 rounded-sm border border-border shadow-sm">
+            <ShieldCheck className="h-3 w-3 text-success" />
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-4 flex flex-col flex-1 gap-3">
+        <div>
+          <h3 className="font-black text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors tracking-tight uppercase">
+            {name}
+          </h3>
+          <p className="text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
+            ID: {slug.substring(0, 8).toUpperCase()}
+          </p>
+        </div>
+
+        <div className="mt-auto space-y-2 pt-3 border-t border-border/50">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Affiliation</span>
+            <span className="text-[9px] font-black text-foreground uppercase tracking-tight">{partyName || "Independent"}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <StateIcon stateName={state || ""} statePath={statePath} className="h-2.5 w-2.5 opacity-50 group-hover:text-primary group-hover:opacity-100 transition-all" />
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">Jurisdiction</span>
+            </div>
+            <span className="text-[9px] font-black text-foreground uppercase tracking-tight truncate max-w-[80px]">{state}</span>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 }
+

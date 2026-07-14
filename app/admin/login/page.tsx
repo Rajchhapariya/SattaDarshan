@@ -22,12 +22,26 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error&&<p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1">Email</label>
-            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} required className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"/>
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 block mb-1">Email</label>
+            <input 
+              id="email"
+              type="email" 
+              value={email} 
+              onChange={e=>setEmail(e.target.value)} 
+              required 
+              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
+            />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-1">Password</label>
-            <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"/>
+            <label htmlFor="password" className="text-sm font-medium text-gray-700 block mb-1">Password</label>
+            <input 
+              id="password"
+              type="password" 
+              value={password} 
+              onChange={e=>setPassword(e.target.value)} 
+              required 
+              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
+            />
           </div>
           <button type="submit" disabled={loading} className="w-full h-10 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50">{loading?"Signing in...":"Sign In"}</button>
         </form>

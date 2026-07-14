@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SearchBar } from "@/components/ui/SearchBar";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { ShieldCheck, ArrowRightLeft, User, AlertTriangle, Wallet, GraduationCap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Politician = {
   slug: string;
@@ -19,69 +22,129 @@ export default function ComparePage() {
   const [all, setAll] = useState<Politician[]>([]);
   const [left, setLeft] = useState("");
   const [right, setRight] = useState("");
-  const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/politicians?limit=1000")
+    fetch("/api/politicians?limit=500")
       .then((r) => r.json())
-      .then((d) => setAll(d.politicians || []))
-      .catch(() => setAll([]));
+      .then((d) => {
+        setAll(d.politicians || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const filtered = useMemo(() => {
-    const key = q.trim().toLowerCase();
-    if (!key) return all.slice(0, 40);
-    return all.filter((p) => [p.name, p.partyName, p.state].join(" ").toLowerCase().includes(key)).slice(0, 40);
-  }, [all, q]);
+  const p1 = useMemo(() => all.find((p) => p.slug === left), [all, left]);
+  const p2 = useMemo(() => all.find((p) => p.slug === right), [all, right]);
 
-  const leftData = all.find((p) => p.slug === left);
-  const rightData = all.find((p) => p.slug === right);
+  const rows = [
+    { label: "Designation", key: "role", icon: User },
+    { label: "Political Party", key: "partyName", icon: ShieldCheck },
+    { label: "State / Jurisdiction", key: "state", icon: ShieldCheck },
+    { label: "Constituency", key: "constituency", icon: ShieldCheck },
+    { label: "Education Level", key: "education", icon: GraduationCap },
+    { label: "Declared Assets", key: "assets", icon: Wallet },
+    { label: "Legal Records", key: "criminalCases", icon: AlertTriangle },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="text-3xl font-bold">Compare Politicians</h1>
-        <p className="text-sm text-gray-500 mt-1">Side-by-side comparison of assets, cases, role, and party.</p>
-        <div className="mt-6">
-          <SearchBar value={q} onChange={setQ} placeholder="Search politicians for quick selection..." className="max-w-md" />
+    <div className="space-y-8 animate-in fade-in duration-700">
+      {/* Compare Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-sm bg-primary/10 border border-primary/20 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+            <ArrowRightLeft className="h-3 w-3" /> Binary Comparison
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
+            Data <span className="text-muted-foreground font-light">Validator</span>
+          </h1>
+          <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed font-medium">
+            Side-by-binary validation of representative data points. 
+            Cross-reference metrics across jurisdictions and affiliations.
+          </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          {[{ label: "Left", value: left, setValue: setLeft }, { label: "Right", value: right, setValue: setRight }].map((slot) => (
-            <div key={slot.label} className="bg-white rounded-2xl border border-gray-100 p-4">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 block">{slot.label}</label>
-              <select value={slot.value} onChange={(e) => slot.setValue(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-transparent px-3 py-2 text-sm">
-                <option value="">Select politician</option>
-                {filtered.map((p) => (
-                  <option key={p.slug} value={p.slug}>
-                    {p.name} — {p.partyName || "Independent"}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/30 p-6 rounded-md border border-border">
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Member Alpha</label>
+          <select 
+            value={left} 
+            onChange={(e) => setLeft(e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-border bg-background text-sm font-bold uppercase tracking-tight focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          >
+            <option value="">-- Select Representative --</option>
+            {all.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
+          </select>
         </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Member Beta</label>
+          <select 
+            value={right} 
+            onChange={(e) => setRight(e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-border bg-background text-sm font-bold uppercase tracking-tight focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          >
+            <option value="">-- Select Representative --</option>
+            {all.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
+          </select>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          {[leftData, rightData].map((p, idx) => (
-            <div key={idx} className="bg-white rounded-2xl border border-gray-100 p-6 min-h-[320px]">
-              {!p ? (
-                <p className="text-sm text-gray-400">Select a politician to compare.</p>
-              ) : (
-                <div className="space-y-3 text-sm">
-                  <h2 className="text-xl font-bold">{p.name}</h2>
-                  <div className="flex justify-between"><span className="text-gray-400">Role</span><span>{p.role || "N/A"}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">Party</span><span>{p.partyName || "Independent"}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">State</span><span>{p.state || "N/A"}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">Constituency</span><span>{p.constituency || "N/A"}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">Criminal Cases</span><span className={p.criminalCases && p.criminalCases > 0 ? "text-red-600" : "text-green-600"}>{p.criminalCases ?? 0}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">Assets</span><span>{p.assets || "Not disclosed"}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-400">Education</span><span>{p.education || "N/A"}</span></div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+      <div className="bg-background border border-border rounded-md overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50 border-b border-border">
+              <TableHead className="w-1/4">Metric Descriptor</TableHead>
+              <TableHead className="w-3/8 text-center border-l border-border/50">ALPHA DATA</TableHead>
+              <TableHead className="w-3/8 text-center border-l border-border/50">BETA DATA</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.key} className="hover:bg-muted/10 border-b border-border/50">
+                <TableCell className="bg-muted/5 py-4">
+                  <div className="flex items-center gap-3">
+                    <row.icon className="h-3.5 w-3.5 text-muted-foreground/40" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">{row.label}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center py-4 border-l border-border/50">
+                  {p1 ? (
+                    <span className={cn(
+                      "font-bold uppercase tracking-tight",
+                      row.key === 'criminalCases' ? (Number(p1[row.key as keyof Politician]) > 0 ? "text-destructive font-mono" : "text-success font-mono") : "text-foreground",
+                      row.key === 'assets' && "font-mono text-xs"
+                    )}>
+                      {p1[row.key as keyof Politician] ?? "N/A"}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/20 italic text-xs">Awaiting Input...</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-center py-4 border-l border-border/50">
+                  {p2 ? (
+                    <span className={cn(
+                      "font-bold uppercase tracking-tight",
+                      row.key === 'criminalCases' ? (Number(p2[row.key as keyof Politician]) > 0 ? "text-destructive font-mono" : "text-success font-mono") : "text-foreground",
+                      row.key === 'assets' && "font-mono text-xs"
+                    )}>
+                      {p2[row.key as keyof Politician] ?? "N/A"}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground/20 italic text-xs">Awaiting Input...</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Comparison Signature */}
+      <div className="flex items-center justify-center pt-8 pb-12 border-t border-border">
+        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em]">
+          End of Comparison Protocol // Ledger SD-COMP-V1
+        </p>
       </div>
     </div>
   );

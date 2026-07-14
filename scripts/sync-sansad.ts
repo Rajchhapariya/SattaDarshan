@@ -63,15 +63,21 @@ async function main() {
       }
 
       const lsMembers = await page.evaluate(() => {
-        const rows = document.querySelectorAll("table tbody tr");
+        const tables = document.querySelectorAll("table");
+        // Table 1 (second table) has correctly formatted names
+        const targetTable = tables.length > 1 ? tables[1] : tables[0];
+        const rows = targetTable.querySelectorAll("tbody tr");
         const members: any[] = [];
         rows.forEach(tr => {
           const tds = tr.querySelectorAll("td");
           if (tds.length < 4) return;
           const name = (tds[1]?.innerText || "").trim().replace(/\n/g, " ").replace(/\s+/g, " ");
           const party = (tds[2]?.innerText || "").trim();
-          const constituency = (tds[3]?.innerText || "").trim();
-          const state = (tds[4]?.innerText || tds[3]?.innerText || "").trim();
+          let constituency = (tds[3]?.innerText || "").trim();
+          const state = (tds[4]?.innerText || "").trim();
+          if (constituency.includes("(")) {
+            constituency = constituency.split("(")[0].trim();
+          }
           const photo = tds[1]?.querySelector("img")?.src || "";
           if (name && name.length > 1 && party) {
             members.push({
@@ -177,7 +183,14 @@ async function main() {
     
     console.log(`\n💾 Inserting ${allResults.length} records...`);
     let imported = 0;
-    for (const m of allResults) {
+    for (let m of allResults) {
+      // --- Normalization Layer ---
+      if (m.name.includes("Narendra Modi") || m.name.includes("Shri Narendra Modi")) m.name = "Narendra Modi";
+      if (m.partyName === "Bharatiya Janata Party") m.partyName = "BJP";
+      if (m.partyName === "Indian National Congress") m.partyName = "INC";
+      if (m.partyName === "Aam Aadmi Party") m.partyName = "AAP";
+      // ---------------------------
+
       const slug = toSlug(m.name);
       await Politician.updateOne({ slug }, { $set: { ...m, slug, party: toSlug(m.partyName), sourceUrl: "https://sansad.in", sourceVerifiedOn: new Date(), status: "Active" } }, { upsert: true });
       imported++;

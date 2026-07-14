@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/Button";
 type ProfileActionsProps = {
   slug: string;
   name: string;
@@ -9,7 +9,11 @@ type ProfileActionsProps = {
 
 export function ProfileActions({ slug, name }: ProfileActionsProps) {
   const [saved, setSaved] = useState(false);
-  const url = useMemo(() => (typeof window !== "undefined" ? window.location.href : ""), []);
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    setUrl(typeof window !== "undefined" ? `${window.location.origin}/politicians/${slug}` : "");
+  }, [slug]);
 
   useEffect(() => {
     const savedItems = JSON.parse(localStorage.getItem("saved-politicians") || "[]") as string[];
@@ -38,12 +42,18 @@ export function ProfileActions({ slug, name }: ProfileActionsProps) {
 
   return (
     <div className="flex flex-wrap gap-2 mt-4">
-      <button onClick={toggleSave} className="px-3 py-1.5 rounded-lg text-xs bg-indigo-50 text-indigo-700">
+      <Button variant="outline" size="sm" onClick={toggleSave} className="text-xs bg-indigo-50/50 hover:bg-indigo-100 text-indigo-700 border-indigo-200">
         {saved ? "Saved" : "Bookmark"}
-      </button>
-      <button onClick={() => share("whatsapp")} className="px-3 py-1.5 rounded-lg text-xs bg-green-50 text-green-700">WhatsApp</button>
-      <button onClick={() => share("twitter")} className="px-3 py-1.5 rounded-lg text-xs bg-blue-50 text-blue-700">Twitter</button>
-      <button onClick={() => share("copy")} className="px-3 py-1.5 rounded-lg text-xs bg-gray-100 text-gray-700">Copy Link</button>
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => share("whatsapp")} className="text-xs bg-green-50/50 hover:bg-green-100 text-green-700 border-green-200">
+        WhatsApp
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => share("twitter")} className="text-xs bg-blue-50/50 hover:bg-blue-100 text-blue-700 border-blue-200">
+        Twitter
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => share("copy")} className="text-xs bg-gray-50/50 hover:bg-gray-100 text-gray-700 border-gray-200">
+        Copy Link
+      </Button>
     </div>
   );
 }

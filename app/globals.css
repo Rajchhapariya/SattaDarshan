@@ -1,52 +1,77 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Sovereign Ledger - Light Theme */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222.2 47.4% 11.2%; /* Slate-950 approx */
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 28 100% 60%; /* Saffron */
+    --popover-foreground: 222.2 47.4% 11.2%;
+    
+    /* Semantic Accents */
+    --primary: 28 100% 60%;    /* Saffron-Gold #FF9933 */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    
+    --secondary: 210 40% 96.1%; /* Slate-50 approx */
     --secondary-foreground: 222.2 47.4% 11.2%;
+    
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
+    
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    
+    --success: 160 84% 39%;   /* Eco-Green #10B981 */
+    --success-foreground: 210 40% 98%;
+    
+    --destructive: 0 84.2% 60.2%; /* Rose-Red #F43F5E */
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
+    
+    --border: 214.3 31.8% 91.4%; /* Slate-200 */
     --input: 214.3 31.8% 91.4%;
-    --ring: 28 100% 60%;
-    --radius: 0.5rem;
+    --ring: 222.2 47.4% 11.2%;
+    
+    --radius: 0.25rem; /* Strict 4px radius */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Sovereign Ledger - Dark Theme */
+    --background: 222.2 84% 4.9%; /* Slate-950 #0F172A */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    
+    --card: 222.2 47.4% 11.2%; /* Slate-900 #1E293B */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    
+    --popover: 222.2 47.4% 11.2%;
     --popover-foreground: 210 40% 98%;
-    --primary: 28 100% 60%; /* Saffron */
+    
+    --primary: 28 100% 60%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    
+    --secondary: 217.2 32.6% 17.5%; /* Slate-800 approx */
     --secondary-foreground: 210 40% 98%;
+    
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
+    
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    
+    --success: 160 84% 39%;
+    --success-foreground: 210 40% 98%;
+    
+    --destructive: 346 84% 61%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
+    
+    --border: 217.2 32.6% 17.5%; /* Slate-800 */
     --input: 217.2 32.6% 17.5%;
-    --ring: 28 100% 60%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -55,6 +80,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Data Precision Utility */
+.font-data {
+  @apply font-mono tracking-tighter;
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import { slugify } from "@/lib/utils";
+import { getStatePath } from "@/lib/server/statePaths";
 
 export async function GET(req: NextRequest) {
   await connectDB();
@@ -30,8 +31,13 @@ export async function GET(req: NextRequest) {
   if (state && state !== "All") filter.state = state;
 
   const total = await Politician.countDocuments(filter);
-  const politicians = await Politician.find(filter)
+  const rawPoliticians = await Politician.find(filter)
     .skip((page - 1) * limit).limit(limit).lean();
+
+  const politicians = rawPoliticians.map((p: any) => ({
+    ...p,
+    statePath: p.state ? getStatePath(p.state) : undefined,
+  }));
 
   return NextResponse.json({ politicians, total, page, pages: Math.ceil(total / limit) });
 }

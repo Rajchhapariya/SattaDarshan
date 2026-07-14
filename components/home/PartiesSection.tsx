@@ -1,29 +1,52 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { CommandCenterSection } from "@/components/ui/CommandCenter";
+
 export function PartiesSection() {
   const [parties,setParties] = useState([]);
   useEffect(()=>{fetch("/api/parties?tier=National&limit=8").then(r=>r.json()).then(d=>setParties(d.parties??[])).catch(()=>{});},[]);
+  
   return (
-    <section className="py-14 px-4 bg-gray-50/50">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div><p className="text-xs font-semibold text-indigo-600 uppercase tracking-widest mb-1">Parties</p><h2 className="text-2xl font-bold text-gray-900">National Parties</h2></div>
-          <Link href="/parties" className="text-sm text-indigo-600 font-medium">View all →</Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {parties.map((p:any)=>(
-            <Link key={p.slug} href={"/parties/"+p.slug} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 group flex items-center gap-4">
-              {p.logo&&<img src={p.logo} alt={p.abbr||p.name} className="w-10 h-10 object-contain"/>}
-              <div>
-                <div className="font-bold text-gray-900 group-hover:text-indigo-700">{p.abbr||p.name}</div>
-                <div className="text-xs text-gray-500 mt-0.5 line-clamp-1">{p.name}</div>
-                {p.seatsLokSabha!==undefined&&<div className="text-xs text-orange-600 font-semibold mt-2">{p.seatsLokSabha} LS seats</div>}
+    <CommandCenterSection 
+      title="Political Formations" 
+      subtitle="National Organizations"
+      action={{ label: "Access Index", href: "/parties" }}
+      className="pb-24"
+    >
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {parties.map((p:any)=>(
+          <Link 
+            key={p.slug} 
+            href={`/parties/${p.slug}`} 
+            className="bg-background border border-border p-5 group flex items-center gap-4 hover:border-primary/50 transition-all"
+          >
+            {p.logo && (
+              <div className="w-10 h-10 rounded border border-border p-1 bg-muted/30 grayscale group-hover:grayscale-0 transition-all flex items-center justify-center">
+                <Image 
+                  src={p.logo} 
+                  alt={p.abbr || p.name} 
+                  width={32} 
+                  height={32} 
+                  className="object-contain"
+                />
               </div>
-            </Link>
-          ))}
-        </div>
+            )}
+            <div>
+              <div className="font-black text-sm text-foreground group-hover:text-primary transition-colors tracking-tight uppercase">
+                {p.abbr || p.name.substring(0, 4)}
+              </div>
+              {p.seatsLokSabha !== undefined && (
+                <div className="text-[10px] font-mono font-bold text-primary mt-0.5 uppercase tracking-widest">
+                  {p.seatsLokSabha} LS_SEATS
+                </div>
+              )}
+            </div>
+          </Link>
+        ))}
       </div>
-    </section>
+    </CommandCenterSection>
   );
 }
+

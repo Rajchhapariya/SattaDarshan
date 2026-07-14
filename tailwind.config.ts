@@ -19,8 +19,16 @@ const config = {
     },
     extend: {
       colors: {
-        saffron: { DEFAULT:"#FF9933","50":"#FFF4EE","500":"#FF9933","600":"#E85A1A" },
-        navy: { DEFAULT:"#000080" },
+        /* Sovereign Ledger Palette */
+        saffron: { 
+          DEFAULT: "#FF9933",
+          50: "#FFF4EE",
+          500: "#FF9933",
+          600: "#E85A1A" 
+        },
+        navy: { 
+          DEFAULT: "#000080" 
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -33,6 +41,10 @@ const config = {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -59,6 +71,10 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "Inter", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       keyframes: {
         "accordion-down": {
