@@ -61,7 +61,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/95 backdrop-blur supports-[backdrop-blur]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90 flex-shrink-0">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm">
               <Landmark className="h-5 w-5" />
@@ -75,9 +75,6 @@ export function Navbar() {
               </span>
             </div>
           </Link>
-          <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-muted text-muted-foreground border border-border/80">
-            Non-Government
-          </span>
         </div>
 
         {/* Desktop Navigation Links */}
@@ -89,7 +86,7 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "px-3.5 py-2 rounded-lg text-sm font-semibold transition-all",
+                  "px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex-shrink-0 transition-all",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
