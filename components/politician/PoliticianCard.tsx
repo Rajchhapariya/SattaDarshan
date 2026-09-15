@@ -27,6 +27,7 @@ export function PoliticianCard({
   state, 
   statePath,
   tenureStatus,
+  verificationStatus,
   className
 }: PoliticianCardProps) {
   const isFormer = tenureStatus === "former";

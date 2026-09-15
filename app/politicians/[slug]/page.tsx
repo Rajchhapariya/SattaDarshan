@@ -176,7 +176,7 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
                   target="_blank"
                   rel="noreferrer"
                   className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
-                  title="Official Website"
+                  title="Website"
                 >
                   <Globe className="h-4 w-4" />
                 </a>
