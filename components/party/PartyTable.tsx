@@ -24,7 +24,7 @@ type PartySummary = {
 
 export function PartyTable({ data }: { data: PartySummary[] }) {
   return (
-    <div className="rounded-2xl border border-border/80 overflow-hidden bg-card shadow-sm">
+    <div className="rounded-2xl border border-border/80 overflow-x-auto bg-card shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/30">
@@ -77,6 +77,7 @@ export function PartyTable({ data }: { data: PartySummary[] }) {
               <TableCell className="text-right">
                 <Link 
                   href={`/parties/${p.slug}`}
+                  aria-label={`View party profile of ${p.name}`}
                   className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border hover:bg-muted hover:text-primary transition-all"
                 >
                   <ChevronRight className="h-4 w-4" />

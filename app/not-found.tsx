@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <div className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 py-16 animate-in fade-in duration-500 max-w-2xl mx-auto">
       {/* Civic Emblem Badge */}
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 mb-6 shadow-sm">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 mb-6 shadow-sm">
         <Landmark className="h-8 w-8" />
       </div>
 

@@ -14,11 +14,11 @@ export function StatsBar() {
     {label:"Lok Sabha Seats",val:543},
   ];
   return (
-    <section className="bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800 py-6">
+    <section className="bg-white border-y border-gray-100 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         {items.map(({label,val})=>(
           <div key={label} className="text-center">
-            <div className="text-2xl font-black text-gray-900 dark:text-gray-100">{val.toLocaleString("en-IN")}</div>
+            <div className="text-2xl font-black text-gray-900">{val.toLocaleString("en-IN")}</div>
             <div className="text-xs text-gray-500 mt-0.5">{label}</div>
           </div>
         ))}

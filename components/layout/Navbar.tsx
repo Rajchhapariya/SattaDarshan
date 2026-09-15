@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { 
   Menu, 
   X, 
@@ -12,8 +11,6 @@ import {
   Flag, 
   MapPin, 
   ArrowRightLeft, 
-  Sun, 
-  Moon, 
   Compass,
   ChevronRight,
   FileEdit
@@ -33,12 +30,6 @@ const NAV_LINKS = [
 export function Navbar() {
   const path = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Handle Escape key and body scroll lock when mobile drawer is open
   React.useEffect(() => {
@@ -114,18 +105,6 @@ export function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           <GlobalSearch />
 
-          {/* Theme Toggle Button */}
-          {mounted && (
-            <button
-              type="button"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors min-h-[44px] min-w-[44px]"
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-700" />}
-            </button>
-          )}
-
           {/* Mobile Hamburger Toggle */}
           <button
             type="button"
@@ -175,7 +154,7 @@ export function Navbar() {
             <Link
               href="/corrections"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-muted transition-colors min-h-[44px]"
+              className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-amber-600 hover:bg-muted transition-colors min-h-[44px]"
             >
               <div className="flex items-center gap-3">
                 <FileEdit className="h-4 w-4" />
@@ -183,17 +162,6 @@ export function Navbar() {
               </div>
               <ChevronRight className="h-4 w-4 opacity-40" />
             </Link>
-
-            <div className="pt-3 mt-2 border-t border-border/60 flex items-center justify-between px-3 text-xs text-muted-foreground">
-              <span>Theme: {theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
-              <button
-                type="button"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="text-xs font-semibold text-primary py-2 px-3 min-h-[44px] flex items-center"
-              >
-                Switch Theme
-              </button>
-            </div>
           </div>
         </div>
       )}

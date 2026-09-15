@@ -18,7 +18,7 @@ export default function Error({
   return (
     <div className="flex items-center justify-center min-h-[70vh] w-full px-4 py-12">
       <div className="max-w-md w-full bg-card border border-border/80 rounded-2xl p-8 shadow-sm text-center animate-in fade-in duration-300">
-        <div className="mx-auto w-14 h-14 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center mb-5 text-rose-600 dark:text-rose-400 shadow-sm">
+        <div className="mx-auto w-14 h-14 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center mb-5 text-rose-600 shadow-sm">
           <AlertCircle className="w-7 h-7" />
         </div>
         

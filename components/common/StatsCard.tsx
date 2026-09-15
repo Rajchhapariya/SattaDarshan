@@ -27,7 +27,7 @@ export function StatsCard({ title, value, subtitle, icon, trend, className }: St
       {(subtitle || trend) && (
         <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
           {subtitle && <span>{subtitle}</span>}
-          {trend && <span className="font-semibold text-emerald-600 dark:text-emerald-400">{trend}</span>}
+          {trend && <span className="font-semibold text-emerald-600">{trend}</span>}
         </div>
       )}
     </div>

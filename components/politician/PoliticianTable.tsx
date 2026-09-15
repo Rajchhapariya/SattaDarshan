@@ -65,6 +65,7 @@ export function PoliticianTable({ data }: { data: PoliticianSummary[] }) {
               <TableCell className="text-right">
                 <Link 
                   href={`/politicians/${p.slug}`}
+                  aria-label={`View profile of ${p.name}`}
                   className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border hover:bg-muted hover:text-primary transition-all"
                 >
                   <ChevronRight className="h-4 w-4" />

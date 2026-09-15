@@ -22,9 +22,9 @@ import {
   Instagram, 
   Globe, 
   Calendar,
-  ChevronRight,
-  Share2
+  ChevronRight
 } from "lucide-react";
+import { ShareButton } from "@/components/common/ShareButton";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 type PoliticianPageProps = {
@@ -101,7 +101,7 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
           <div>
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               {p.tenureStatus === "former" && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 border border-amber-500/20">
                   Former Office Holder
                 </span>
               )}
@@ -114,13 +114,22 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
                 Compiled from public records
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-              {p.name}
-            </h1>
-            <p className="text-base font-semibold text-primary mt-1">
-              {p.partyName || "Independent"}
-              {p.chamber && ` • ${p.chamber}`}
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                  {p.name}
+                </h1>
+                <p className="text-base font-semibold text-primary mt-1">
+                  {p.partyName || "Independent"}
+                  {p.chamber && ` • ${p.chamber}`}
+                </p>
+              </div>
+              <ShareButton
+                title={`${p.name} — Political Profile & Legislative Records`}
+                label="Share Profile"
+                className="self-start sm:self-auto"
+              />
+            </div>
           </div>
 
           {/* Key Tag Badges */}
@@ -210,7 +219,7 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
               <AlertTriangle className="h-4 w-4 text-amber-500" />
             )}
           </div>
-          <div className={cn("text-xl font-bold", hasZeroCriminalCases ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400")}>
+          <div className={cn("text-xl font-bold", hasZeroCriminalCases ? "text-emerald-600" : "text-amber-600")}>
             {hasZeroCriminalCases ? "0 Cases" : `${p.criminalCases} Cases Declared`}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">ECI election compliance status</p>

@@ -53,12 +53,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className="bg-background">
-      <body className={`${inter.variable} ${mono.variable} font-sans min-h-screen flex flex-col antialiased bg-background`}>
+    <html lang="en" className="bg-background">
+      <body className={`${inter.variable} ${mono.variable} font-sans min-h-screen flex flex-col antialiased bg-background text-foreground`}>
+        {/* Accessible Skip Link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-amber-600 focus:text-white focus:rounded-xl focus:shadow-xl focus:font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-transform"
+        >
+          Skip to main content
+        </a>
         <Providers>
           <DisclaimerModal />
           <Navbar />
-          <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+          <main id="main-content" className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
             {children}
           </main>
           <Footer />

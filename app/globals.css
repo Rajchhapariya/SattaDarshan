@@ -39,40 +39,6 @@
     
     --radius: 0.625rem;             /* Modern 10px rounded curve */
   }
-
-  .dark {
-    /* Modern Civic Intelligence Theme - Dark */
-    --background: 222.2 84% 4.9%;   /* #0B0F19 deep rich dark slate */
-    --foreground: 210 40% 98%;
-    
-    --card: 222.2 47.4% 9.5%;       /* #111827 refined card dark */
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222.2 47.4% 9.5%;
-    --popover-foreground: 210 40% 98%;
-    
-    --primary: 38 92% 50%;          /* Amber / Gold */
-    --primary-foreground: 222.2 47.4% 11.2%;
-    
-    --secondary: 217.2 32.6% 17.5%; /* #1E293B */
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217.2 32.6% 15%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    
-    --success: 158 64% 42%;
-    --success-foreground: 210 40% 98%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 38 92% 50%;
-  }
 }
 
 @layer base {
@@ -91,12 +57,6 @@
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.dark .glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
 }
 
 /* Subtle custom scrollbar */

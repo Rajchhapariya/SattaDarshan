@@ -36,7 +36,7 @@ export default async function Home() {
     <div className="space-y-12 sm:space-y-16 animate-in fade-in duration-500">
       {/* Hero Section */}
       <section className="relative pt-6 sm:pt-10 pb-4 text-center max-w-4xl mx-auto space-y-5">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 shadow-sm">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 border border-amber-500/25 shadow-sm">
           <Landmark className="h-3.5 w-3.5" /> Independent Civic & Legislative Platform
         </div>
 

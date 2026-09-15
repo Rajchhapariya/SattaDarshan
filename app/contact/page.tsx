@@ -47,7 +47,7 @@ export default function ContactPage() {
         <div className="p-6 sm:p-7 rounded-3xl bg-card border border-border/80 shadow-sm space-y-3 flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600">
                 <FileText className="h-5 w-5" />
               </div>
               <h2 className="font-bold text-base text-foreground">Data Inaccuracies & Updates</h2>
@@ -71,7 +71,7 @@ export default function ContactPage() {
         <div className="p-6 sm:p-7 rounded-3xl bg-card border border-border/80 shadow-sm space-y-3 flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600">
                 <ShieldAlert className="h-5 w-5" />
               </div>
               <h2 className="font-bold text-base text-foreground">Copyright & Attribution Notices</h2>

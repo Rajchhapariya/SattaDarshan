@@ -6,11 +6,17 @@ import Image from "next/image";
 import { Search, Flag, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { PartyTable } from "@/components/party/PartyTable";
+import { CivicSelect } from "@/components/ui/CivicSelect";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 const ALLIANCES = ["All", "NDA", "INDIA", "Others"];
-const TIERS = ["All", "National", "State", "RUPP"];
+const TIER_OPTIONS = [
+  { value: "All", label: "All Tiers" },
+  { value: "National", label: "National Parties" },
+  { value: "State", label: "State Recognized" },
+  { value: "RUPP", label: "RUPP" },
+];
 
 type PartySummary = {
   slug: string;
@@ -65,7 +71,7 @@ export function PartiesClient() {
       {/* Header Banner */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 border border-blue-500/20">
             <Flag className="h-3.5 w-3.5" /> Political Formations Index
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
@@ -122,43 +128,41 @@ export function PartiesClient() {
         </div>
 
         <div className="flex items-center gap-3 justify-between sm:justify-end">
-          <select
+          <CivicSelect
             value={tier}
-            onChange={(e) => {
-              setTier(e.target.value);
+            onChange={(val) => {
+              setTier(val);
               setPage(1);
             }}
-            aria-label="Filter by Party Tier"
-            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="All">All Tiers</option>
-            <option value="National">National Parties</option>
-            <option value="State">State Recognized</option>
-            <option value="RUPP">RUPP</option>
-          </select>
+            options={TIER_OPTIONS}
+            ariaLabel="Filter by Party Tier"
+            className="w-44"
+          />
 
           <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1">
             <button
               onClick={() => setView("grid")}
               className={cn(
-                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                "p-2 rounded-lg text-xs font-semibold transition-all min-h-[40px] min-w-[40px] flex items-center justify-center",
                 view === "grid"
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
               title="Grid View"
+              aria-label="Grid View"
             >
               <LayoutGrid className="h-4 w-4" />
             </button>
             <button
               onClick={() => setView("table")}
               className={cn(
-                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                "p-2 rounded-lg text-xs font-semibold transition-all min-h-[40px] min-w-[40px] flex items-center justify-center",
                 view === "table"
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
               title="Table View"
+              aria-label="Table View"
             >
               <List className="h-4 w-4" />
             </button>
@@ -178,8 +182,24 @@ export function PartiesClient() {
           <Flag className="h-10 w-10 text-muted-foreground/40 mx-auto" />
           <h3 className="font-bold text-base text-foreground">No Parties Found</h3>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            No political party matched your search or tier filter.
+            Try adjusting your search query or choosing another alliance / tier tab.
           </p>
+          {(q || tier !== "All" || alliance !== "All") && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setTier("All");
+                  setAlliance("All");
+                  setPage(1);
+                }}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity min-h-[44px]"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
         </div>
       ) : view === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">

@@ -14,6 +14,7 @@ import {
   UserCheck
 } from "lucide-react";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
+import { ShareButton } from "@/components/common/ShareButton";
 import { escapeRegex } from "@/lib/utils";
 
 type StateDetails = {
@@ -164,6 +165,11 @@ export default async function StatePage({ params }: StatePageProps) {
             <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Assembly</span>
             <span className="text-lg font-bold text-foreground">{s.totalAssemblySeats || 0}</span>
           </div>
+          <ShareButton
+            title={`${s.name} — Political & Legislative Profile`}
+            label="Share State"
+            className="self-center"
+          />
         </div>
       </div>
 

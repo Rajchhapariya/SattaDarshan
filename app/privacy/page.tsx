@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
       {/* Header Banner */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
           <Shield className="h-3.5 w-3.5" /> Civic Privacy & Minimal Data Policy
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-6 text-sm text-muted-foreground leading-relaxed">
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <EyeOff className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <EyeOff className="h-4 w-4 text-emerald-600" />
             1. Zero Behavioral Tracking & No Commercial Pixels
           </h2>
           <p>
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <Lock className="h-4 w-4 text-emerald-600" />
             2. Local Browser Storage & Cookie Usage
           </h2>
           <p>
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
 
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Server className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <Server className="h-4 w-4 text-emerald-600" />
             3. Information Collected via the Correction Form
           </h2>
           <p>
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
 
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <Shield className="h-4 w-4 text-emerald-600" />
             4. Statutory Rights & Data Inquiries
           </h2>
           <p>

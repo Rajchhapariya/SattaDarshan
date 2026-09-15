@@ -90,15 +90,19 @@ export function Combobox({
     [onChange]
   );
 
-  // Click outside listener to close dropdown
+  // Click & touch outside listener to close dropdown
   React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   // Keyboard navigation
@@ -204,7 +208,7 @@ export function Combobox({
           role="listbox"
           aria-label={placeholder}
           className={cn(
-            "absolute z-50 w-full rounded-2xl border border-border bg-popover/98 backdrop-blur-md p-1.5 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150",
+            "absolute z-50 w-full left-0 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-card p-1.5 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150",
             openUpward ? "bottom-full mb-1.5" : "top-full mt-1.5"
           )}
         >

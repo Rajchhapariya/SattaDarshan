@@ -18,7 +18,7 @@ export function Footer() {
       <div className="border-b border-border/60 bg-muted/40 py-3.5 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-center sm:text-left">
           <div className="flex items-center gap-2 text-foreground font-semibold">
-            <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <ShieldAlert className="h-4 w-4 text-amber-600 flex-shrink-0" />
             <span>SattaDarshan is an independent, non-government website and is not affiliated with or endorsed by any government institution or political organization.</span>
           </div>
           <button

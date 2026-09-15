@@ -18,6 +18,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
+import { ShareButton } from "@/components/common/ShareButton";
 
 type PartyPageProps = {
   params: Promise<{ slug: string }>;
@@ -104,8 +105,8 @@ export default async function PartyPage({ params }: PartyPageProps) {
           </div>
         </div>
 
-        {/* Seat Counters */}
-        <div className="flex items-center gap-3">
+        {/* Seat Counters & Share */}
+        <div className="flex flex-wrap items-center gap-3">
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[110px]">
             <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Lok Sabha</span>
             <span className="text-2xl font-bold text-foreground">{p.seatsLokSabha || 0}</span>
@@ -116,6 +117,11 @@ export default async function PartyPage({ params }: PartyPageProps) {
             <span className="text-2xl font-bold text-foreground">{p.seatsRajyaSabha || 0}</span>
             <span className="text-[10px] text-muted-foreground">Seats</span>
           </div>
+          <ShareButton
+            title={`${p.name} (${p.abbr || ""}) — Party Profile`}
+            label="Share Party"
+            className="self-center"
+          />
         </div>
       </div>
 

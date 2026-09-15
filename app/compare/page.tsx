@@ -13,12 +13,12 @@ import {
   Landmark, 
   MapPin, 
   Flag,
-  Share2,
   ExternalLink
 } from "lucide-react";
 import { Combobox, ComboboxItem } from "@/components/ui/Combobox";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
+import { ShareButton } from "@/components/common/ShareButton";
 import { cn } from "@/lib/utils";
 
 type Politician = {
@@ -41,7 +41,6 @@ export default function ComparePage() {
   const [left, setLeft] = useState("narendra-modi");
   const [right, setRight] = useState("rahul-gandhi");
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch("/api/politicians?limit=500")
@@ -73,13 +72,6 @@ export default function ComparePage() {
   const p1 = useMemo(() => all.find((p) => p.slug === left), [all, left]);
   const p2 = useMemo(() => all.find((p) => p.slug === right), [all, right]);
 
-  const handleShare = () => {
-    const url = `${window.location.origin}/compare?left=${left}&right=${right}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const metrics = [
     { label: "Role & Office", icon: Landmark, get: (p?: Politician) => p?.role || "Representative" },
     { label: "House Chamber", icon: Landmark, get: (p?: Politician) => p?.chamber || "Parliament" },
@@ -94,7 +86,7 @@ export default function ComparePage() {
       render: (p?: Politician) => {
         const cases = p?.criminalCases ?? 0;
         return (
-          <span className={cn("inline-flex items-center gap-1 font-semibold text-xs", cases === 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400")}>
+          <span className={cn("inline-flex items-center gap-1 font-semibold text-xs", cases === 0 ? "text-emerald-600" : "text-amber-600")}>
             {cases === 0 ? <CheckCircle className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
             {cases === 0 ? "0 Cases Declared" : `${cases} Active Cases`}
           </span>
@@ -119,13 +111,12 @@ export default function ComparePage() {
           </p>
         </div>
 
-        <button
-          onClick={handleShare}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors self-start md:self-auto shadow-sm"
-        >
-          <Share2 className="h-3.5 w-3.5 text-primary" />
-          {copied ? "Link Copied!" : "Share Comparison"}
-        </button>
+        <ShareButton
+          title={`Compare: ${p1?.name || "Representative"} vs ${p2?.name || "Representative"}`}
+          label="Share Comparison"
+          url={typeof window !== "undefined" ? `${window.location.origin}/compare?left=${left}&right=${right}` : undefined}
+          className="self-start md:self-auto"
+        />
       </div>
 
       {/* Selectors Grid */}

@@ -13,7 +13,23 @@ import {
   ChevronRight,
   Info
 } from "lucide-react";
+import { CivicSelect } from "@/components/ui/CivicSelect";
 import { cn } from "@/lib/utils";
+
+const RECORD_TYPE_OPTIONS = [
+  { value: "politician", label: "Representative / Leader" },
+  { value: "party", label: "Political Party" },
+  { value: "state", label: "State or Union Territory" },
+  { value: "general", label: "General Parliamentary Data" },
+];
+
+const ISSUE_TYPE_OPTIONS = [
+  { value: "outdated_info", label: "Outdated Information (term completed, newly elected, new office)" },
+  { value: "factual_error", label: "Factual Error in Record (wrong constituency, incorrect seat count)" },
+  { value: "party_affiliation", label: "Party Affiliation Change (defection, expulsion, alliance shift)" },
+  { value: "broken_link_image", label: "Broken Photo, Citation, or Reference URL" },
+  { value: "other", label: "Other Editorial Inaccuracy" },
+];
 
 export function CorrectionsClient() {
   const searchParams = useSearchParams();
@@ -94,7 +110,7 @@ export function CorrectionsClient() {
 
       {/* Header Banner */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 border border-amber-500/20">
           <FileEdit className="h-3.5 w-3.5" /> Civic Data Verification Channel
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
@@ -116,9 +132,9 @@ export function CorrectionsClient() {
 
       {/* Success Notification Banner */}
       {successMessage && (
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 space-y-2">
+        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 space-y-2">
           <div className="flex items-center gap-2 font-bold text-sm">
-            <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle className="h-5 w-5 text-emerald-600" />
             Submission Confirmed
           </div>
           <p className="text-xs leading-relaxed">{successMessage}</p>
@@ -135,8 +151,8 @@ export function CorrectionsClient() {
 
       {/* Error Notification Banner */}
       {error && (
-        <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-800 dark:text-red-300 flex items-start gap-2.5">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+        <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-800 flex items-start gap-2.5">
+          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
           <div className="text-xs space-y-1">
             <p className="font-bold">Submission Incomplete</p>
             <p>{error}</p>
@@ -164,21 +180,17 @@ export function CorrectionsClient() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Record Category */}
             <div className="space-y-1.5">
-              <label htmlFor="recordType" className="text-xs font-bold uppercase tracking-wider text-foreground">
+              <label htmlFor="recordType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
                 Record Category <span className="text-red-500">*</span>
               </label>
-              <select
+              <CivicSelect
                 id="recordType"
                 value={recordType}
-                onChange={(e) => setRecordType(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
-                required
-              >
-                <option value="politician">Representative / Leader</option>
-                <option value="party">Political Party</option>
-                <option value="state">State or Union Territory</option>
-                <option value="general">General Parliamentary Data</option>
-              </select>
+                onChange={setRecordType}
+                options={RECORD_TYPE_OPTIONS}
+                ariaLabel="Record Category"
+                className="w-full"
+              />
             </div>
 
             {/* Record Name or Identifier */}
@@ -200,22 +212,17 @@ export function CorrectionsClient() {
 
           {/* Issue Classification */}
           <div className="space-y-1.5">
-            <label htmlFor="issueType" className="text-xs font-bold uppercase tracking-wider text-foreground">
+            <label htmlFor="issueType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
               Nature of Issue <span className="text-red-500">*</span>
             </label>
-            <select
+            <CivicSelect
               id="issueType"
               value={issueType}
-              onChange={(e) => setIssueType(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
-              required
-            >
-              <option value="outdated_info">Outdated Information (term completed, newly elected, new office)</option>
-              <option value="factual_error">Factual Error in Record (wrong constituency, incorrect seat count)</option>
-              <option value="party_affiliation">Party Affiliation Change (defection, expulsion, alliance shift)</option>
-              <option value="broken_link_image">Broken Photo, Citation, or Reference URL</option>
-              <option value="other">Other Editorial Inaccuracy</option>
-            </select>
+              onChange={setIssueType}
+              options={ISSUE_TYPE_OPTIONS}
+              ariaLabel="Nature of Issue"
+              className="w-full"
+            />
           </div>
 
           {/* What Appears Incorrect */}

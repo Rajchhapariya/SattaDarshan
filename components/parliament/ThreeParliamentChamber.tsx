@@ -342,7 +342,7 @@ export function ThreeParliamentChamber({
       <div className="p-4 sm:p-6 border-b border-border/60 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">
               <Landmark className="h-3 w-3" /> 3D Chamber Seating
             </span>
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -376,7 +376,7 @@ export function ThreeParliamentChamber({
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
               activeAlliance === "NDA"
                 ? "bg-amber-500 text-white border-amber-500 shadow-sm"
-                : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20"
+                : "bg-amber-500/10 text-amber-700 border-amber-500/20 hover:bg-amber-500/20"
             )}
           >
             <span className="h-2 w-2 rounded-full bg-amber-500" />
@@ -388,7 +388,7 @@ export function ThreeParliamentChamber({
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
               activeAlliance === "INDIA"
                 ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                : "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 hover:bg-blue-500/20"
+                : "bg-blue-500/10 text-blue-700 border-blue-500/20 hover:bg-blue-500/20"
             )}
           >
             <span className="h-2 w-2 rounded-full bg-blue-600" />
@@ -400,7 +400,7 @@ export function ThreeParliamentChamber({
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
               activeAlliance === "Others"
                 ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
+                : "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 hover:bg-emerald-500/20"
             )}
           >
             <span className="h-2 w-2 rounded-full bg-emerald-500" />

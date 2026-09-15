@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Search, Users, LayoutGrid, List, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { PoliticianTable } from "@/components/politician/PoliticianTable";
+import { CivicSelect } from "@/components/ui/CivicSelect";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
@@ -79,7 +80,7 @@ export function PoliticiansClient() {
       {/* Header Banner */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 border border-amber-500/20">
             <Users className="h-3.5 w-3.5" /> Constitutional Directory
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
@@ -136,41 +137,41 @@ export function PoliticiansClient() {
         </div>
 
         <div className="flex items-center gap-3 justify-between sm:justify-end">
-          <select
+          <CivicSelect
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            aria-label="Sort representatives"
-            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => {
+              setSort(val);
+              setPage(1);
+            }}
+            options={SORT_OPTIONS}
+            ariaLabel="Sort representatives"
+            className="w-48"
+          />
 
           <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1">
             <button
               onClick={() => setView("grid")}
               className={cn(
-                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                "p-2 rounded-lg text-xs font-semibold transition-all min-h-[40px] min-w-[40px] flex items-center justify-center",
                 view === "grid"
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
               title="Grid View"
+              aria-label="Grid View"
             >
               <LayoutGrid className="h-4 w-4" />
             </button>
             <button
               onClick={() => setView("table")}
               className={cn(
-                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                "p-2 rounded-lg text-xs font-semibold transition-all min-h-[40px] min-w-[40px] flex items-center justify-center",
                 view === "table"
                   ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
               title="Table View"
+              aria-label="Table View"
             >
               <List className="h-4 w-4" />
             </button>
@@ -192,6 +193,22 @@ export function PoliticiansClient() {
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             Try adjusting your search keywords or switching role filters.
           </p>
+          {(q || role !== "All" || sort !== "name:asc") && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setRole("All");
+                  setSort("name:asc");
+                  setPage(1);
+                }}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity min-h-[44px]"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          )}
         </div>
       ) : view === "grid" ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
