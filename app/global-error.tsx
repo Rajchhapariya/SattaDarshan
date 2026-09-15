@@ -35,12 +35,12 @@ export default function GlobalError({
             >
               <RotateCcw className="w-4 h-4" /> Reload Portal
             </button>
-            <a
+            <Link
               href="/"
               className="w-full py-2.5 px-4 rounded-xl border border-border bg-card font-semibold text-sm hover:bg-muted transition-colors flex items-center justify-center gap-2"
             >
               <Landmark className="w-4 h-4 text-primary" /> Home Page
-            </a>
+            </Link>
           </div>
         </div>
       </body>

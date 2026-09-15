@@ -13,6 +13,7 @@ import {
   ChevronRight, 
   UserCheck
 } from "lucide-react";
+import { escapeRegex } from "@/lib/utils";
 
 type StateDetails = {
   slug: string;

@@ -1,56 +1,60 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Party from "@/models/Party";
-import { slugify } from "@/lib/utils";
+import { escapeRegex } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
-  await connectDB();
-  const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get("page") ?? "1");
-  const limit = parseInt(searchParams.get("limit") ?? "50");
-  const q = searchParams.get("q") ?? "";
-  const tier = searchParams.get("tier") ?? "";
-  const alliance = searchParams.get("alliance") ?? "";
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
 
-  const filter: any = {};
-  if (q) filter.$or = [
-    { name: { $regex: q, $options: "i" } },
-    { abbr: { $regex: q, $options: "i" } },
-  ];
-  if (tier && tier !== "All") filter.tier = tier;
-  if (alliance && alliance !== "All") filter.alliance = alliance;
+    const rawPage = parseInt(searchParams.get("page") ?? "1", 10);
+    const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 
-  const total = await Party.countDocuments(filter);
-  const parties = await Party.find(filter)
-    .sort({ seatsLokSabha: -1, name: 1 })
-    .skip((page - 1) * limit).limit(limit).lean();
+    const rawLimit = parseInt(searchParams.get("limit") ?? "50", 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 100) : 50;
 
-  return NextResponse.json({ parties, total, page, pages: Math.ceil(total / limit) });
+    const rawQ = (searchParams.get("q") ?? "").trim().slice(0, 80);
+    const tier = (searchParams.get("tier") ?? "").trim();
+    const alliance = (searchParams.get("alliance") ?? "").trim();
+
+    const filter: any = {};
+    if (rawQ) {
+      const safeQ = escapeRegex(rawQ);
+      const regexObj = { $regex: safeQ, $options: "i" };
+      filter.$or = [
+        { name: regexObj },
+        { abbr: regexObj },
+      ];
+    }
+    if (tier && tier !== "All") filter.tier = tier;
+    if (alliance && alliance !== "All") filter.alliance = alliance;
+
+    const total = await Party.countDocuments(filter);
+    const parties = await Party.find(filter)
+      .select("slug name nameHindi abbr tier status founded ideology president hq logo alliance seatsLokSabha seatsRajyaSabha website createdAt updatedAt")
+      .sort({ seatsLokSabha: -1, name: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    return NextResponse.json({
+      parties,
+      total,
+      page,
+      pages: Math.ceil(total / limit) || 1,
+    });
+  } catch {
+    return NextResponse.json(
+      { parties: [], total: 0, page: 1, pages: 1, error: "Failed to retrieve parties" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(req: NextRequest) {
-  await connectDB();
-  const body = await req.json();
-  const name = String(body.name || "").trim();
-  if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 });
-  const party = await Party.create({
-    slug: slugify(String(body.slug || name)),
-    name,
-    abbr: body.abbr,
-    tier: body.tier,
-    status: body.status || "Active",
-    founded: body.founded,
-    ideology: body.ideology,
-    president: body.president,
-    hq: body.hq,
-    states: body.states || [],
-    logo: body.logo,
-    alliance: body.alliance,
-    seatsLokSabha: body.seatsLokSabha,
-    seatsRajyaSabha: body.seatsRajyaSabha,
-    website: body.website,
-    description: body.description,
-  });
-  return NextResponse.json(party);
+export async function POST() {
+  return NextResponse.json(
+    { error: "Public mutation is disabled for security" },
+    { status: 405 }
+  );
 }

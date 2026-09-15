@@ -26,20 +26,61 @@ export interface IPolitician extends Document {
     website?: string;
   };
   tags: string[];
+  source?: string;
+  sourceUrl?: string;
+  sourceDate?: string;
+  lastVerifiedAt?: Date;
+  verificationStatus?: "official" | "verified" | "historical" | "unverified";
+  verificationNotes?: string;
+  tenureStatus?: "serving" | "former" | "historical";
   createdAt: Date;
   updatedAt: Date;
 }
 
 const S = new Schema<IPolitician>({
-  slug:{type:String,required:true,unique:true,index:true},   name:{type:String,required:true},
-  photo:String, dob:String, gender:{type:String,enum:["Male","Female","Other"]},
-  role:{type:String,required:true,index:true}, status:{type:String,default:"Active",index:true},
-  party:{type:String,required:true,index:true}, partyName:String,
-  state:{type:String,required:true,index:true}, constituency:String,
-  chamber:String, termStart:String, termEnd:String,
-   education:String, assets:String, criminalCases:Number,
-  bio:String,
-  socialLinks:{twitter:String,facebook:String,instagram:String,website:String}, tags:[String]
-},{timestamps:true});
-S.index({name:"text",constituency:"text"});
+  slug: { type: String, required: true, unique: true, index: true },
+  name: { type: String, required: true },
+  photo: String,
+  dob: String,
+  gender: { type: String, enum: ["Male", "Female", "Other"] },
+  role: { type: String, required: true, index: true },
+  status: { type: String, default: "Active", index: true },
+  party: { type: String, required: true, index: true },
+  partyName: String,
+  state: { type: String, required: true, index: true },
+  constituency: String,
+  chamber: String,
+  termStart: String,
+  termEnd: String,
+  education: String,
+  assets: String,
+  criminalCases: Number,
+  bio: String,
+  socialLinks: {
+    twitter: String,
+    facebook: String,
+    instagram: String,
+    website: String,
+  },
+  tags: [String],
+  source: String,
+  sourceUrl: String,
+  sourceDate: String,
+  lastVerifiedAt: Date,
+  verificationStatus: {
+    type: String,
+    enum: ["official", "verified", "historical", "unverified"],
+    default: "unverified",
+    index: true,
+  },
+  verificationNotes: String,
+  tenureStatus: {
+    type: String,
+    enum: ["serving", "former", "historical"],
+    default: "serving",
+    index: true,
+  },
+}, { timestamps: true });
+
+S.index({ name: "text", constituency: "text" });
 export default (mongoose.models.Politician || mongoose.model<IPolitician>("Politician", S));

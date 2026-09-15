@@ -17,6 +17,7 @@ import {
   ExternalLink,
   ChevronRight
 } from "lucide-react";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 type PartyPageProps = {
   params: Promise<{ slug: string }>;
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: PartyPageProps) {
   const p = await getParty(slug);
   return {
     title: p ? `${p.name} (${p.abbr || ""}) — Party Profile & Seat Distribution` : "Party Not Found",
-    description: p ? `Official political party profile for ${p.name}. Includes leadership, seats in Lok Sabha and Rajya Sabha, and affiliated members.` : "",
+    description: p ? `Party profile, seat distribution, and public legislative records for ${p.name}. Compiled from public election records.` : "",
   };
 }
 
@@ -139,7 +140,7 @@ export default async function PartyPage({ params }: PartyPageProps) {
           <div className="text-base font-bold text-foreground">
             {p.founded ? `Year ${p.founded}` : "Established Formation"}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Official registration</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Formation record</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
@@ -155,7 +156,7 @@ export default async function PartyPage({ params }: PartyPageProps) {
 
         <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Official Web</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Party Web</span>
             <Globe className="h-4 w-4 text-primary" />
           </div>
           {p.website ? (
@@ -232,6 +233,16 @@ export default async function PartyPage({ params }: PartyPageProps) {
           </div>
         )}
       </div>
+
+      {/* Data Accuracy & Source Provenance Notice */}
+      <DataAccuracyNotice
+        variant="detailed"
+        recordSlug={p.slug}
+        recordType="party"
+        source={p.source || "Election Commission of India (ECI)"}
+        sourceUrl={p.sourceUrl || "https://www.eci.gov.in/"}
+        lastVerifiedAt={p.lastVerifiedAt}
+      />
     </div>
   );
 }

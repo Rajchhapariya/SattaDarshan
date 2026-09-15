@@ -88,7 +88,7 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
-            <Landmark className="h-3.5 w-3.5" /> Lower House of India's Parliament
+            <Landmark className="h-3.5 w-3.5" /> Lower House of India&apos;s Parliament
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             18th Lok Sabha Directory
@@ -310,16 +310,20 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to previous page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Previous
             </button>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to next page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>

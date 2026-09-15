@@ -25,6 +25,7 @@ import {
   ChevronRight,
   Share2
 } from "lucide-react";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 type PoliticianPageProps = {
   params: Promise<{ slug: string }>;
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: PoliticianPageProps) {
 
   return {
     title: `${p.name} — Political Profile & Legislative Records`,
-    description: `Official public profile for ${p.name} (${p.role || "Representative"}), representing ${p.constituency || p.state} in India.`,
+    description: `Public legislative profile and records for ${p.name} (${p.role || "Representative"}), representing ${p.constituency || p.state || "India"}. Compiled from public sources.`,
   };
 }
 
@@ -98,9 +99,19 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
         {/* Member Title & Meta */}
         <div className="space-y-4 flex-1">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                <CheckCircle className="h-3.5 w-3.5" /> Verified Public Representative
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              {p.tenureStatus === "former" && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                  Former Office Holder
+                </span>
+              )}
+              {p.verificationStatus === "verified" && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-muted text-muted-foreground border border-border">
+                  Source verified
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground">
+                Compiled from public records
               </span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
@@ -237,6 +248,30 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
           {p.bio || `${p.name} is an active public representative in India, serving in the ${p.chamber || "Parliament"} representing ${p.constituency ? `the constituency of ${p.constituency} in ${p.state}` : p.state || "the nation"}. As a key member of ${p.partyName || "their political party"}, they participate in legislative debates, regional constituency development, and national policy initiatives.`}
         </p>
       </div>
+
+      {/* Data Accuracy & Record-Specific Provenance Notice */}
+      <DataAccuracyNotice
+        variant="detailed"
+        recordSlug={p.slug}
+        recordType="politician"
+        source={
+          p.source ||
+          (p.chamber === "Lok Sabha"
+            ? "Parliament of India / Sansad.in"
+            : p.chamber === "Rajya Sabha"
+            ? "Parliament of India / Sansad.in"
+            : p.role?.toLowerCase().includes("chief minister") && p.state
+            ? `Official Government of ${p.state} / State Gazette`
+            : "Public Parliamentary Records")
+        }
+        sourceUrl={
+          p.sourceUrl ||
+          (p.role?.toLowerCase().includes("chief minister")
+            ? "https://www.india.gov.in/"
+            : "https://sansad.in/")
+        }
+        lastVerifiedAt={p.lastVerifiedAt}
+      />
 
       {/* Direct Quick Nav to State & Party */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

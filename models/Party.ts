@@ -22,23 +22,50 @@ export interface IParty extends Document {
   seatsRajyaSabha?: number;
   website?: string;
   description?: string;
+  source?: string;
+  sourceUrl?: string;
+  sourceDate?: string;
+  lastVerifiedAt?: Date;
+  verificationStatus?: "official" | "verified" | "historical" | "unverified";
+  verificationNotes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const S = new Schema<IParty>({
-  slug:{type:String,required:true,unique:true,index:true}, name:{type:String,required:true},
-  nameHindi:String, abbr:String,
-  tier:{type:String,enum:["National","State","RUPP"],index:true},
-  status:{type:String,default:"Active",index:true},
-  founded:Number, ideology:String, president:String,
-  hq:String, states:[String], state:String,
-  headquartersAddress:String, pincode:String,
-  flag:String,
-  logo:String,
-  alliance:String,
-  seatsLokSabha:Number, seatsRajyaSabha:Number,
-  website:String, description:String
-},{timestamps:true});
-S.index({name:"text",nameHindi:"text"});
+  slug: { type: String, required: true, unique: true, index: true },
+  name: { type: String, required: true },
+  nameHindi: String,
+  abbr: String,
+  tier: { type: String, enum: ["National", "State", "RUPP"], index: true },
+  status: { type: String, default: "Active", index: true },
+  founded: Number,
+  ideology: String,
+  president: String,
+  hq: String,
+  states: [String],
+  state: String,
+  headquartersAddress: String,
+  pincode: String,
+  flag: String,
+  logo: String,
+  alliance: String,
+  seatsLokSabha: Number,
+  seatsRajyaSabha: Number,
+  website: String,
+  description: String,
+  source: String,
+  sourceUrl: String,
+  sourceDate: String,
+  lastVerifiedAt: Date,
+  verificationStatus: {
+    type: String,
+    enum: ["official", "verified", "historical", "unverified"],
+    default: "unverified",
+    index: true,
+  },
+  verificationNotes: String,
+}, { timestamps: true });
+
+S.index({ name: "text", nameHindi: "text" });
 export default (mongoose.models.Party || mongoose.model<IParty>("Party", S));

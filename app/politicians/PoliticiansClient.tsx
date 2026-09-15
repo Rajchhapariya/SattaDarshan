@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Search, Users, LayoutGrid, List, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { PoliticianTable } from "@/components/politician/PoliticianTable";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 const ROLES = [
@@ -85,7 +86,7 @@ export function PoliticiansClient() {
             Representatives & Leaders
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
-            Verified public profiles of Indian lawmakers, Ministers, Chief Ministers, and Parliamentarians.
+            Public directory of Indian lawmakers, Ministers, Chief Ministers, and Parliamentarians compiled from official legislative records.
           </p>
         </div>
 
@@ -210,22 +211,29 @@ export function PoliticiansClient() {
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to previous page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Previous
             </button>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(p + 1, pages))}
               disabled={page === pages}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to next page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
       )}
+
+      {/* Data Accuracy Notice */}
+      <DataAccuracyNotice variant="compact" recordType="politician" />
     </div>
   );
 }

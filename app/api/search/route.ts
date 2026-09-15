@@ -3,14 +3,19 @@ import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import Party from "@/models/Party";
 import State from "@/models/State";
+import { escapeRegex } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
-  await connectDB();
-  const { searchParams } = new URL(req.url);
-  const q = (searchParams.get("q") || "").trim();
-  if (!q) return NextResponse.json({ items: [] });
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const rawQ = (searchParams.get("q") || "").trim();
+    if (!rawQ) return NextResponse.json({ items: [] });
 
-  const regex = { $regex: q, $options: "i" };
+    // Clamp search query length to 80 chars to prevent ReDoS / CPU abuse
+    const q = rawQ.slice(0, 80);
+    const safeRegex = escapeRegex(q);
+    const regex = { $regex: safeRegex, $options: "i" };
   const [politicians, parties, states] = await Promise.all([
     Politician.find({
       $or: [{ name: regex }, { constituency: regex }, { state: regex }]
@@ -44,4 +49,7 @@ export async function GET(req: NextRequest) {
     })),
   ];
   return NextResponse.json({ items: items.slice(0, 15) });
+  } catch {
+    return NextResponse.json({ items: [] }, { status: 500 });
+  }
 }

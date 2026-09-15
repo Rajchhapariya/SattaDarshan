@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { StateIcon } from "@/components/ui/StateIcon";
-import { Badge } from "@/components/ui/Badge";
-import { CheckCircle, MapPin, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type PoliticianCardProps = {
@@ -14,6 +12,8 @@ type PoliticianCardProps = {
   constituency?: string;
   state?: string;
   statePath?: string;
+  tenureStatus?: "serving" | "former" | "historical";
+  verificationStatus?: string;
   className?: string;
 };
 
@@ -26,8 +26,11 @@ export function PoliticianCard({
   constituency, 
   state, 
   statePath,
+  tenureStatus,
   className
 }: PoliticianCardProps) {
+  const isFormer = tenureStatus === "former";
+
   return (
     <Link 
       href={`/politicians/${slug}`} 
@@ -36,7 +39,7 @@ export function PoliticianCard({
         className
       )}
     >      
-      {/* Portrait Image Container - Natural Color, No Grayscale */}
+      {/* Portrait Image Container */}
       <div className="relative aspect-[4/4.5] w-full bg-muted/60 overflow-hidden">
         <CivicAvatar src={photo} alt={name} size="card" shape="fill" />
 
@@ -47,12 +50,23 @@ export function PoliticianCard({
           </span>
         </div>
 
-        {/* Verified Status */}
-        <div className="absolute top-2.5 right-2.5 z-10">
-          <span className="inline-flex items-center p-1 rounded-full bg-background/90 backdrop-blur-md text-emerald-600 shadow-sm border border-border/50">
-            <CheckCircle className="h-3 w-3" />
-          </span>
-        </div>
+        {/* Former / Historical Status Tag */}
+        {isFormer && (
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/90 text-white backdrop-blur-md shadow-sm">
+              Former
+            </span>
+          </div>
+        )}
+
+        {/* Source Verified Badge - Only if verified in DB and not former */}
+        {!isFormer && verificationStatus === "verified" && (
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold bg-background/90 text-muted-foreground backdrop-blur-md shadow-sm border border-border/50">
+              Source verified
+            </span>
+          </div>
+        )}
       </div>
       
       {/* Member Details */}

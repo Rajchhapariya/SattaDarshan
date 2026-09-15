@@ -281,16 +281,20 @@ export function RajyaSabhaClient({ mps, states, parties }: RajyaSabhaClientProps
           </span>
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to previous page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> Previous
             </button>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+              aria-label="Go to next page"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1 min-h-[44px]"
             >
               Next <ChevronRight className="h-3.5 w-3.5" />
             </button>

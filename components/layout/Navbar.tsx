@@ -15,7 +15,8 @@ import {
   Sun, 
   Moon, 
   Compass,
-  ChevronRight
+  ChevronRight,
+  FileEdit
 } from "lucide-react";
 import { GlobalSearch } from "./GlobalSearch";
 import { cn } from "@/lib/utils";
@@ -39,26 +40,57 @@ export function Navbar() {
     setMounted(true);
   }, []);
 
+  // Handle Escape key and body scroll lock when mobile drawer is open
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileOpen) {
+        setMobileOpen(false);
+      }
+    };
+
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileOpen]);
+
+  // Close mobile menu whenever path changes
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [path]);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/95 backdrop-blur supports-[backdrop-blur]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90 flex-shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm">
-            <Landmark className="h-5 w-5" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-foreground text-base tracking-tight leading-none">
-              Satta<span className="text-amber-500">Darshan</span>
-            </span>
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5 hidden sm:inline-block">
-              India Legislative Portal
-            </span>
-          </div>
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90 flex-shrink-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm">
+              <Landmark className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-foreground text-base tracking-tight leading-none">
+                Satta<span className="text-amber-500">Darshan</span>
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5 hidden sm:inline-block">
+                Independent Civic Platform
+              </span>
+            </div>
+          </Link>
+          <span className="hidden xl:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-muted text-muted-foreground border border-border/80">
+            Non-Government
+          </span>
+        </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Main Navigation">
           {NAV_LINKS.map((item) => {
             const isActive = path === item.href || (item.href !== "/" && path.startsWith(item.href));
             return (
@@ -85,9 +117,10 @@ export function Navbar() {
           {/* Theme Toggle Button */}
           {mounted && (
             <button
+              type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-9 w-9 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              aria-label="Toggle color theme"
+              className="h-10 w-10 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors min-h-[44px] min-w-[44px]"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
               {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-700" />}
             </button>
@@ -95,8 +128,11 @@ export function Navbar() {
 
           {/* Mobile Hamburger Toggle */}
           <button
+            type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl border border-border bg-card hover:bg-muted transition-colors"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation-drawer"
+            className="lg:hidden h-10 w-10 flex items-center justify-center rounded-xl border border-border bg-card hover:bg-muted transition-colors min-h-[44px] min-w-[44px]"
             aria-label="Toggle navigation menu"
           >
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -106,7 +142,10 @@ export function Navbar() {
 
       {/* Mobile Slide-down Navigation Drawer */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-border bg-card/95 backdrop-blur-md animate-in slide-in-from-top-2 duration-200">
+        <div 
+          id="mobile-navigation-drawer"
+          className="lg:hidden border-t border-border bg-card/95 backdrop-blur-md animate-in slide-in-from-top-2 duration-200"
+        >
           <div className="px-4 py-4 space-y-1">
             {NAV_LINKS.map((item) => {
               const Icon = item.icon;
@@ -117,7 +156,7 @@ export function Navbar() {
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
-                    "flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-colors",
+                    "flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-colors min-h-[44px]",
                     isActive
                       ? "bg-primary/10 text-primary font-semibold"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -132,13 +171,27 @@ export function Navbar() {
               );
             })}
 
+            {/* Quick Correction Link on Mobile */}
+            <Link
+              href="/corrections"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-muted transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-3">
+                <FileEdit className="h-4 w-4" />
+                <span>Suggest a Correction</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-40" />
+            </Link>
+
             <div className="pt-3 mt-2 border-t border-border/60 flex items-center justify-between px-3 text-xs text-muted-foreground">
               <span>Theme: {theme === "dark" ? "Dark Mode" : "Light Mode"}</span>
               <button
+                type="button"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="text-xs font-semibold text-primary"
+                className="text-xs font-semibold text-primary py-2 px-3 min-h-[44px] flex items-center"
               >
-                Switch
+                Switch Theme
               </button>
             </div>
           </div>

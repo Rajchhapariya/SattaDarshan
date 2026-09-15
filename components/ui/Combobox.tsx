@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Check, ChevronsUpDown, Search, User } from "lucide-react";
+import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { cn } from "@/lib/utils";
 
@@ -58,12 +58,28 @@ export function Combobox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Escape key listener to close dropdown
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   return (
     <div ref={dropdownRef} className={cn("relative w-full", className)}>
       <button
         type="button"
+        role="combobox"
+        aria-expanded={open}
+        aria-controls={open ? "combobox-options-list" : undefined}
+        aria-haspopup="listbox"
+        aria-label={selectedItem ? `Selected: ${selectedItem.label}` : placeholder}
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-card px-3.5 py-2.5 text-left text-sm font-medium text-foreground shadow-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-card px-3.5 py-2.5 text-left text-sm font-medium text-foreground shadow-sm hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors min-h-[44px]"
       >
         {selectedItem ? (
           <div className="flex items-center gap-2.5 min-w-0">
@@ -82,7 +98,12 @@ export function Combobox({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150">
+        <div 
+          id="combobox-options-list"
+          role="listbox"
+          aria-label={placeholder}
+          className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+        >
           <div className="flex items-center gap-2 border-b border-border/60 px-2.5 pb-2 pt-1">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
@@ -105,13 +126,15 @@ export function Combobox({
                   <button
                     key={item.value}
                     type="button"
+                    role="option"
+                    aria-selected={isSelected}
                     onClick={() => {
                       onChange(item.value);
                       setOpen(false);
                       setQuery("");
                     }}
                     className={cn(
-                      "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
+                      "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors min-h-[40px]",
                       isSelected
                         ? "bg-primary/10 text-primary font-semibold"
                         : "text-foreground hover:bg-muted"

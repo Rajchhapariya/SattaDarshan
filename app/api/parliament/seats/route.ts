@@ -10,8 +10,9 @@ const ALLIANCE_COLORS: Record<string, string> = {
 };
 
 export async function GET(req: NextRequest) {
-  await connectDB();
-  const { searchParams } = new URL(req.url);
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
   const chamber = searchParams.get("chamber") === "Rajya Sabha" ? "Rajya Sabha" : "Lok Sabha";
 
   const politicians = await Politician.find({ chamber })
@@ -78,4 +79,10 @@ export async function GET(req: NextRequest) {
     partyBreakdown: Object.values(partyCounts).sort((a, b) => b.count - a.count),
     seats
   });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to retrieve parliament seats data", seats: [] },
+      { status: 500 }
+    );
+  }
 }
