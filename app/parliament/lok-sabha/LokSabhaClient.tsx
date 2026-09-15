@@ -164,7 +164,7 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
             value={selectedState}
             onChange={(e) => handleStateChange(e.target.value)}
             aria-label="Filter by State"
-            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px] cursor-pointer hover:bg-muted/50 transition-colors"
           >
             <option value="All">All States ({states.length})</option>
             {states.map((s) => (
@@ -177,7 +177,7 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
             value={selectedParty}
             onChange={(e) => handlePartyChange(e.target.value)}
             aria-label="Filter by Party"
-            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-card text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px] cursor-pointer hover:bg-muted/50 transition-colors"
           >
             <option value="All">All Parties ({parties.length})</option>
             {parties.map((p) => (
