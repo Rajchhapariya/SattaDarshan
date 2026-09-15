@@ -1,8 +1,11 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { MapPin, ChevronRight, Users, Landmark } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const INDIA_GEO_URL = "https://raw.githubusercontent.com/geohacker/india/master/state/india_telengana.geojson";
 
@@ -10,75 +13,207 @@ function toSlug(name: string) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+type HoveredState = {
+  name: string;
+  slug: string;
+  rulingParty?: string;
+  cm?: string;
+};
+
+const STATE_GEO_MAP: Record<string, string> = {
+  "andaman and nicobar": "andaman-nicobar",
+  "andaman and nicobar islands": "andaman-nicobar",
+  "andaman & nicobar": "andaman-nicobar",
+  "dadra and nagar haveli": "dadra-nagar-haveli",
+  "daman and diu": "dadra-nagar-haveli",
+  "dadra and nagar haveli and daman and diu": "dadra-nagar-haveli",
+  "jammu and kashmir": "jammu-kashmir",
+  "jammu & kashmir": "jammu-kashmir",
+  "nct of delhi": "delhi",
+  "delhi": "delhi",
+  "telengana": "telangana",
+  "orissa": "odisha",
+  "uttaranchal": "uttarakhand",
+  "pondicherry": "puducherry",
+};
+
 export function IndiaMap() {
   const [mounted, setMounted] = useState(false);
+  const [hovered, setHovered] = useState<HoveredState | null>(null);
+  const [stateInfoMap, setStateInfoMap] = useState<Record<string, any>>({});
   const router = useRouter();
-  useEffect(() => setMounted(true), []);
-  
-  if (!mounted) return <div className="animate-pulse w-full h-[400px] bg-muted rounded-md flex items-center justify-center"><p className="text-muted-foreground font-mono text-[10px] font-bold uppercase tracking-widest">Initialising Vector Terrain...</p></div>;
+
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/states")
+      .then((r) => r.json())
+      .then((data) => {
+        const map: Record<string, any> = {};
+        (data || []).forEach((s: any) => {
+          map[s.slug] = s;
+          map[s.name.toLowerCase()] = s;
+        });
+        setStateInfoMap(map);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-full h-[450px] bg-muted/30 rounded-2xl flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full min-h-[400px] cursor-crosshair bg-background relative overflow-hidden group">
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" />
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-1">
-        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-[0.2em] bg-background/80 backdrop-blur-sm px-1.5 py-0.5 border border-border">Coord_System: Mercator</div>
-        <div className="text-[8px] font-mono font-bold text-primary uppercase tracking-[0.2em] bg-background/80 backdrop-blur-sm px-1.5 py-0.5 border border-primary/20 flex items-center gap-1.5">
-          <div className="h-1 w-1 rounded-full bg-primary animate-pulse" /> Live_Telemetry
+    <div className="relative w-full rounded-2xl bg-card border border-border/80 shadow-sm overflow-hidden">
+      {/* Map Header */}
+      <div className="p-4 sm:p-6 border-b border-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/20">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+              <MapPin className="h-3 w-3" /> Territorial Governance
+            </span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              36 States & UTs
+            </span>
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground mt-1">
+            Interactive State & Jurisdiction Map
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Hover or tap any state to inspect regional administration, leadership, and parliamentary seats
+          </p>
         </div>
+
+        <Link
+          href="/states"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline self-start sm:self-auto"
+        >
+          View All States <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
-      
-      <div className="relative z-10 w-full h-full p-4 lg:p-8">
-        <ComposableMap projection="geoMercator" projectionConfig={{ center: [82, 22], scale: 1000 }} style={{ width: "100%", height: "100%" }}>
+
+      {/* SVG Map Canvas */}
+      <div className="relative w-full h-[420px] sm:h-[480px] flex items-center justify-center p-2 sm:p-4 bg-gradient-to-b from-card to-background">
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{ center: [82, 22], scale: 950 }}
+          className="w-full h-full max-w-3xl"
+        >
           <Geographies geography={INDIA_GEO_URL}>
             {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  onClick={() => {
-                    const stateName = geo.properties.ST_NM || geo.properties.NAME_1;
-                    if (stateName) {
-                      let slug = toSlug(stateName);
-                      // Handle map-to-database slug mismatches
-                      if (slug === "jammu-and-kashmir") slug = "jammu-kashmir";
-                      
-                      router.push(`/states/${slug}`);
-                    }
-                  }}
-                  style={{
-                    default: { 
-                      fill: "transparent", 
-                      stroke: "hsl(var(--border))", 
-                      strokeWidth: 0.75, 
-                      outline: "none", 
-                      transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)" 
-                    },
-                    hover: { 
-                      fill: "hsl(var(--primary) / 0.1)", 
-                      stroke: "hsl(var(--primary))", 
-                      strokeWidth: 1.5, 
-                      outline: "none", 
-                      cursor: "pointer" 
-                    },
-                    pressed: { 
-                      fill: "hsl(var(--primary) / 0.3)", 
-                      stroke: "hsl(var(--primary))", 
-                      outline: "none" 
-                    },
-                  }}
-                />
-              ))
+              geographies.map((geo) => {
+                const rawName = geo.properties.ST_NM || geo.properties.NAME_1 || "";
+                const cleanKey = rawName.toLowerCase().trim();
+                const mappedSlug = STATE_GEO_MAP[cleanKey] || STATE_GEO_MAP[toSlug(rawName)];
+                const info = stateInfoMap[mappedSlug || ""] || stateInfoMap[toSlug(rawName)] || stateInfoMap[cleanKey];
+                const finalSlug = info?.slug || mappedSlug || toSlug(rawName);
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    onMouseEnter={() => {
+                      setHovered({
+                        name: info?.name || rawName,
+                        slug: finalSlug,
+                        rulingParty: info?.rulingParty,
+                        cm: info?.cm,
+                      });
+                    }}
+                    onMouseLeave={() => setHovered(null)}
+                    onClick={() => {
+                      router.push(`/states/${finalSlug}`);
+                    }}
+                    style={{
+                      default: {
+                        fill: "hsl(var(--muted))",
+                        stroke: "hsl(var(--border))",
+                        strokeWidth: 0.8,
+                        outline: "none",
+                        transition: "all 200ms ease",
+                        cursor: "pointer",
+                      },
+                      hover: {
+                        fill: "hsl(var(--primary) / 0.35)",
+                        stroke: "hsl(var(--primary))",
+                        strokeWidth: 1.6,
+                        outline: "none",
+                        cursor: "pointer",
+                      },
+                      pressed: {
+                        fill: "hsl(var(--primary) / 0.6)",
+                        stroke: "hsl(var(--primary))",
+                        outline: "none",
+                      },
+                    }}
+                  />
+                );
+              })
             }
           </Geographies>
         </ComposableMap>
+
+        {/* Hover / Touch State Preview Card */}
+        {hovered && (
+          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-72 p-4 rounded-2xl bg-card/95 backdrop-blur-md border border-border shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h4 className="font-bold text-sm text-foreground">{hovered.name}</h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Ruling Party: <span className="font-semibold text-primary">{hovered.rulingParty || "Democratic Council"}</span>
+                </p>
+                {hovered.cm && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Chief Minister: <span className="font-medium text-foreground">{hovered.cm}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <Link
+              href={`/states/${hovered.slug}`}
+              className="mt-3 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
+            >
+              Explore State Details <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
       </div>
-      
-      <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="text-[8px] font-mono font-bold text-muted-foreground uppercase tracking-widest bg-background/80 backdrop-blur-sm px-2 py-1 border border-border">
-          Target: State_Node_Scan
+
+      {/* Mobile Quick Tap Fallback Chips */}
+      <div className="p-3 sm:p-4 bg-muted/20 border-t border-border/60">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+          Popular Jurisdictions:
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { name: "Uttar Pradesh", slug: "uttar-pradesh" },
+            { name: "Maharashtra", slug: "maharashtra" },
+            { name: "West Bengal", slug: "west-bengal" },
+            { name: "Bihar", slug: "bihar" },
+            { name: "Tamil Nadu", slug: "tamil-nadu" },
+            { name: "Karnataka", slug: "karnataka" },
+            { name: "Gujarat", slug: "gujarat" },
+            { name: "Delhi", slug: "delhi" },
+          ].map((s) => (
+            <Link
+              key={s.slug}
+              href={`/states/${s.slug}`}
+              className="px-2.5 py-1 rounded-lg text-xs font-medium bg-card border border-border/70 hover:border-primary/50 hover:text-primary transition-colors"
+            >
+              {s.name}
+            </Link>
+          ))}
+          <Link
+            href="/states"
+            className="px-2.5 py-1 rounded-lg text-xs font-semibold text-primary hover:underline"
+          >
+            View All 36 States
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,20 +1,13 @@
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
-import { StateIcon } from "@/components/ui/StateIcon";
-import { Badge } from "@/components/ui/Badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
-import { 
-  Ledger, 
-  LedgerHeader, 
-  LedgerContent, 
-  LedgerFooter 
-} from "@/components/ui/Ledger";
-import Link from "next/link";
-import { Info, Database } from "lucide-react";
-import { getStatePath } from "@/lib/server/statePaths";
+import { LokSabhaClient } from "./LokSabhaClient";
 
-export const revalidate = 3600; // 1 hr cache
+export const metadata = {
+  title: "18th Lok Sabha — Members of Parliament",
+  description: "Explore the comprehensive directory of the 18th Lok Sabha of India with 3D seating chamber visualization, constituency mappings, and party affiliations.",
+};
+
+export const revalidate = 3600;
 
 export default async function LokSabhaPage() {
   await connectDB();
@@ -23,83 +16,19 @@ export default async function LokSabhaPage() {
     .sort({ state: 1, name: 1 })
     .lean();
 
-  const mps = rawMps;
+  const mps = JSON.parse(JSON.stringify(rawMps));
 
-  return (
-    <Ledger>
-      <LedgerHeader
-        title="Lok Sabha 18th House"
-        subtitle="Authorized registry of the lower house of India's Parliament. High-precision data synchronized with official parliamentary records."
-        badge="Parliamentary Registry"
-        icon={<Database className="h-3 w-3" />}
-        stats={[
-          { label: "House Capacity", value: "543 / 550" },
-          { label: "Active Ledger", value: mps.length }
-        ]}
-      />
+  // Extract unique states and parties for filters
+  const statesSet = new Set<string>();
+  const partiesSet = new Set<string>();
 
-      <LedgerContent>
-        <div className="rounded-md border border-border overflow-hidden bg-background">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent bg-muted/50">
-                <TableHead className="w-[300px]">Member of Parliament</TableHead>
-                <TableHead>Jurisdiction (State/UT)</TableHead>
-                <TableHead>Constituency</TableHead>
-                <TableHead>Affiliation</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mps.map((mp: any) => (
-                <TableRow key={mp.slug} className="group border-b border-border/50">
-                  <TableCell className="py-3">
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <Avatar className="h-10 w-10 border border-border rounded-sm grayscale group-hover:grayscale-0 transition-all">
-                          <AvatarImage src={mp.photo} className="object-cover" />
-                          <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs rounded-none">
-                            {mp.name.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-success border-2 border-background rounded-full" title="Verified active" />
-                      </div>
-                      <div className="flex flex-col">
-                        <Link href={`/politicians/${mp.slug}`} className="font-bold text-foreground hover:text-primary transition-colors underline-offset-4 hover:underline decoration-primary/30">
-                          {mp.name}
-                        </Link>
-                        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">ID: {mp.slug.substring(0, 8)}...</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2.5">
-                      <StateIcon stateName={mp.state} mode="simple" className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="text-xs font-bold text-foreground uppercase tracking-tight">{mp.state}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{mp.constituency}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-mono text-[9px] border-border group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
-                      {mp.partyName || "Independent"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                     <Link href={`/politicians/${mp.slug}`} className="inline-flex items-center justify-center h-8 w-8 rounded border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-                       <Info className="h-3.5 w-3.5" />
-                     </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </LedgerContent>
+  mps.forEach((mp: any) => {
+    if (mp.state) statesSet.add(mp.state);
+    if (mp.partyName) partiesSet.add(mp.partyName);
+  });
 
-      <LedgerFooter label="Source: Sansad Registry" />
-    </Ledger>
-  );
+  const states = Array.from(statesSet).sort();
+  const parties = Array.from(partiesSet).sort();
+
+  return <LokSabhaClient mps={mps} states={states} parties={parties} />;
 }
-

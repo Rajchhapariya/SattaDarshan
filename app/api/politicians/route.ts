@@ -30,9 +30,16 @@ export async function GET(req: NextRequest) {
   if (party && party !== "All") filter.party = party;
   if (state && state !== "All") filter.state = state;
 
+  const sortField = searchParams.get("sort") ?? "name";
+  const sortOrder = searchParams.get("order") === "desc" ? -1 : 1;
+  const sortObj: Record<string, 1 | -1> = { [sortField]: sortOrder };
+
   const total = await Politician.countDocuments(filter);
   const rawPoliticians = await Politician.find(filter)
-    .skip((page - 1) * limit).limit(limit).lean();
+    .sort(sortObj)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
 
   const politicians = rawPoliticians;
 

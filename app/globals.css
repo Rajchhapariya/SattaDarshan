@@ -4,74 +4,74 @@
 
 @layer base {
   :root {
-    /* Sovereign Ledger - Light Theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%; /* Slate-950 approx */
+    /* Modern Civic Intelligence Theme - Light */
+    --background: 210 20% 98%;      /* #F8FAFC crisp off-white */
+    --foreground: 222.2 47.4% 11.2%; /* #0F172A slate-950 */
     
-    --card: 0 0% 100%;
+    --card: 0 0% 100%;              /* Pure white cards */
     --card-foreground: 222.2 47.4% 11.2%;
     
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 47.4% 11.2%;
     
     /* Semantic Accents */
-    --primary: 28 100% 60%;    /* Saffron-Gold #FF9933 */
-    --primary-foreground: 210 40% 98%;
+    --primary: 38 92% 50%;          /* #F59E0B Amber / Warm Gold Saffron */
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 210 40% 96.1%; /* Slate-50 approx */
+    --secondary: 210 40% 96.1%;     /* #F1F5F9 */
     --secondary-foreground: 222.2 47.4% 11.2%;
     
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 46.9%; /* #64748B */
     
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
     
-    --success: 160 84% 39%;   /* Eco-Green #10B981 */
-    --success-foreground: 210 40% 98%;
+    --success: 158 64% 42%;         /* #10B981 Emerald */
+    --success-foreground: 0 0% 100%;
     
-    --destructive: 0 84.2% 60.2%; /* Rose-Red #F43F5E */
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;   /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
     
-    --border: 214.3 31.8% 91.4%; /* Slate-200 */
+    --border: 214.3 31.8% 91.4%;    /* #E2E8F0 */
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 47.4% 11.2%;
+    --ring: 38 92% 50%;
     
-    --radius: 0.25rem; /* Strict 4px radius */
+    --radius: 0.625rem;             /* Modern 10px rounded curve */
   }
 
   .dark {
-    /* Sovereign Ledger - Dark Theme */
-    --background: 222.2 84% 4.9%; /* Slate-950 #0F172A */
+    /* Modern Civic Intelligence Theme - Dark */
+    --background: 222.2 84% 4.9%;   /* #0B0F19 deep rich dark slate */
     --foreground: 210 40% 98%;
     
-    --card: 222.2 47.4% 11.2%; /* Slate-900 #1E293B */
+    --card: 222.2 47.4% 9.5%;       /* #111827 refined card dark */
     --card-foreground: 210 40% 98%;
     
-    --popover: 222.2 47.4% 11.2%;
+    --popover: 222.2 47.4% 9.5%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 28 100% 60%;
+    --primary: 38 92% 50%;          /* Amber / Gold */
     --primary-foreground: 222.2 47.4% 11.2%;
     
-    --secondary: 217.2 32.6% 17.5%; /* Slate-800 approx */
+    --secondary: 217.2 32.6% 17.5%; /* #1E293B */
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 217.2 32.6% 15%;
     --muted-foreground: 215 20.2% 65.1%;
     
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     
-    --success: 160 84% 39%;
+    --success: 158 64% 42%;
     --success-foreground: 210 40% 98%;
     
-    --destructive: 346 84% 61%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 217.2 32.6% 17.5%; /* Slate-800 */
+    --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 38 92% 50%;
   }
 }
 
@@ -82,10 +82,35 @@
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/20;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
   }
 }
 
-/* Data Precision Utility */
-.font-data {
-  @apply font-mono tracking-tighter;
+/* Glassmorphic card styling */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
 }

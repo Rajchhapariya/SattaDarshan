@@ -16,12 +16,12 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "SattaDarshan — Sovereign political intelligence ledger", template: "%s | SattaDarshan" },
-  description: "High-precision, verified legislative data tracking the Indian parliamentary matrix. Explore comprehensive records for Lok Sabha, Rajya Sabha, MLAs, and Chief Ministers.",
-  keywords: ["India Politics", "Lok Sabha", "Rajya Sabha", "Indian Parliament", "Chief Ministers", "MLAs", "Political Intelligence"],
+  title: { default: "SattaDarshan — India Parliamentary & Political Intelligence Portal", template: "%s | SattaDarshan" },
+  description: "Comprehensive, open civic intelligence tracking the Indian Parliament (18th Lok Sabha & Rajya Sabha), political parties, Chief Ministers, and state jurisdictions with interactive 3D visualizations.",
+  keywords: ["India Politics", "Lok Sabha", "Rajya Sabha", "Indian Parliament", "Chief Ministers", "MLAs", "Political Intelligence", "Indian Elections"],
   openGraph: {
-    title: "SattaDarshan",
-    description: "High-precision, verified legislative data tracking the Indian parliamentary matrix.",
+    title: "SattaDarshan — Indian Legislative & Political Intelligence",
+    description: "Comprehensive, open civic intelligence tracking the Indian Parliament, political parties, Chief Ministers, and states.",
     url: "https://sattadarshan.vercel.app",
     siteName: "SattaDarshan",
     locale: "en_IN",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SattaDarshan",
-    description: "High-precision, verified legislative data tracking the Indian parliamentary matrix.",
+    title: "SattaDarshan — Indian Legislative & Political Intelligence",
+    description: "Comprehensive, open civic intelligence tracking the Indian Parliament, political parties, Chief Ministers, and states.",
   },
 };
 

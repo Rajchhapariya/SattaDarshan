@@ -1,52 +1,108 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CommandCenterSection } from "@/components/ui/CommandCenter";
+import { Flag, ChevronRight } from "lucide-react";
+import { AllianceBadge } from "@/components/common/AllianceBadge";
 
 export function PartiesSection() {
-  const [parties,setParties] = useState([]);
-  useEffect(()=>{fetch("/api/parties?tier=National&limit=8").then(r=>r.json()).then(d=>setParties(d.parties??[])).catch(()=>{});},[]);
-  
+  const [parties, setParties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/parties?limit=12")
+      .then((r) => r.json())
+      .then((d) => {
+        setParties(d.parties ?? []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   return (
-    <CommandCenterSection 
-      title="Political Formations" 
-      subtitle="National Organizations"
-      action={{ label: "Access Index", href: "/parties" }}
-      className="pb-24"
-    >
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {parties.map((p:any)=>(
-          <Link 
-            key={p.slug} 
-            href={`/parties/${p.slug}`} 
-            className="bg-background border border-border p-5 group flex items-center gap-4 hover:border-primary/50 transition-all"
-          >
-            {p.logo && (
-              <div className="w-10 h-10 rounded border border-border p-1 bg-muted/30 grayscale group-hover:grayscale-0 transition-all flex items-center justify-center">
-                <Image 
-                  src={p.logo} 
-                  alt={p.abbr || p.name} 
-                  width={32} 
-                  height={32} 
-                  className="object-contain"
-                />
+    <section className="space-y-6 pt-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-border/60 pb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+              <Flag className="h-3 w-3" /> Coalitions & Formations
+            </span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Recognized Political Entities
+            </span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground mt-1">
+            Political Parties Directory
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Explore national formations, regional parties, seat allocations, and alliance alignments
+          </p>
+        </div>
+
+        <Link
+          href="/parties"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline self-start sm:self-auto"
+        >
+          View All 90+ Parties <ChevronRight className="h-4 w-4" />
+        </Link>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-28 rounded-2xl bg-muted/40 animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {parties.map((p) => (
+            <Link
+              key={p.slug}
+              href={`/parties/${p.slug}`}
+              className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="relative h-12 w-12 rounded-xl border border-border/60 bg-muted/30 p-1.5 flex-shrink-0 flex items-center justify-center">
+                  {p.logo ? (
+                    <Image
+                      src={p.logo}
+                      alt={p.abbr || p.name}
+                      width={36}
+                      height={36}
+                      className="object-contain max-h-full"
+                    />
+                  ) : (
+                    <Flag className="h-6 w-6 text-muted-foreground/40" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                      {p.abbr || p.name}
+                    </span>
+                    <AllianceBadge alliance={p.alliance} size="sm" />
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-[180px]">
+                    {p.name}
+                  </p>
+                </div>
               </div>
-            )}
-            <div>
-              <div className="font-black text-sm text-foreground group-hover:text-primary transition-colors tracking-tight uppercase">
-                {p.abbr || p.name.substring(0, 4)}
-              </div>
+
               {p.seatsLokSabha !== undefined && (
-                <div className="text-[10px] font-mono font-bold text-primary mt-0.5 uppercase tracking-widest">
-                  {p.seatsLokSabha} LS_SEATS
+                <div className="text-right flex-shrink-0">
+                  <span className="text-lg font-bold text-foreground">
+                    {p.seatsLokSabha}
+                  </span>
+                  <span className="block text-[10px] uppercase font-semibold text-muted-foreground">
+                    LS Seats
+                  </span>
                 </div>
               )}
-            </div>
-          </Link>
-        ))}
-      </div>
-    </CommandCenterSection>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
-

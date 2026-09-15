@@ -3,24 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { Pagination } from "@/components/ui/Pagination";
+import { Search, Flag, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
+import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { PartyTable } from "@/components/party/PartyTable";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { Badge } from "@/components/ui/Badge";
-import { 
-  Ledger, 
-  LedgerHeader, 
-  LedgerControls, 
-  LedgerFilterGroup, 
-  LedgerViewToggle, 
-  LedgerContent, 
-  LedgerFooter 
-} from "@/components/ui/Ledger";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { Flag, PieChart as ChartIcon, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const ALLIANCES = ["All", "NDA", "INDIA", "Others"];
 const TIERS = ["All", "National", "State", "RUPP"];
 
 type PartySummary = {
@@ -30,7 +18,9 @@ type PartySummary = {
   tier?: string;
   status?: string;
   logo?: string;
+  alliance?: string;
   seatsLokSabha?: number;
+  seatsRajyaSabha?: number;
 };
 
 export function PartiesClient() {
@@ -40,15 +30,20 @@ export function PartiesClient() {
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
   const [tier, setTier] = useState("All");
+  const [alliance, setAlliance] = useState("All");
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [view, setView] = useState<"grid" | "table">("grid");
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    const p = new URLSearchParams({ page: String(page), limit: view === 'grid' ? "30" : "50" });
+    const p = new URLSearchParams({
+      page: String(page),
+      limit: view === "grid" ? "24" : "50",
+    });
     if (q) p.set("q", q);
     if (tier !== "All") p.set("tier", tier);
+    if (alliance !== "All") p.set("alliance", alliance);
+
     fetch("/api/parties?" + p)
       .then((r) => r.json())
       .then((d) => {
@@ -58,212 +53,212 @@ export function PartiesClient() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [q, tier, page, view]);
+  }, [q, tier, alliance, page, view]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const tierStats = [
-    { name: "National", value: data.filter((x) => x.tier === "National").length },
-    { name: "State", value: data.filter((x) => x.tier === "State").length },
-    { name: "RUPP", value: data.filter((x) => x.tier === "RUPP").length },
-  ];
-  
-  const COLORS = ["#FF9933", "#10b981", "#64748b"];
-
   return (
-    <Ledger>
-      <LedgerHeader
-        title="Parties Directory"
-        subtitle="Registry of active and recognized political formations in India. Tier distribution maintained per official ECI notification status."
-        badge="Political Index"
-        icon={<Flag className="h-3 w-3" />}
-        stats={[{ label: "Total Formations", value: total }]}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Statistics Panel */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-muted/30 border border-border rounded-md p-6">
-            <div className="flex items-center gap-2 mb-6">
-               <ChartIcon className="h-4 w-4 text-primary" />
-               <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground">Tier Distribution</h3>
-            </div>
-            <div className="h-48 w-full flex items-center justify-center">
-              {mounted ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie 
-                      data={tierStats} 
-                      dataKey="value" 
-                      nameKey="name" 
-                      innerRadius={50} 
-                      outerRadius={70} 
-                      paddingAngle={4}
-                      stroke="none"
-                    >
-                      {tierStats.map((entry, index) => (
-                        <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#0F172A', 
-                        border: 'none', 
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        fontWeight: 'bold',
-                        color: '#fff'
-                      }}
-                      itemStyle={{ color: '#fff' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-32 w-32 rounded-full border-8 border-muted animate-pulse" />
-              )}
-            </div>
-            <div className="space-y-2 mt-4">
-               {tierStats.map((t, i) => (
-                 <div key={t.name} className="flex items-center justify-between">
-                   <div className="flex items-center gap-2">
-                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i] }} />
-                     <span className="text-xs font-bold text-muted-foreground uppercase">{t.name}</span>
-                   </div>
-                   <span className="text-xs font-mono font-black">{t.value}</span>
-                 </div>
-               ))}
-            </div>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+            <Flag className="h-3.5 w-3.5" /> Political Formations Index
           </div>
-
-          <div className="bg-primary/5 border border-primary/10 rounded-md p-6">
-             <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Protocol Note</h3>
-             <p className="text-[11px] text-muted-foreground leading-relaxed">
-               Recognized parties are subject to periodic performance reviews by the Election Commission of India. 
-               Status is updated per latest verification cycle.
-             </p>
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+            Political Parties of India
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
+            Registry of active recognized parties, state parties, and national alliances with official seat allocations.
+          </p>
         </div>
 
-        {/* List Panel */}
-        <div className="lg:col-span-3 space-y-6">
-          <LedgerControls>
-            <LedgerFilterGroup label="Classification">
-              {TIERS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => {
-                    setTier(t);
-                    setPage(1);
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-wider transition-all border",
-                    tier === t
-                      ? "bg-primary border-primary text-primary-foreground shadow-sm shadow-primary/20"
-                      : "bg-background border-border text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground"
-                  )}
-                >
-                  {t}
-                </button>
-              ))}
-            </LedgerFilterGroup>
-            
-            <div className="flex w-full md:w-auto gap-4 items-center">
-              <SearchBar 
-                value={q} 
-                onChange={(v) => {
-                  setQ(v);
-                  setPage(1);
-                }} 
-                placeholder="Search index..." 
-                className="flex-1 md:w-64" 
-              />
-              <LedgerViewToggle view={view} onViewChange={setView} />
-            </div>
-          </LedgerControls>
-
-          <LedgerContent>
-            {loading ? (
-              <div className={cn(
-                "grid gap-4",
-                view === 'grid' ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
-              )}>
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <Skeleton key={i} className={cn("rounded-md", view === 'grid' ? "h-32 w-full" : "h-16 w-full")} />
-                ))}
-              </div>
-            ) : data.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-center border border-dashed border-border rounded-md">
-                <h3 className="font-bold text-foreground uppercase tracking-tight">Registry Empty</h3>
-                <p className="text-xs text-muted-foreground mt-1">No formations matching current filter criteria.</p>
-              </div>
-            ) : view === 'grid' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {data.map((p) => (
-                  <Link 
-                    key={p.slug} 
-                    href={`/parties/${p.slug}`} 
-                    className="group flex flex-col bg-background border border-border rounded-md p-5 transition-all hover:border-primary/50 hover:shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded border border-border bg-muted/30 p-2 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
-                          {p.logo ? (
-                            <Image 
-                              src={p.logo} 
-                              alt={p.abbr || p.name} 
-                              width={40} 
-                              height={40} 
-                              className="object-contain"
-                            />
-                          ) : (
-                            <Flag className="h-6 w-6 text-muted-foreground/30" />
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-black text-lg text-foreground tracking-tighter group-hover:text-primary transition-colors">
-                            {p.abbr || p.name.substring(0, 4)}
-                          </h3>
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase truncate max-w-[120px]">
-                            {p.name}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mt-auto pt-4 border-t border-border/50">
-                      <Badge variant="secondary" className="text-[8px]">
-                        {p.tier}
-                      </Badge>
-                      {p.seatsLokSabha !== undefined && (
-                        <div className="flex flex-col items-end">
-                           <span className="text-[10px] font-black font-mono text-primary">{p.seatsLokSabha} SEATS</span>
-                           <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">LOK SABHA</span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <PartyTable data={data} />
-            )}
-          </LedgerContent>
-
-          <LedgerFooter page={page} total={total} label="End of Index">
-            <Pagination page={page} pages={pages} onPageChange={setPage} />
-          </LedgerFooter>
+        <div className="px-5 py-3.5 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[120px]">
+          <span className="block text-[11px] font-semibold uppercase text-muted-foreground">Total Parties</span>
+          <span className="text-2xl font-bold text-foreground">
+            {total > 0 ? total : "90+"}
+          </span>
         </div>
       </div>
-    </Ledger>
+
+      {/* Alliance Quick Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {ALLIANCES.map((a) => (
+          <button
+            key={a}
+            onClick={() => {
+              setAlliance(a);
+              setPage(1);
+            }}
+            className={cn(
+              "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all border",
+              alliance === a
+                ? "bg-foreground text-background border-foreground shadow-sm"
+                : "bg-card text-muted-foreground hover:text-foreground border-border/80"
+            )}
+          >
+            {a === "All" ? "All Alliances" : `${a} Alliance`}
+          </button>
+        ))}
+      </div>
+
+      {/* Search, Tier Filter & View Controls */}
+      <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search party by name or acronym (e.g. BJP, INC, AAP)..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+          />
+        </div>
+
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
+          <select
+            value={tier}
+            onChange={(e) => {
+              setTier(e.target.value);
+              setPage(1);
+            }}
+            aria-label="Filter by Party Tier"
+            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="All">All Tiers</option>
+            <option value="National">National Parties</option>
+            <option value="State">State Recognized</option>
+            <option value="RUPP">RUPP</option>
+          </select>
+
+          <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1">
+            <button
+              onClick={() => setView("grid")}
+              className={cn(
+                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                view === "grid"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setView("table")}
+              className={cn(
+                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                view === "table"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Table View"
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid or Table Listing */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="h-32 rounded-2xl bg-muted/40 animate-pulse" />
+          ))}
+        </div>
+      ) : data.length === 0 ? (
+        <div className="p-12 text-center rounded-2xl bg-card border border-border/80 space-y-3">
+          <Flag className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+          <h3 className="font-bold text-base text-foreground">No Parties Found</h3>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+            No political party matched your search or tier filter.
+          </p>
+        </div>
+      ) : view === "grid" ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {data.map((p) => (
+            <Link
+              key={p.slug}
+              href={`/parties/${p.slug}`}
+              className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="relative h-12 w-12 rounded-xl border border-border/60 bg-muted/30 p-1.5 flex-shrink-0 flex items-center justify-center">
+                  {p.logo ? (
+                    <Image
+                      src={p.logo}
+                      alt={p.abbr || p.name}
+                      width={38}
+                      height={38}
+                      className="object-contain max-h-full"
+                    />
+                  ) : (
+                    <Flag className="h-6 w-6 text-muted-foreground/40" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">
+                      {p.abbr || p.name}
+                    </span>
+                    <AllianceBadge alliance={p.alliance} size="sm" />
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5 max-w-[190px]">
+                    {p.name}
+                  </p>
+                  <span className="inline-block text-[10px] uppercase font-semibold text-muted-foreground/80 mt-1">
+                    {p.tier || "State"} Formation
+                  </span>
+                </div>
+              </div>
+
+              {p.seatsLokSabha !== undefined && (
+                <div className="text-right flex-shrink-0">
+                  <span className="text-xl font-extrabold text-foreground">
+                    {p.seatsLokSabha}
+                  </span>
+                  <span className="block text-[10px] uppercase font-semibold text-muted-foreground">
+                    LS Seats
+                  </span>
+                </div>
+              )}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <PartyTable data={data} />
+      )}
+
+      {/* Pagination */}
+      {pages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-border/60">
+          <span className="text-xs text-muted-foreground">
+            Page {page} of {pages} ({total} Total)
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(p + 1, pages))}
+              disabled={page === pages}
+              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+            >
+              Next <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-

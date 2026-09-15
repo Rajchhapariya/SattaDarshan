@@ -2,30 +2,26 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { Pagination } from "@/components/ui/Pagination";
+import { Search, Users, LayoutGrid, List, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { PoliticianTable } from "@/components/politician/PoliticianTable";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { 
-  Ledger, 
-  LedgerHeader, 
-  LedgerControls, 
-  LedgerFilterGroup, 
-  LedgerViewToggle, 
-  LedgerSort,
-  LedgerContent, 
-  LedgerFooter 
-} from "@/components/ui/Ledger";
-import { UserCheck, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ROLES = ["All", "President", "PM", "CM", "Minister", "MP", "MLA", "Governor", "Other"];
+const ROLES = [
+  { label: "All", value: "All" },
+  { label: "Prime Minister", value: "PM" },
+  { label: "Chief Ministers", value: "CM" },
+  { label: "Cabinet Ministers", value: "Minister" },
+  { label: "Lok Sabha MPs", value: "MP" },
+  { label: "Rajya Sabha MPs", value: "MP" },
+  { label: "MLAs", value: "MLA" },
+];
+
 const SORT_OPTIONS = [
   { label: "Name (A-Z)", value: "name:asc" },
   { label: "Name (Z-A)", value: "name:desc" },
-  { label: "Party", value: "partyName:asc" },
-  { label: "State", value: "state:asc" },
+  { label: "Party (A-Z)", value: "partyName:asc" },
+  { label: "State (A-Z)", value: "state:asc" },
 ];
 
 type PoliticianSummary = {
@@ -45,22 +41,23 @@ export function PoliticiansClient() {
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState(sp.get("q") ?? "");
-  const [role, setRole] = useState("All");
+  const [role, setRole] = useState(sp.get("role") ?? "All");
   const [page, setPage] = useState(1);
-  const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [view, setView] = useState<"grid" | "table">("grid");
   const [sort, setSort] = useState("name:asc");
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    const [sortField, sortOrder] = sort.split(':');
-    const p = new URLSearchParams({ 
-      page: String(page), 
-      limit: view === 'grid' ? "24" : "50",
+    const [sortField, sortOrder] = sort.split(":");
+    const p = new URLSearchParams({
+      page: String(page),
+      limit: view === "grid" ? "24" : "50",
       sort: sortField,
-      order: sortOrder
+      order: sortOrder,
     });
     if (q) p.set("q", q);
     if (role !== "All") p.set("role", role);
+
     fetch("/api/politicians?" + p)
       .then((r) => r.json())
       .then((d) => {
@@ -77,103 +74,158 @@ export function PoliticiansClient() {
   }, [fetchData]);
 
   return (
-    <Ledger>
-      <LedgerHeader
-        title="Politicians Index"
-        subtitle="Search and verify official profiles of current and former representatives. All records are validated against ECI and Parliamentary data domains."
-        badge="Representative Directory"
-        icon={<UserCheck className="h-3 w-3" />}
-        stats={[{ label: "Total Records", value: total }]}
-      />
-
-      <LedgerControls>
-        <LedgerFilterGroup label="Filters">
-          {ROLES.map((r) => (
-            <button
-              key={r}
-              onClick={() => {
-                setRole(r);
-                setPage(1);
-              }}
-              className={cn(
-                "px-3 py-1.5 rounded-sm text-[10px] font-bold uppercase tracking-wider transition-all border",
-                role === r
-                  ? "bg-primary border-primary text-primary-foreground shadow-sm shadow-primary/20"
-                  : "bg-background border-border text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground"
-              )}
-            >
-              {r}
-            </button>
-          ))}
-        </LedgerFilterGroup>
-        
-        <div className="flex flex-wrap w-full lg:w-auto gap-4 items-center">
-          <LedgerSort 
-            options={SORT_OPTIONS} 
-            value={sort} 
-            onChange={(v) => {
-              setSort(v);
-              setPage(1);
-            }} 
-          />
-          <SearchBar 
-            value={q} 
-            onChange={(v) => {
-              setQ(v);
-              setPage(1);
-            }} 
-            placeholder="Filter by name, state, party..." 
-            className="flex-1 lg:w-80" 
-          />
-          <LedgerViewToggle view={view} onViewChange={setView} />
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+            <Users className="h-3.5 w-3.5" /> Constitutional Directory
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+            Representatives & Leaders
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
+            Verified public profiles of Indian lawmakers, Ministers, Chief Ministers, and Parliamentarians.
+          </p>
         </div>
-      </LedgerControls>
 
-      <LedgerContent>
-        {loading ? (
-          view === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="aspect-[4/5] w-full rounded-md" />
-                  <div className="space-y-2">
-                     <Skeleton className="h-4 w-3/4 rounded-sm" />
-                     <Skeleton className="h-3 w-1/2 rounded-sm" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full rounded-md" />
-              ))}
-            </div>
-          )
-        ) : data.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center border border-dashed border-border rounded-md">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground/50">
-              <Filter className="h-6 w-6" />
-            </div>
-            <h3 className="font-bold text-foreground uppercase tracking-tight">No data matching filters</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">Adjust your parameters or reset search query to continue discovery.</p>
-            <button onClick={()=>{setQ(""); setRole("All");}} className="mt-6 text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">Reset Workspace</button>
-          </div>
-        ) : view === 'grid' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {data.map((p) => (
-              <PoliticianCard key={p.slug} {...p} />
+        <div className="px-5 py-3.5 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[120px]">
+          <span className="block text-[11px] font-semibold uppercase text-muted-foreground">Total Profiles</span>
+          <span className="text-2xl font-bold text-foreground">
+            {total > 0 ? total.toLocaleString("en-IN") : "840+"}
+          </span>
+        </div>
+      </div>
+
+      {/* Role Filter Tabs (Horizontally scrollable on mobile) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {ROLES.map((r) => (
+          <button
+            key={r.value + r.label}
+            onClick={() => {
+              setRole(r.value);
+              setPage(1);
+            }}
+            className={cn(
+              "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all border",
+              role === r.value
+                ? "bg-foreground text-background border-foreground shadow-sm"
+                : "bg-card text-muted-foreground hover:text-foreground border-border/80"
+            )}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Search, Sort, View Controls */}
+      <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search by leader name, constituency, or party..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+          />
+        </div>
+
+        <div className="flex items-center gap-3 justify-between sm:justify-end">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            aria-label="Sort representatives"
+            className="px-3 py-2 rounded-xl border border-border bg-background text-xs sm:text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
-          </div>
-        ) : (
-          <PoliticianTable data={data} />
-        )}
-      </LedgerContent>
+          </select>
 
-      <LedgerFooter page={page} total={total} label="End of Ledger">
-        <Pagination page={page} pages={pages} onPageChange={setPage} />
-      </LedgerFooter>
-    </Ledger>
+          <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1">
+            <button
+              onClick={() => setView("grid")}
+              className={cn(
+                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                view === "grid"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setView("table")}
+              className={cn(
+                "p-1.5 rounded-lg text-xs font-semibold transition-all",
+                view === "table"
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Table View"
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid or Table Listing */}
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="h-72 rounded-2xl bg-muted/40 animate-pulse" />
+          ))}
+        </div>
+      ) : data.length === 0 ? (
+        <div className="p-12 text-center rounded-2xl bg-card border border-border/80 space-y-3">
+          <Users className="h-10 w-10 text-muted-foreground/40 mx-auto" />
+          <h3 className="font-bold text-base text-foreground">No Representatives Found</h3>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+            Try adjusting your search keywords or switching role filters.
+          </p>
+        </div>
+      ) : view === "grid" ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {data.map((p) => (
+            <PoliticianCard key={p.slug} {...p} />
+          ))}
+        </div>
+      ) : (
+        <PoliticianTable data={data} />
+      )}
+
+      {/* Pagination */}
+      {pages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-border/60">
+          <span className="text-xs text-muted-foreground">
+            Page {page} of {pages} ({total} Total)
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" /> Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(p + 1, pages))}
+              disabled={page === pages}
+              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold disabled:opacity-40 hover:bg-muted transition-colors flex items-center gap-1"
+            >
+              Next <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-

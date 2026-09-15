@@ -3,12 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import Link from "next/link";
+import { MapPin, Landmark, Users, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type StateInfo = {
   slug: string;
   name: string;
   rulingParty?: string;
   cm?: string;
+  capital?: string;
   totalAssemblySeats?: number;
   totalLokSabhaSeats?: number;
 };
@@ -26,7 +30,14 @@ export default function IndiaMapPage() {
     setMounted(true);
     fetch("/api/states")
       .then((r) => r.json())
-      .then((d) => setStates(d || []))
+      .then((d) => {
+        const list = d || [];
+        setStates(list);
+        if (list.length > 0) {
+          const up = list.find((s: any) => s.slug === "uttar-pradesh") || list[0];
+          setSelected(up);
+        }
+      })
       .catch(() => setStates([]));
   }, []);
 
@@ -43,8 +54,7 @@ export default function IndiaMapPage() {
 
     states.forEach((s) => {
       map.set(s.name.toLowerCase(), s);
-      // Let's set alias maps too
-      const alias = Object.keys(aliases).find(k => aliases[k] === s.name.toLowerCase());
+      const alias = Object.keys(aliases).find((k) => aliases[k] === s.name.toLowerCase());
       if (alias) map.set(alias, s);
     });
     return Object.assign(map, { fallbackAliases: aliases });
@@ -58,87 +68,151 @@ export default function IndiaMapPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">India Political Map</h1>
-            <p className="text-sm text-gray-500 mt-1">Interactive state view with ruling party and CM insights.</p>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 w-fit mb-2">
+            <MapPin className="h-3.5 w-3.5" /> Geospatial Governance Explorer
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => setView("Lok Sabha")} className={`px-3 py-1.5 rounded-lg text-sm ${view === "Lok Sabha" ? "bg-orange-500 text-white" : "bg-white border border-gray-200"}`}>Lok Sabha</button>
-            <button onClick={() => setView("Vidhan Sabha")} className={`px-3 py-1.5 rounded-lg text-sm ${view === "Vidhan Sabha" ? "bg-orange-500 text-white" : "bg-white border border-gray-200"}`}>Vidhan Sabha</button>
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+            India Political Territory Map
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Interactive state boundaries, ruling administration, and legislative seat shares.
+          </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-4 min-h-[420px]">
-            {mounted ? (
-              <ComposableMap projection="geoMercator" projectionConfig={{ center: [82, 22], scale: 1000 }}>
-                <Geographies geography={INDIA_GEO_URL}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      let rawName = String((geo.properties as any)?.NAME_1 || "").toLowerCase();
-                      if ((stateMap as any).fallbackAliases[rawName]) {
-                        rawName = (stateMap as any).fallbackAliases[rawName];
-                      }
-                      const info = stateMap.get(rawName);
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          onMouseEnter={() => info && setHovered(info)}
-                          onMouseLeave={() => setHovered(null)}
-                          onClick={() => info && setSelected(info)}
-                          style={{
-                            default: { fill: info?.rulingParty ? "#fb923c" : "#d1d5db", stroke: "#fff", strokeWidth: 0.6, outline: "none" },
-                            hover: { fill: "#4f46e5", stroke: "#fff", outline: "none" },
-                            pressed: { fill: "#1d4ed8", stroke: "#fff", outline: "none" },
-                          }}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ComposableMap>
-            ) : (
-              <div className="h-full w-full rounded-2xl bg-gray-100 animate-pulse" />
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 p-1 self-start sm:self-auto">
+          <button
+            onClick={() => setView("Lok Sabha")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+              view === "Lok Sabha" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
-          </div>
+          >
+            Lok Sabha View
+          </button>
+          <button
+            onClick={() => setView("Vidhan Sabha")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+              view === "Vidhan Sabha" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Assembly View
+          </button>
+        </div>
+      </div>
 
-          <aside className="bg-white rounded-2xl border border-gray-100 p-5">
-            {hovered ? (
-              <div className="space-y-3 mb-4 p-3 rounded-2xl bg-orange-50 text-orange-900">
-                <div className="text-xs uppercase tracking-wide font-semibold">Hover preview</div>
-                <div className="text-lg font-semibold">{hovered.name}</div>
-                <div className="text-sm text-gray-600">{hovered.rulingParty || "No ruling party data"}</div>
-                <div className="text-sm text-gray-600">CM: {hovered.cm || "N/A"}</div>
+      {/* Map & State Details Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Interactive Vector Map Canvas */}
+        <div className="lg:col-span-2 rounded-3xl bg-card border border-border/80 shadow-sm p-4 sm:p-6 min-h-[440px] flex items-center justify-center">
+          {mounted ? (
+            <ComposableMap projection="geoMercator" projectionConfig={{ center: [82, 22], scale: 1000 }} className="w-full h-full max-w-2xl">
+              <Geographies geography={INDIA_GEO_URL}>
+                {({ geographies }) =>
+                  geographies.map((geo) => {
+                    let rawName = String((geo.properties as any)?.NAME_1 || "").toLowerCase();
+                    if ((stateMap as any).fallbackAliases[rawName]) {
+                      rawName = (stateMap as any).fallbackAliases[rawName];
+                    }
+                    const info = stateMap.get(rawName);
+                    const isSelected = selected && selected.name.toLowerCase() === rawName;
+
+                    return (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        onMouseEnter={() => info && setHovered(info)}
+                        onMouseLeave={() => setHovered(null)}
+                        onClick={() => info && setSelected(info)}
+                        style={{
+                          default: {
+                            fill: isSelected
+                              ? "hsl(var(--primary))"
+                              : info?.rulingParty
+                              ? "hsl(var(--primary) / 0.25)"
+                              : "hsl(var(--muted))",
+                            stroke: "hsl(var(--border))",
+                            strokeWidth: 0.8,
+                            outline: "none",
+                            cursor: "pointer",
+                            transition: "all 200ms ease",
+                          },
+                          hover: {
+                            fill: "hsl(var(--primary) / 0.6)",
+                            stroke: "hsl(var(--foreground))",
+                            strokeWidth: 1.5,
+                            outline: "none",
+                            cursor: "pointer",
+                          },
+                          pressed: {
+                            fill: "hsl(var(--primary))",
+                            outline: "none",
+                          },
+                        }}
+                      />
+                    );
+                  })
+                }
+              </Geographies>
+            </ComposableMap>
+          ) : (
+            <div className="h-full w-full rounded-2xl bg-muted/40 animate-pulse" />
+          )}
+        </div>
+
+        {/* Selected State Details Sidebar */}
+        <div className="rounded-3xl bg-card border border-border/80 shadow-sm p-6 flex flex-col justify-between space-y-6">
+          {selected ? (
+            <div className="space-y-5">
+              <div>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Selected Territory</span>
+                <h2 className="text-2xl font-bold text-foreground mt-0.5">{selected.name}</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Capital: {selected.capital || "Administrative Center"}</p>
               </div>
-            ) : null}
-            {!selected ? (
-              <p className="text-sm text-gray-400">Click a state to view party distribution and CM profile.</p>
-            ) : (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold">{selected.name}</h2>
-                <p className="text-sm"><span className="text-gray-400">Ruling Party:</span> {selected.rulingParty || "N/A"}</p>
-                <p className="text-sm"><span className="text-gray-400">Chief Minister:</span> {selected.cm || "N/A"}</p>
-                <div className="h-56">
-                  {mounted ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="seats" fill="#f97316" radius={[8, 8, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full w-full bg-gray-50 rounded-2xl" />
-                  )}
+
+              <div className="space-y-3 text-sm">
+                <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60">
+                  <span className="text-xs text-muted-foreground block">Ruling Party / Alliance</span>
+                  <span className="font-bold text-base text-primary">{selected.rulingParty || "Democratic Council"}</span>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-muted/30 border border-border/60">
+                  <span className="text-xs text-muted-foreground block">Chief Minister</span>
+                  <span className="font-bold text-base text-foreground">{selected.cm || "Governor's Administration"}</span>
                 </div>
               </div>
-            )}
-          </aside>
+
+              {/* Bar Chart Representation */}
+              <div>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">Seats Distribution</span>
+                <div className="h-44 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "12px" }} />
+                      <Bar dataKey="seats" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <Link
+                href={`/states/${selected.slug}`}
+                className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                View State MPs & Leaders <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center text-center p-6 text-muted-foreground">
+              Click any state on the map to inspect details.
+            </div>
+          )}
         </div>
       </div>
     </div>

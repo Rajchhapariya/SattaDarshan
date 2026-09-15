@@ -2,12 +2,13 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { 
   Search, 
   User, 
   Flag, 
-  Map as MapIcon, 
-  Command as CommandIcon,
+  MapPin, 
+  Landmark,
   Loader2
 } from "lucide-react";
 
@@ -26,6 +27,8 @@ type SearchResult = {
   label: string;
   sub: string;
   href: string;
+  photo?: string;
+  logo?: string;
 };
 
 export function GlobalSearch() {
@@ -39,7 +42,7 @@ export function GlobalSearch() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((prev) => !prev);
       }
     };
     document.addEventListener("keydown", down);
@@ -65,7 +68,7 @@ export function GlobalSearch() {
       }
     };
 
-    const timer = setTimeout(fetchResults, 300);
+    const timer = setTimeout(fetchResults, 250);
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -78,21 +81,20 @@ export function GlobalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="group relative flex h-9 w-full items-center justify-between gap-2 rounded-md border border-border bg-background px-3 text-sm text-muted-foreground transition-all hover:bg-accent hover:text-accent-foreground sm:w-64"
+        className="group relative flex h-9 w-full sm:w-60 md:w-72 items-center justify-between gap-2 rounded-xl border border-border bg-card px-3 text-sm text-muted-foreground transition-all hover:bg-muted hover:text-foreground shadow-sm"
       >
-        <div className="flex items-center gap-2">
-          <Search className="h-4 w-4" />
-          <span className="hidden sm:inline-block">Search intelligence ledger...</span>
-          <span className="sm:hidden">Search...</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="truncate text-xs sm:text-sm">Search leaders, parties, states...</span>
         </div>
-        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex flex-shrink-0">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput 
-          placeholder="Type name, state, or party..." 
+          placeholder="Search by leader name, constituency, party, or state..." 
           value={query}
           onValueChange={setQuery}
         />
@@ -100,51 +102,65 @@ export function GlobalSearch() {
           <CommandEmpty>
             {loading ? (
               <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
               </div>
             ) : (
-              "No results found."
+              "No matching records found."
             )}
           </CommandEmpty>
           
           {results.length > 0 && (
-            <>
-              <CommandGroup heading="Intelligence Ledger">
-                {results.map((item) => (
-                  <CommandItem
-                    key={item.href}
-                    onSelect={() => onSelect(item.href)}
-                    className="flex items-center gap-3 py-3"
-                  >
-                    <div className="flex h-8 w-8 items-center justify-center rounded border border-border bg-background">
-                      {item.type === "politician" && <User className="h-4 w-4 text-primary" />}
-                      {item.type === "party" && <Flag className="h-4 w-4 text-success" />}
-                      {item.type === "state" && <MapIcon className="h-4 w-4 text-indigo-500" />}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-foreground">{item.label}</span>
-                      <span className="text-xs text-muted-foreground font-mono uppercase tracking-widest">{item.sub}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
+            <CommandGroup heading="Directory Results">
+              {results.map((item) => (
+                <CommandItem
+                  key={item.href}
+                  onSelect={() => onSelect(item.href)}
+                  className="flex items-center gap-3 py-2.5 px-3 rounded-lg cursor-pointer"
+                >
+                  <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center flex-shrink-0">
+                    {item.photo ? (
+                      <Image src={item.photo} alt={item.label} fill className="object-cover" />
+                    ) : item.logo ? (
+                      <Image src={item.logo} alt={item.label} width={24} height={24} className="object-contain" />
+                    ) : item.type === "politician" ? (
+                      <User className="h-4 w-4 text-primary" />
+                    ) : item.type === "party" ? (
+                      <Flag className="h-4 w-4 text-amber-500" />
+                    ) : (
+                      <MapPin className="h-4 w-4 text-emerald-500" />
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-semibold text-sm text-foreground truncate">{item.label}</span>
+                    <span className="text-xs text-muted-foreground truncate">{item.sub}</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
           )}
 
           <CommandSeparator />
           
-          <CommandGroup heading="System Navigation">
-            <CommandItem onSelect={() => onSelect("/politicians")}>
-              <User className="mr-2 h-4 w-4" />
-              <span>Browse Politicians</span>
+          <CommandGroup heading="Quick Navigation">
+            <CommandItem onSelect={() => onSelect("/parliament/lok-sabha")} className="cursor-pointer">
+              <Landmark className="mr-2 h-4 w-4 text-primary" />
+              <span>18th Lok Sabha Directory</span>
             </CommandItem>
-            <CommandItem onSelect={() => onSelect("/parties")}>
-              <Flag className="mr-2 h-4 w-4" />
-              <span>Political Index</span>
+            <CommandItem onSelect={() => onSelect("/parliament/rajya-sabha")} className="cursor-pointer">
+              <Landmark className="mr-2 h-4 w-4 text-emerald-500" />
+              <span>Rajya Sabha Registry</span>
             </CommandItem>
-            <CommandItem onSelect={() => onSelect("/parliament/lok-sabha")}>
-              <CommandIcon className="mr-2 h-4 w-4" />
-              <span>Lok Sabha Ledger</span>
+            <CommandItem onSelect={() => onSelect("/politicians")} className="cursor-pointer">
+              <User className="mr-2 h-4 w-4 text-blue-500" />
+              <span>Browse All Representatives</span>
+            </CommandItem>
+            <CommandItem onSelect={() => onSelect("/parties")} className="cursor-pointer">
+              <Flag className="mr-2 h-4 w-4 text-amber-500" />
+              <span>Political Parties Index</span>
+            </CommandItem>
+            <CommandItem onSelect={() => onSelect("/states")} className="cursor-pointer">
+              <MapPin className="mr-2 h-4 w-4 text-purple-500" />
+              <span>States & Territories Hub</span>
             </CommandItem>
           </CommandGroup>
         </CommandList>

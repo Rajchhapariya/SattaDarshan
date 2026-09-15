@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") ?? "50");
   const q = searchParams.get("q") ?? "";
   const tier = searchParams.get("tier") ?? "";
+  const alliance = searchParams.get("alliance") ?? "";
 
   const filter: any = {};
   if (q) filter.$or = [
@@ -18,9 +19,11 @@ export async function GET(req: NextRequest) {
     { abbr: { $regex: q, $options: "i" } },
   ];
   if (tier && tier !== "All") filter.tier = tier;
+  if (alliance && alliance !== "All") filter.alliance = alliance;
 
   const total = await Party.countDocuments(filter);
   const parties = await Party.find(filter)
+    .sort({ seatsLokSabha: -1, name: 1 })
     .skip((page - 1) * limit).limit(limit).lean();
 
   return NextResponse.json({ parties, total, page, pages: Math.ceil(total / limit) });

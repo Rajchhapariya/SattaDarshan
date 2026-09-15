@@ -1,9 +1,24 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SearchBar } from "@/components/ui/SearchBar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { ShieldCheck, ArrowRightLeft, User, AlertTriangle, Wallet, GraduationCap } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { 
+  ArrowRightLeft, 
+  User, 
+  Wallet, 
+  GraduationCap, 
+  AlertTriangle, 
+  CheckCircle, 
+  Landmark, 
+  MapPin, 
+  Flag,
+  Share2,
+  ExternalLink
+} from "lucide-react";
+import { Combobox, ComboboxItem } from "@/components/ui/Combobox";
+import { AllianceBadge } from "@/components/common/AllianceBadge";
+import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { cn } from "@/lib/utils";
 
 type Politician = {
@@ -11,140 +26,197 @@ type Politician = {
   name: string;
   role?: string;
   partyName?: string;
+  party?: string;
   state?: string;
   constituency?: string;
+  chamber?: string;
   assets?: string;
   criminalCases?: number;
   education?: string;
+  photo?: string;
 };
 
 export default function ComparePage() {
   const [all, setAll] = useState<Politician[]>([]);
-  const [left, setLeft] = useState("");
-  const [right, setRight] = useState("");
+  const [left, setLeft] = useState("narendra-modi");
+  const [right, setRight] = useState("rahul-gandhi");
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch("/api/politicians?limit=500")
       .then((r) => r.json())
       .then((d) => {
-        setAll(d.politicians || []);
+        const list: Politician[] = d.politicians || [];
+        setAll(list);
+        // If query parameters exist in URL, set them
+        const sp = new URLSearchParams(window.location.search);
+        const qLeft = sp.get("left");
+        const qRight = sp.get("right");
+        if (qLeft && list.some((p) => p.slug === qLeft)) setLeft(qLeft);
+        if (qRight && list.some((p) => p.slug === qRight)) setRight(qRight);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
+  const comboboxItems: ComboboxItem[] = useMemo(() => {
+    return all.map((p) => ({
+      value: p.slug,
+      label: p.name,
+      sub: `${p.role || "Leader"} • ${p.partyName || "Independent"} (${p.state || "India"})`,
+      photo: p.photo,
+      badge: p.partyName,
+    }));
+  }, [all]);
+
   const p1 = useMemo(() => all.find((p) => p.slug === left), [all, left]);
   const p2 = useMemo(() => all.find((p) => p.slug === right), [all, right]);
 
-  const rows = [
-    { label: "Designation", key: "role", icon: User },
-    { label: "Political Party", key: "partyName", icon: ShieldCheck },
-    { label: "State / Jurisdiction", key: "state", icon: ShieldCheck },
-    { label: "Constituency", key: "constituency", icon: ShieldCheck },
-    { label: "Education Level", key: "education", icon: GraduationCap },
-    { label: "Declared Assets", key: "assets", icon: Wallet },
-    { label: "Legal Records", key: "criminalCases", icon: AlertTriangle },
+  const handleShare = () => {
+    const url = `${window.location.origin}/compare?left=${left}&right=${right}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const metrics = [
+    { label: "Role & Office", icon: Landmark, get: (p?: Politician) => p?.role || "Representative" },
+    { label: "House Chamber", icon: Landmark, get: (p?: Politician) => p?.chamber || "Parliament" },
+    { label: "Party Affiliation", icon: Flag, get: (p?: Politician) => p?.partyName || "Independent" },
+    { label: "State / UT", icon: MapPin, get: (p?: Politician) => p?.state || "N/A" },
+    { label: "Constituency", icon: MapPin, get: (p?: Politician) => p?.constituency || "N/A" },
+    { label: "Education Level", icon: GraduationCap, get: (p?: Politician) => p?.education || "Graduate" },
+    { label: "Declared Assets", icon: Wallet, get: (p?: Politician) => p?.assets || "Affidavit Declared" },
+    { 
+      label: "Criminal Cases", 
+      icon: AlertTriangle, 
+      render: (p?: Politician) => {
+        const cases = p?.criminalCases ?? 0;
+        return (
+          <span className={cn("inline-flex items-center gap-1 font-semibold text-xs", cases === 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400")}>
+            {cases === 0 ? <CheckCircle className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
+            {cases === 0 ? "0 Cases Declared" : `${cases} Active Cases`}
+          </span>
+        );
+      }
+    },
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Compare Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-sm bg-primary/10 border border-primary/20 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-            <ArrowRightLeft className="h-3 w-3" /> Binary Comparison
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+            <ArrowRightLeft className="h-3.5 w-3.5" /> Direct Side-by-Side Comparison
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
-            Data <span className="text-muted-foreground font-light">Validator</span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+            Compare Representatives
           </h1>
-          <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed font-medium">
-            Side-by-binary validation of representative data points. 
-            Cross-reference metrics across jurisdictions and affiliations.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
+            Side-by-side analysis of public records, declared wealth, criminal affidavits, and constituency mandates.
           </p>
         </div>
+
+        <button
+          onClick={handleShare}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-muted transition-colors self-start md:self-auto shadow-sm"
+        >
+          <Share2 className="h-3.5 w-3.5 text-primary" />
+          {copied ? "Link Copied!" : "Share Comparison"}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/30 p-6 rounded-md border border-border">
-        <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Member Alpha</label>
-          <select 
-            value={left} 
-            onChange={(e) => setLeft(e.target.value)}
-            className="w-full h-10 px-3 rounded-md border border-border bg-background text-sm font-bold uppercase tracking-tight focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-          >
-            <option value="">-- Select Representative --</option>
-            {all.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
-          </select>
+      {/* Selectors Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-muted/20 border border-border/80">
+        <div className="space-y-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            First Representative
+          </label>
+          <Combobox
+            items={comboboxItems}
+            value={left}
+            onChange={setLeft}
+            placeholder="Select first leader..."
+            searchPlaceholder="Search by name, party, state..."
+          />
         </div>
-        <div className="space-y-3">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Member Beta</label>
-          <select 
-            value={right} 
-            onChange={(e) => setRight(e.target.value)}
-            className="w-full h-10 px-3 rounded-md border border-border bg-background text-sm font-bold uppercase tracking-tight focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-          >
-            <option value="">-- Select Representative --</option>
-            {all.map((p) => <option key={p.slug} value={p.slug}>{p.name}</option>)}
-          </select>
+
+        <div className="space-y-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Second Representative
+          </label>
+          <Combobox
+            items={comboboxItems}
+            value={right}
+            onChange={setRight}
+            placeholder="Select second leader..."
+            searchPlaceholder="Search by name, party, state..."
+          />
         </div>
       </div>
 
-      <div className="bg-background border border-border rounded-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50 border-b border-border">
-              <TableHead className="w-1/4">Metric Descriptor</TableHead>
-              <TableHead className="w-3/8 text-center border-l border-border/50">ALPHA DATA</TableHead>
-              <TableHead className="w-3/8 text-center border-l border-border/50">BETA DATA</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.key} className="hover:bg-muted/10 border-b border-border/50">
-                <TableCell className="bg-muted/5 py-4">
-                  <div className="flex items-center gap-3">
-                    <row.icon className="h-3.5 w-3.5 text-muted-foreground/40" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">{row.label}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center py-4 border-l border-border/50">
-                  {p1 ? (
-                    <span className={cn(
-                      "font-bold uppercase tracking-tight",
-                      row.key === 'criminalCases' ? (Number(p1[row.key as keyof Politician]) > 0 ? "text-destructive font-mono" : "text-success font-mono") : "text-foreground",
-                      row.key === 'assets' && "font-mono text-xs"
-                    )}>
-                      {p1[row.key as keyof Politician] ?? "N/A"}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground/20 italic text-xs">Awaiting Input...</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-center py-4 border-l border-border/50">
-                  {p2 ? (
-                    <span className={cn(
-                      "font-bold uppercase tracking-tight",
-                      row.key === 'criminalCases' ? (Number(p2[row.key as keyof Politician]) > 0 ? "text-destructive font-mono" : "text-success font-mono") : "text-foreground",
-                      row.key === 'assets' && "font-mono text-xs"
-                    )}>
-                      {p2[row.key as keyof Politician] ?? "N/A"}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground/20 italic text-xs">Awaiting Input...</span>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      {/* Comparison Cards Header */}
+      <div className="grid grid-cols-2 gap-4 sm:gap-6">
+        {/* Left Politician Card */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col items-center text-center">
+          <div className="mb-3">
+            <CivicAvatar src={p1?.photo} alt={p1?.name || "Leader 1"} size="xl" shape="circle" className="border-2 border-border shadow-md" />
+          </div>
+          <h3 className="font-bold text-base sm:text-xl text-foreground line-clamp-1">{p1?.name || "Representative 1"}</h3>
+          <p className="text-xs sm:text-sm font-semibold text-primary mt-0.5">{p1?.partyName || "Independent"}</p>
+          <span className="text-[11px] text-muted-foreground mt-0.5">{p1?.state}</span>
+          {p1 && (
+            <Link
+              href={`/politicians/${p1.slug}`}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              Full Profile <ExternalLink className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
+
+        {/* Right Politician Card */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col items-center text-center">
+          <div className="mb-3">
+            <CivicAvatar src={p2?.photo} alt={p2?.name || "Leader 2"} size="xl" shape="circle" className="border-2 border-border shadow-md" />
+          </div>
+          <h3 className="font-bold text-base sm:text-xl text-foreground line-clamp-1">{p2?.name || "Representative 2"}</h3>
+          <p className="text-xs sm:text-sm font-semibold text-primary mt-0.5">{p2?.partyName || "Independent"}</p>
+          <span className="text-[11px] text-muted-foreground mt-0.5">{p2?.state}</span>
+          {p2 && (
+            <Link
+              href={`/politicians/${p2.slug}`}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              Full Profile <ExternalLink className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
       </div>
 
-      {/* Comparison Signature */}
-      <div className="flex items-center justify-center pt-8 pb-12 border-t border-border">
-        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em]">
-          End of Comparison Protocol // Ledger SD-COMP-V1
-        </p>
+      {/* Side-by-Side Comparison Metric Rows */}
+      <div className="rounded-2xl bg-card border border-border/80 shadow-sm overflow-hidden divide-y divide-border/60">
+        {metrics.map((metric, idx) => {
+          const Icon = metric.icon;
+          return (
+            <div key={idx} className="p-4 sm:p-5 hover:bg-muted/10 transition-colors">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                <Icon className="h-3.5 w-3.5 text-primary" />
+                <span>{metric.label}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="text-xs sm:text-sm font-semibold text-foreground px-2">
+                  {metric.render ? metric.render(p1) : (metric.get ? metric.get(p1) : "—")}
+                </div>
+                <div className="text-xs sm:text-sm font-semibold text-foreground px-2 border-l border-border/60">
+                  {metric.render ? metric.render(p2) : (metric.get ? metric.get(p2) : "—")}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,112 +1,132 @@
-import { 
-  CommandCenter, 
-  CommandCenterHeader, 
-  CommandCenterGrid, 
-  TacticalMetric, 
-  IntelligenceModule,
-  SystemTerminal
-} from "@/components/ui/CommandCenter";
-import { IndiaMap } from "@/components/home/IndiaMap";
-import { FeaturedPoliticians } from "@/components/home/FeaturedPoliticians";
-import { PartiesSection } from "@/components/home/PartiesSection";
-import { StatesSection } from "@/components/home/StatesSection";
-import { Landmark, Users, Flag, Map, Database, List } from "lucide-react";
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import Party from "@/models/Party";
 import State from "@/models/State";
 import Link from "next/link";
+import { 
+  Landmark, 
+  Users, 
+  Flag, 
+  MapPin, 
+  ArrowRight, 
+  ShieldCheck,
+  Search,
+  Compass
+} from "lucide-react";
+import { StatsCard } from "@/components/common/StatsCard";
+import { ThreeParliamentChamber } from "@/components/parliament/ThreeParliamentChamber";
+import { IndiaMap } from "@/components/home/IndiaMap";
+import { FeaturedPoliticians } from "@/components/home/FeaturedPoliticians";
+import { PartiesSection } from "@/components/home/PartiesSection";
+import { StatesSection } from "@/components/home/StatesSection";
 
 export const revalidate = 3600;
 
 export default async function Home() {
   await connectDB();
-  const lokSabhaCount = await Politician.countDocuments({ chamber: "Lok Sabha" });
-  const rajyaSabhaCount = await Politician.countDocuments({ chamber: "Rajya Sabha" });
-  const partyCount = await Party.countDocuments();
-  const stateCount = await State.countDocuments();
+  const [lokSabhaCount, rajyaSabhaCount, partyCount, stateCount] = await Promise.all([
+    Politician.countDocuments({ chamber: "Lok Sabha" }),
+    Politician.countDocuments({ chamber: "Rajya Sabha" }),
+    Party.countDocuments(),
+    State.countDocuments(),
+  ]);
 
   return (
-    <CommandCenter>
-      <CommandCenterHeader
-        title="SattaDarshan Matrix"
-        subtitle="The most advanced, cryptographically verified dashboard tracking the Indian Parliamentary matrix. Sourced natively from GoI domains with zero human proxy interference."
-        systemStatus="Operational_V6"
-      />
+    <div className="space-y-12 sm:space-y-16 animate-in fade-in duration-500">
+      {/* Hero Section */}
+      <section className="relative pt-6 sm:pt-10 pb-4 text-center max-w-4xl mx-auto space-y-5">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 shadow-sm">
+          <ShieldCheck className="h-3.5 w-3.5" /> Indian Legislative & Parliamentary Intelligence
+        </div>
 
-      <CommandCenterGrid cols={3}>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
+          Indian Parliamentary & <br className="hidden sm:inline" />
+          <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+            Political Intelligence
+          </span> Portal
+        </h1>
+
+        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Comprehensive, verified records for the 18th Lok Sabha, Rajya Sabha, Chief Ministers, and national political parties—featuring real-time 3D chamber visualization and geospatial territory mapping.
+        </p>
+
+        {/* Hero Quick Action Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <Link
+            href="/parliament/lok-sabha"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:opacity-90 transition-all hover:scale-[1.02]"
+          >
+            Explore 18th Lok Sabha <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/politicians"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card border border-border text-foreground font-semibold text-sm shadow-sm hover:bg-muted transition-all"
+          >
+            <Users className="h-4 w-4 text-muted-foreground" /> Browse Representatives
+          </Link>
+          <Link
+            href="/compare"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-card border border-border text-foreground font-semibold text-sm shadow-sm hover:bg-muted transition-all"
+          >
+            Compare Leaders
+          </Link>
+        </div>
+      </section>
+
+      {/* Top Level Metric Summary Cards */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/parliament/lok-sabha">
-          <TacticalMetric 
-            label="Lok Sabha" 
-            value={lokSabhaCount} 
-            total={550} 
-            icon={<Users className="h-4 w-4" />} 
+          <StatsCard
+            title="Lok Sabha (18th House)"
+            value={lokSabhaCount}
+            subtitle="543 Max Constitutional Seats"
+            icon={<Users className="h-5 w-5" />}
           />
         </Link>
         <Link href="/parliament/rajya-sabha">
-          <TacticalMetric 
-            label="Rajya Sabha" 
-            value={rajyaSabhaCount} 
-            total={245} 
-            icon={<Landmark className="h-4 w-4" />} 
+          <StatsCard
+            title="Rajya Sabha (Upper House)"
+            value={rajyaSabhaCount}
+            subtitle="245 Total House Strength"
+            icon={<Landmark className="h-5 w-5" />}
           />
         </Link>
         <Link href="/parties">
-          <TacticalMetric 
-            label="Political Index" 
-            value={partyCount} 
-            icon={<Flag className="h-4 w-4" />} 
+          <StatsCard
+            title="Recognized Parties"
+            value={partyCount}
+            subtitle="National & State Formations"
+            icon={<Flag className="h-5 w-5" />}
           />
         </Link>
-      </CommandCenterGrid>
+        <Link href="/states">
+          <StatsCard
+            title="States & Union Territories"
+            value={stateCount}
+            subtitle="28 States + 8 UTs"
+            icon={<MapPin className="h-5 w-5" />}
+          />
+        </Link>
+      </section>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <IntelligenceModule 
-          className="lg:col-span-2" 
-          title="Interactive Map Matrix" 
-          subtitle="Live territory distribution and demographic scanning"
-          icon={<Map className="h-5 w-5 text-primary" />}
-        >
-          <div className="border-t border-border">
-            <IndiaMap />
-          </div>
-        </IntelligenceModule>
+      {/* Flagship Showpiece: Three.js 3D Parliament Chamber */}
+      <section className="space-y-4">
+        <ThreeParliamentChamber chamber="Lok Sabha" />
+      </section>
 
-        <div className="space-y-8">
-          <IntelligenceModule 
-            title="System Terminal" 
-            subtitle="Real-time protocol status and data pedigree"
-            icon={<Database className="h-5 w-5 text-primary" />}
-          >
-            <SystemTerminal />
-          </IntelligenceModule>
+      {/* Interactive India Geospatial Map */}
+      <section className="space-y-4">
+        <IndiaMap />
+      </section>
 
-          <IntelligenceModule 
-            title="Discovery Nodes" 
-            subtitle="Quick access points to key registries"
-            icon={<List className="h-5 w-5 text-primary" />}
-          >
-            <div className="p-4 space-y-2">
-              <Link href="/politicians" className="flex items-center justify-between p-3 rounded-sm bg-muted/50 border border-border hover:border-primary/50 hover:bg-muted transition-all group">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">Politician Index</span>
-                <span className="text-[10px] font-mono font-black text-primary">SCAN_REQ</span>
-              </Link>
-              <Link href="/states" className="flex items-center justify-between p-3 rounded-sm bg-muted/50 border border-border hover:border-primary/50 hover:bg-muted transition-all group">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">Regional Registry</span>
-                <span className="text-[10px] font-mono font-black text-primary">SCAN_REQ</span>
-              </Link>
-              <Link href="/compare" className="flex items-center justify-between p-3 rounded-sm bg-muted/50 border border-border hover:border-primary/50 hover:bg-muted transition-all group">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">Analytic Comparison</span>
-                <span className="text-[10px] font-mono font-black text-primary">PROC_REQ</span>
-              </Link>
-            </div>
-          </IntelligenceModule>
-        </div>
-      </div>
-
-      <StatesSection />
+      {/* Prominent Leadership Spotlight */}
       <FeaturedPoliticians />
+
+      {/* Political Formations & Coalitions */}
       <PartiesSection />
-    </CommandCenter>
+
+      {/* Major Legislative Jurisdictions */}
+      <StatesSection />
+    </div>
   );
 }

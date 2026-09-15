@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/Button";
-import { AlertCircle, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { AlertCircle, RotateCcw, Landmark, ArrowRight } from "lucide-react";
 
 export default function Error({
   error,
@@ -16,33 +16,43 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh] w-full px-4">
-      <div className="max-w-md w-full bg-white border border-slate-100 rounded-2xl p-8 shadow-xl text-center">
-        <div className="mx-auto w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mb-6">
-          <AlertCircle className="w-8 h-8 text-rose-500" />
+    <div className="flex items-center justify-center min-h-[70vh] w-full px-4 py-12">
+      <div className="max-w-md w-full bg-card border border-border/80 rounded-2xl p-8 shadow-sm text-center animate-in fade-in duration-300">
+        <div className="mx-auto w-14 h-14 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center mb-5 text-rose-600 dark:text-rose-400 shadow-sm">
+          <AlertCircle className="w-7 h-7" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Protocol Interrupted</h2>
-        <p className="text-slate-500 mb-8 leading-relaxed">
-          The system encountered an unexpected synchronization error. Data pedigree could not be verified at this moment.
+        
+        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          System Notice
+        </span>
+
+        <h2 className="text-2xl font-bold tracking-tight text-foreground mt-1 mb-2">
+          Service Temporarily Unavailable
+        </h2>
+        
+        <p className="text-xs sm:text-sm text-muted-foreground mb-6 leading-relaxed">
+          The server encountered an unexpected issue while retrieving parliamentary or demographic records. Please retry your query or return to the main directory.
         </p>
-        <div className="flex flex-col gap-3">
-          <Button 
+
+        <div className="flex flex-col gap-2.5">
+          <button
             onClick={() => reset()}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-6 rounded-xl font-bold gap-2"
+            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-xs sm:text-sm shadow-sm hover:opacity-90 transition-opacity"
           >
-            <RotateCcw className="w-4 h-4" /> Reset Connection
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = "/"}
-            className="w-full py-6 rounded-xl font-semibold border-slate-200"
+            <RotateCcw className="w-4 h-4" /> Retry Query
+          </button>
+          
+          <Link
+            href="/"
+            className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-border bg-card font-semibold text-xs sm:text-sm text-foreground hover:bg-muted transition-colors shadow-sm"
           >
-            Return to Command Center
-          </Button>
+            <Landmark className="w-4 h-4 text-primary" /> Return to Portal Home
+          </Link>
         </div>
+
         {error.digest && (
-          <p className="mt-6 text-[10px] font-mono text-slate-300 uppercase tracking-tighter">
-            Error Signature: {error.digest}
+          <p className="mt-6 text-[10px] font-mono text-muted-foreground/60 tracking-tight">
+            Reference ID: {error.digest}
           </p>
         )}
       </div>

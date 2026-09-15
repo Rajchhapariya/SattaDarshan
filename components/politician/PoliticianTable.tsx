@@ -1,6 +1,5 @@
-import * as React from "react"
-import Link from "next/link"
-import Image from "next/image"
+import Link from "next/link";
+import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { 
   Table, 
   TableBody, 
@@ -8,9 +7,9 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from "@/components/ui/Table"
-import { Badge } from "@/components/ui/Badge"
-import { User, ChevronRight, ExternalLink } from "lucide-react"
+} from "@/components/ui/Table";
+import { Badge } from "@/components/ui/Badge";
+import { User, ChevronRight } from "lucide-react";
 
 type PoliticianSummary = {
   slug: string;
@@ -24,67 +23,49 @@ type PoliticianSummary = {
 
 export function PoliticianTable({ data }: { data: PoliticianSummary[] }) {
   return (
-    <div className="rounded-md border border-border overflow-hidden bg-background">
+    <div className="rounded-2xl border border-border/80 overflow-x-auto bg-card shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent odd:bg-muted/50 even:bg-muted/50">
-            <TableHead className="w-[80px]">Profile</TableHead>
+          <TableRow className="bg-muted/30">
+            <TableHead className="w-[70px]">Photo</TableHead>
             <TableHead>Representative</TableHead>
-            <TableHead>Primary Role</TableHead>
-            <TableHead>Affiliation</TableHead>
-            <TableHead className="hidden md:table-cell">Jurisdiction</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Office / Role</TableHead>
+            <TableHead>Party</TableHead>
+            <TableHead className="hidden md:table-cell">Constituency & State</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((p) => (
-            <TableRow key={p.slug} className="group">
+            <TableRow key={p.slug} className="hover:bg-muted/20 transition-colors">
               <TableCell>
-                <div className="h-10 w-10 rounded-sm border border-border bg-muted overflow-hidden relative grayscale group-hover:grayscale-0 transition-all">
-                  {p.photo ? (
-                    <Image
-                      src={p.photo}
-                      alt={p.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full w-full">
-                      <User className="h-5 w-5 text-muted-foreground/30" />
-                    </div>
-                  )}
-                </div>
+                <CivicAvatar src={p.photo} alt={p.name} size="table" shape="circle" className="border border-border flex-shrink-0" />
               </TableCell>
               <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-black text-sm tracking-tight group-hover:text-primary transition-colors">
-                    {p.name}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    ID: {p.slug.split('-').pop()?.toUpperCase()}
-                  </span>
-                </div>
+                <Link
+                  href={`/politicians/${p.slug}`}
+                  className="font-bold text-sm text-foreground hover:text-primary transition-colors"
+                >
+                  {p.name}
+                </Link>
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-widest bg-muted/30">
-                  {p.role || "Member"}
+                <Badge variant="outline" className="text-[11px] font-semibold">
+                  {p.role || "Leader"}
                 </Badge>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-bold text-xs">{p.partyName || "Independent"}</span>
-                </div>
+                <span className="font-semibold text-xs text-primary">{p.partyName || "Independent"}</span>
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium">{p.constituency || "N/A"}</span>
-                  <span className="text-[10px] text-muted-foreground font-bold uppercase">{p.state}</span>
-                </div>
+                <span className="text-xs text-muted-foreground">
+                  {p.constituency ? `${p.constituency}, ` : ""}{p.state || "India"}
+                </span>
               </TableCell>
               <TableCell className="text-right">
                 <Link 
                   href={`/politicians/${p.slug}`}
-                  className="inline-flex items-center justify-center h-8 w-8 rounded-sm border border-border hover:bg-primary hover:border-primary hover:text-primary-foreground transition-all"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border hover:bg-muted hover:text-primary transition-all"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Link>
@@ -94,5 +75,5 @@ export function PoliticianTable({ data }: { data: PoliticianSummary[] }) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

@@ -1,57 +1,43 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import connectDB from "@/lib/db";
 import Party from "@/models/Party";
 import Politician from "@/models/Politician";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { PoliticianCard } from "@/components/politician/PoliticianCard";
+import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { 
-  Flag, Building2, Calendar, Users, 
-  Globe, ShieldCheck, History, Database,
-  ArrowUpRight, Landmark, FileText
+  Flag, 
+  Building2, 
+  Calendar, 
+  Users, 
+  Globe, 
+  ShieldCheck, 
+  Landmark, 
+  ExternalLink,
+  ChevronRight
 } from "lucide-react";
-
-type Leader = {
-  slug: string;
-  name: string;
-  photo?: string;
-  role?: string;
-  partyName?: string;
-  constituency?: string;
-  state?: string;
-};
-
-type PartyDetails = {
-  name: string;
-  abbr?: string;
-  logo?: string;
-  founded?: number;
-  president?: string;
-  hq?: string;
-  alliance?: string;
-  seatsLokSabha?: number;
-  seatsRajyaSabha?: number;
-  leaders?: Leader[];
-  states?: string[];
-  ideology?: string;
-  website?: string;
-  description?: string;
-  tier?: string;
-  status?: string;
-};
 
 type PartyPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-async function getParty(slug: string): Promise<PartyDetails | null> {
+async function getParty(slug: string) {
   try {
     await connectDB();
     const party = await Party.findOne({ slug }).lean() as any;
     if (!party) return null;
-    const leaders = await Politician.find({ party: slug }).limit(12).lean();
+
+    // Search for MPs belonging to this party by slug or abbreviation
+    const leaders = await Politician.find({
+      $or: [
+        { party: slug },
+        { party: party.abbr?.toLowerCase() },
+        { partyName: party.name },
+        { partyName: party.abbr }
+      ]
+    }).sort({ role: 1, name: 1 }).limit(24).lean();
+
     return { ...party, leaders };
   } catch {
     return null;
@@ -61,192 +47,190 @@ async function getParty(slug: string): Promise<PartyDetails | null> {
 export async function generateMetadata({ params }: PartyPageProps) {
   const { slug } = await params;
   const p = await getParty(slug);
-  return p ? {
-    title: `${p.name} — Political Index Profile`,
-    description: `Official registry data for ${p.name}. Includes leadership hierarchy, seat distribution, and institutional status.`,
-    openGraph: { images: [{ url: `/api/og/party/${slug}` }] },
-  } : {title:"Not Found"};
+  return {
+    title: p ? `${p.name} (${p.abbr || ""}) — Party Profile & Seat Distribution` : "Party Not Found",
+    description: p ? `Official political party profile for ${p.name}. Includes leadership, seats in Lok Sabha and Rajya Sabha, and affiliated members.` : "",
+  };
 }
 
 export default async function PartyPage({ params }: PartyPageProps) {
   const { slug } = await params;
   const p = await getParty(slug);
-  if(!p) notFound();
+  if (!p) notFound();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Registry Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-        <Link href="/" className="hover:text-primary transition-colors">System</Link>
-        <span className="opacity-30">/</span>
-        <Link href="/parties" className="hover:text-primary transition-colors">Index</Link>
-        <span className="opacity-30">/</span>
-        <span className="text-foreground font-bold underline decoration-primary/30">Formation: {p.abbr || "PROTO"}</span>
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+        <span>/</span>
+        <Link href="/parties" className="hover:text-foreground transition-colors">Political Parties</Link>
+        <span>/</span>
+        <span className="text-foreground font-semibold truncate">{p.abbr || p.name}</span>
       </nav>
 
-      {/* Main Header */}
-      <div className="grid gap-8 lg:grid-cols-4 items-start">
-        <div className="lg:col-span-1">
-           <div className="bg-background border border-border rounded-md p-8 flex flex-col items-center justify-center relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
-              <div className="h-32 w-32 rounded border border-border bg-muted/30 p-4 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500 mb-6">
-                {p.logo ? (
-                  <Image 
-                    src={p.logo} 
-                    alt={p.name} 
-                    width={100} 
-                    height={100} 
-                    className="object-contain"
-                  />
-                ) : (
-                  <Flag className="h-12 w-12 text-muted-foreground/20" />
-                )}
-              </div>
-              <Badge variant="outline" className="mb-2 text-[8px] border-primary/30 text-primary">
-                 {p.tier || "REG_ENTITY"}
-              </Badge>
-              <h1 className="text-center font-black text-2xl tracking-tighter uppercase text-foreground leading-tight">
-                {p.abbr || p.name}
-              </h1>
-              <p className="text-[10px] text-center font-bold text-muted-foreground uppercase tracking-widest mt-2">
-                 {p.status || "Active"} Formation
+      {/* Hero Party Header Card */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-start sm:items-center gap-4 sm:gap-6">
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-muted/30 border border-border/60 p-2.5 flex items-center justify-center flex-shrink-0">
+            {p.logo ? (
+              <Image
+                src={p.logo}
+                alt={p.abbr || p.name}
+                width={80}
+                height={80}
+                className="object-contain max-h-full"
+              />
+            ) : (
+              <Flag className="h-10 w-10 text-muted-foreground/40" />
+            )}
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <AllianceBadge alliance={p.alliance} size="sm" />
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {p.tier || "State"} Recognized
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mt-1.5">
+              {p.name}
+            </h1>
+            {p.abbr && (
+              <p className="text-sm font-semibold text-primary mt-0.5">
+                Acronym: {p.abbr}
               </p>
-              
-              {p.website && (
-                <a 
-                  href={p.website} 
-                  target="_blank" 
-                  className="mt-6 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary hover:underline"
-                >
-                  <Globe className="h-3 w-3" /> Official Domain <ArrowUpRight className="h-3 w-3" />
-                </a>
-              )}
-           </div>
+            )}
+          </div>
         </div>
 
-        <div className="lg:col-span-3 space-y-8">
-          <div className="border-b border-border pb-6">
-             <div className="flex items-center gap-2 mb-2">
-                <Database className="h-3 w-3 text-muted-foreground" />
-                <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Political Index Registry Record</span>
-             </div>
-             <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase mb-6">
-                {p.name}
-             </h2>
-             
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="space-y-1">
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                      <Calendar className="h-3 w-3" /> Founded
-                   </p>
-                   <p className="text-lg font-black font-mono text-foreground uppercase tracking-tighter">{p.founded || "19XX"}</p>
-                </div>
-                <div className="space-y-1">
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                      <Users className="h-3 w-3" /> President
-                   </p>
-                   <p className="text-lg font-black text-foreground uppercase tracking-tighter truncate" title={p.president}>{p.president || "NA_PROTO"}</p>
-                </div>
-                <div className="space-y-1">
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                      <Building2 className="h-3 w-3" /> Headquarters
-                   </p>
-                   <p className="text-lg font-black text-foreground uppercase tracking-tighter truncate" title={p.hq}>{p.hq || "DEL_CENT"}</p>
-                </div>
-                <div className="space-y-1">
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                      <ShieldCheck className="h-3 w-3" /> Alliance
-                   </p>
-                   <p className="text-lg font-black text-foreground uppercase tracking-tighter">{p.alliance || "IND_PROTO"}</p>
-                </div>
-             </div>
+        {/* Seat Counters */}
+        <div className="flex items-center gap-3">
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[110px]">
+            <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Lok Sabha</span>
+            <span className="text-2xl font-bold text-foreground">{p.seatsLokSabha || 0}</span>
+            <span className="text-[10px] text-muted-foreground">Seats</span>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="bg-muted/10 border border-border rounded-md p-6 flex items-center justify-between group hover:border-primary/30 transition-all">
-                <div>
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Lok Sabha Strength</p>
-                   <p className="text-3xl font-black font-mono text-foreground tracking-tighter">
-                      {p.seatsLokSabha?.toString().padStart(2, '0') || "00"} <span className="text-sm font-medium text-muted-foreground">SEATS</span>
-                   </p>
-                </div>
-                <Landmark className="h-12 w-12 text-muted-foreground/10 group-hover:text-primary/20 transition-all" />
-             </div>
-             <div className="bg-muted/10 border border-border rounded-md p-6 flex items-center justify-between group hover:border-indigo-500/30 transition-all">
-                <div>
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Rajya Sabha Strength</p>
-                   <p className="text-3xl font-black font-mono text-foreground tracking-tighter">
-                      {p.seatsRajyaSabha?.toString().padStart(2, '0') || "00"} <span className="text-sm font-medium text-muted-foreground">SEATS</span>
-                   </p>
-                </div>
-                <Landmark className="h-12 w-12 text-muted-foreground/10 group-hover:text-indigo-500/20 transition-all" />
-             </div>
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[110px]">
+            <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Rajya Sabha</span>
+            <span className="text-2xl font-bold text-foreground">{p.seatsRajyaSabha || 0}</span>
+            <span className="text-[10px] text-muted-foreground">Seats</span>
           </div>
+        </div>
+      </div>
 
-          {p.description && (
-            <div className="bg-background border border-border rounded-md p-6 relative overflow-hidden">
-               <FileText className="absolute top-2 right-4 h-12 w-12 text-muted-foreground/5" />
-               <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Organizational Overview</h4>
-               <p className="text-sm font-medium text-foreground leading-relaxed">
-                  {p.description}
-               </p>
-               {p.ideology && (
-                 <div className="mt-6 pt-6 border-t border-border flex items-center gap-4">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Core Ideology:</span>
-                    <Badge variant="secondary" className="font-mono text-[9px]">{p.ideology.toUpperCase()}</Badge>
-                 </div>
-               )}
+      {/* Party Details Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leadership</span>
+            <Users className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-base font-bold text-foreground">
+            {p.president || "Executive Committee"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Party President / General Secretary</p>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Founded</span>
+            <Calendar className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-base font-bold text-foreground">
+            {p.founded ? `Year ${p.founded}` : "Established Formation"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Official registration</p>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Headquarters</span>
+            <Building2 className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-base font-bold text-foreground truncate">
+            {p.hq || "New Delhi, India"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Central Secretariat</p>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Official Web</span>
+            <Globe className="h-4 w-4 text-primary" />
+          </div>
+          {p.website ? (
+            <a
+              href={p.website}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm font-bold text-primary hover:underline flex items-center gap-1 truncate"
+            >
+              Visit Portal <ExternalLink className="h-3 w-3" />
+            </a>
+          ) : (
+            <span className="text-sm font-bold text-foreground">ECI Registered</span>
+          )}
+          <p className="text-[11px] text-muted-foreground mt-0.5">Public domain</p>
+        </div>
+      </div>
+
+      {/* Ideology & Description */}
+      {(p.ideology || p.description) && (
+        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-3">
+          <h3 className="text-lg font-bold text-foreground">Ideology & Political Stance</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {p.description || `The ${p.name} is a prominent political party in India aligned with ${p.ideology || "democratic governance and socio-economic development"}. It actively participates in legislative proceedings at both the Union Parliament and state legislative assemblies.`}
+          </p>
+          {p.ideology && (
+            <div className="flex items-center gap-2 pt-2">
+              <span className="text-xs font-semibold text-muted-foreground">Political Ideologies:</span>
+              <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-muted text-foreground">
+                {p.ideology}
+              </span>
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Leadership Section */}
-      <div className="pt-12 border-t border-border">
-         <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-               <div className="h-6 w-6 rounded-sm bg-success/10 border border-success/20 flex items-center justify-center">
-                  <Users className="h-3.5 w-3.5 text-success" />
-               </div>
-               <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Key Registry Members</h3>
-            </div>
-            <Link href={`/politicians?party=${slug}`} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">
-               View Full Roster →
-            </Link>
-         </div>
-         
-         {!p.leaders?.length ? (
-           <div className="py-20 text-center border border-dashed border-border rounded-md">
-              <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest">Roster Synchronization Pending</p>
-           </div>
-         ) : (
-           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-              {p.leaders.map((l) => <PoliticianCard key={l.slug} {...l} />)}
-           </div>
-         )}
-      </div>
+      {/* Affiliated Representatives Section */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+              Affiliated Lawmakers & Leaders
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Key MPs and elected representatives representing {p.abbr || p.name}
+            </p>
+          </div>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-muted text-muted-foreground">
+            {p.leaders?.length || 0} Members Listed
+          </span>
+        </div>
 
-      {/* Footer Signature */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-12 pb-16 border-t border-border mt-12">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2.5">
-             <History className="h-3.5 w-3.5 text-muted-foreground" />
-             <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Last Index Synchronization</span>
-                <span className="text-[10px] font-mono font-black">{new Date().toISOString().replace('T', ' ').substring(0, 19)} UTC</span>
-             </div>
+        {(!p.leaders || p.leaders.length === 0) ? (
+          <div className="p-12 text-center rounded-2xl bg-card border border-border/80">
+            <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              No representative records currently mapped directly for this party.
+            </p>
           </div>
-          <div className="flex items-center gap-2.5 border-l border-border pl-8">
-             <ShieldCheck className="h-3.5 w-3.5 text-success" />
-             <div className="flex flex-col">
-                <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">ECI Alignment</span>
-                <span className="text-[10px] font-mono font-black text-success uppercase">Status_Verified_V4</span>
-             </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {p.leaders.map((leader: any) => (
+              <PoliticianCard
+                key={leader.slug}
+                slug={leader.slug}
+                name={leader.name}
+                photo={leader.photo}
+                role={leader.role || "MP"}
+                partyName={p.abbr || p.name}
+                constituency={leader.constituency}
+                state={leader.state}
+              />
+            ))}
           </div>
-        </div>
-        <div className="px-4 py-2 bg-foreground text-background rounded-sm">
-           <p className="text-[9px] font-mono font-bold tracking-[0.4em] uppercase">FORMATION_ID_{p.abbr || "PROTO"}_{slug.toUpperCase()}</p>
-        </div>
+        )}
       </div>
     </div>
   );

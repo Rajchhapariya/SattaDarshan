@@ -1,29 +1,29 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import Party from "@/models/Party";
 import { Badge } from "@/components/ui/Badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { StateIcon } from "@/components/ui/StateIcon";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { ProfileActions } from "@/components/politician/ProfileActions";
-import { 
-  Dossier, 
-  DossierHeader, 
-  DossierSection, 
-  DossierGrid, 
-  DossierCard, 
-  DossierField, 
-  DossierFooter 
-} from "@/components/ui/Dossier";
-import Link from "next/link";
 import { getStatePath } from "@/lib/server/statePaths";
 import { cn } from "@/lib/utils";
 import {
-  User, MapPin, Building2, GraduationCap,
-  Wallet, AlertTriangle, ShieldCheck, Twitter,
-  Facebook, Instagram, Globe, Database, History,
-  FileText, Landmark, Fingerprint
+  User, 
+  MapPin, 
+  Landmark, 
+  GraduationCap,
+  Wallet, 
+  AlertTriangle, 
+  CheckCircle, 
+  Twitter,
+  Facebook, 
+  Instagram, 
+  Globe, 
+  Calendar,
+  ChevronRight,
+  Share2
 } from "lucide-react";
 
 type PoliticianPageProps = {
@@ -37,7 +37,11 @@ async function getPolitician(slug: string) {
 
   if (p.party) {
     const party = await Party.findOne({ slug: p.party }).lean() as any;
-    if (party) p.partyName = party.name;
+    if (party) {
+      p.partyName = party.name;
+      p.partyLogo = party.logo;
+      p.partyAbbr = party.abbr;
+    }
   }
   return p;
 }
@@ -45,14 +49,11 @@ async function getPolitician(slug: string) {
 export async function generateMetadata({ params }: PoliticianPageProps) {
   const { slug } = await params;
   const p = await getPolitician(slug);
-  if (!p) return { title: "Dossier Not Found" };
+  if (!p) return { title: "Representative Not Found" };
 
   return {
-    title: `${p.name} — Intelligence Dossier`,
-    description: `Official intelligence profile for ${p.name}. Data points include legislative history, assets, and verified legal records.`,
-    openGraph: {
-      images: [{ url: `/api/og/politician/${slug}` }],
-    },
+    title: `${p.name} — Political Profile & Legislative Records`,
+    description: `Official public profile for ${p.name} (${p.role || "Representative"}), representing ${p.constituency || p.state} in India.`,
   };
 }
 
@@ -62,144 +63,213 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
   if (!p) notFound();
 
   const statePath = p.state ? getStatePath(p.state) : undefined;
+  const hasZeroCriminalCases = p.criminalCases === 0 || p.criminalCases === undefined;
 
   return (
-    <Dossier>
-      {/* Dossier Breadcrumbs */}
-      <nav className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-        <Link href="/" className="hover:text-primary transition-colors">System</Link>
-        <span className="opacity-30">/</span>
-        <Link href="/politicians" className="hover:text-primary transition-colors">Ledger</Link>
-        <span className="opacity-30">/</span>
-        <span className="text-foreground font-bold underline decoration-primary/30">Dossier: {p.slug.substring(0, 8)}</span>
+    <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-500">
+      {/* Breadcrumbs */}
+      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
+        <span>/</span>
+        <Link href="/politicians" className="hover:text-foreground transition-colors">Representatives</Link>
+        <span>/</span>
+        <span className="text-foreground font-semibold truncate">{p.name}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-4 items-start">
-        <div className="lg:col-span-1 space-y-6">
-          <div className="relative aspect-[3/4] rounded-md overflow-hidden border border-border bg-muted group">
-            <Avatar className="w-full h-full rounded-none grayscale group-hover:grayscale-0 transition-all duration-700">
-              <AvatarImage src={p.photo} alt={p.name} className="object-cover" />
-              <AvatarFallback className="text-6xl font-black text-muted-foreground/20 rounded-none bg-muted flex items-center justify-center">
-                {p.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="absolute top-4 left-4">
-               <Badge className="bg-primary text-white border-none shadow-lg px-2 py-0.5">
-                 OFFICIAL RECORD
-               </Badge>
-            </div>
+      {/* Hero Profile Card */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+        {/* Full-Color Portrait */}
+        <div className="relative flex-shrink-0">
+          <CivicAvatar
+            src={p.photo}
+            alt={p.name}
+            size="hero"
+            shape="rounded-2xl"
+            priority
+            className="border border-border/80 shadow-md"
+          />
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-primary-foreground shadow-sm">
+              {p.role || "Leader"}
+            </span>
           </div>
-          <ProfileActions slug={p.slug} name={p.name} />
-          
-          <DossierSection title="Identities" icon={<Database className="h-4 w-4" />} description="Biometric & Civic Metadata">
-            <div className="space-y-1">
-              <DossierField label="Date of Birth" value={p.dob} mono />
-              <DossierField label="Gender" value={p.gender} />
-              <DossierField label="Education" value={p.education} />
-            </div>
-          </DossierSection>
         </div>
 
-        <div className="lg:col-span-3 space-y-8">
-          <DossierHeader 
-            title={p.name}
-            subtitle={`${p.role} // ${p.partyName}`}
-            id={p.slug.split('-').pop()?.toUpperCase()}
-            status={p.status || "Active"}
-            badge="Verified Representative Dossier"
-          />
-
-          <DossierGrid cols={2}>
-            <DossierCard 
-              label="Assigned Constituency"
-              value={p.constituency || "NA_PROTO"}
-              icon={<MapPin className="h-5 w-5 text-primary" />}
-            />
-            <DossierCard 
-              label="State Jurisdiction"
-              value={p.state}
-              subValue="Sub-National Division"
-              icon={<StateIcon stateName={p.state} statePath={statePath} className="h-5 w-5 text-indigo-500" />}
-            />
-          </DossierGrid>
-
-          {p.bio && (
-            <DossierSection icon={<FileText className="h-4 w-4" />} description="Official Profile Overview">
-              <div className="relative p-6 bg-background border-l-4 border-primary rounded-r-md">
-                <p className="text-sm font-medium text-foreground leading-relaxed italic">
-                  &quot;{p.bio}&quot;
-                </p>
-                <p className="mt-4 text-[9px] font-mono text-muted-foreground uppercase tracking-widest">— Official Statement</p>
-              </div>
-            </DossierSection>
-          )}
-
-          <DossierGrid cols={2}>
-            <DossierCard 
-              label="Financial Affidavit"
-              value={p.assets || "NOT_DECLARED"}
-              subValue="Self-Declared Net Evaluation"
-              icon={<Wallet className="h-5 w-5 text-success" />}
-              trend="positive"
-            />
-            <DossierCard 
-              label="Legal Audit"
-              value={p.criminalCases ?? 0}
-              subValue="Flagged Criminal Cases"
-              icon={<AlertTriangle className={cn("h-5 w-5", p.criminalCases > 0 ? "text-destructive" : "text-success")} />}
-              trend={p.criminalCases > 0 ? "negative" : "positive"}
-            />
-          </DossierGrid>
-
-          <DossierSection title="Legislative Service History" icon={<Landmark className="h-4 w-4" />} description="Chamber Tenure & Records">
-            <div className="bg-muted/10 border border-border p-6 rounded-md">
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Chamber</p>
-                  <p className="text-xl font-black text-foreground uppercase tracking-tight underline decoration-primary/20 decoration-2">{p.chamber || "NA_PROTO"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Service Tenure</p>
-                  <p className="text-xl font-black font-mono text-foreground tracking-tighter">
-                    {p.termStart || "UNKN"} <span className="text-muted-foreground font-light mx-1">/</span> {p.termEnd || "PRES"}
-                  </p>
-                </div>
-              </div>
+        {/* Member Title & Meta */}
+        <div className="space-y-4 flex-1">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle className="h-3.5 w-3.5" /> Verified Public Representative
+              </span>
             </div>
-          </DossierSection>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              {p.name}
+            </h1>
+            <p className="text-base font-semibold text-primary mt-1">
+              {p.partyName || "Independent"}
+              {p.chamber && ` • ${p.chamber}`}
+            </p>
+          </div>
 
-          {/* Social Identifiers */}
-          {(p.socialLinks?.twitter || p.socialLinks?.facebook || p.socialLinks?.instagram || p.socialLinks?.website) && (
-            <DossierSection title="Digital Presence" icon={<Globe className="h-4 w-4" />} description="Verified Communication Channels">
-              <div className="flex flex-wrap gap-3">
-                {p.socialLinks?.twitter && (
-                  <a href={p.socialLinks.twitter} target="_blank" className="h-10 w-10 flex items-center justify-center bg-muted border border-border rounded-sm hover:bg-primary hover:text-white transition-all group">
-                    <Twitter className="h-4 w-4 text-muted-foreground group-hover:text-white" />
-                  </a>
-                )}
-                {p.socialLinks?.facebook && (
-                  <a href={p.socialLinks.facebook} target="_blank" className="h-10 w-10 flex items-center justify-center bg-muted border border-border rounded-sm hover:bg-primary hover:text-white transition-all group">
-                    <Facebook className="h-4 w-4 text-muted-foreground group-hover:text-white" />
-                  </a>
-                )}
-                {p.socialLinks?.instagram && (
-                  <a href={p.socialLinks.instagram} target="_blank" className="h-10 w-10 flex items-center justify-center bg-muted border border-border rounded-sm hover:bg-primary hover:text-white transition-all group">
-                    <Instagram className="h-4 w-4 text-muted-foreground group-hover:text-white" />
-                  </a>
-                )}
-                {p.socialLinks?.website && (
-                  <a href={p.socialLinks.website} target="_blank" className="h-10 w-10 flex items-center justify-center bg-muted border border-border rounded-sm hover:bg-primary hover:text-white transition-all group">
-                    <Globe className="h-4 w-4 text-muted-foreground group-hover:text-white" />
-                  </a>
-                )}
-              </div>
-            </DossierSection>
+          {/* Key Tag Badges */}
+          <div className="flex flex-wrap gap-2 text-xs">
+            {p.state && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
+                <StateIcon stateName={p.state} statePath={statePath} className="h-3.5 w-3.5 opacity-70" />
+                {p.state}
+              </span>
+            )}
+            {p.constituency && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                Constituency: {p.constituency}
+              </span>
+            )}
+            {p.gender && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
+                <User className="h-3.5 w-3.5 text-muted-foreground" />
+                {p.gender}
+              </span>
+            )}
+          </div>
+
+          {/* Social Links */}
+          {p.socialLinks && (
+            <div className="flex items-center gap-2 pt-2">
+              {p.socialLinks.twitter && (
+                <a
+                  href={p.socialLinks.twitter}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                  title="Twitter / X"
+                >
+                  <Twitter className="h-4 w-4" />
+                </a>
+              )}
+              {p.socialLinks.facebook && (
+                <a
+                  href={p.socialLinks.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                  title="Facebook"
+                >
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+              {p.socialLinks.website && (
+                <a
+                  href={p.socialLinks.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                  title="Official Website"
+                >
+                  <Globe className="h-4 w-4" />
+                </a>
+              )}
+            </div>
           )}
         </div>
       </div>
 
-      <DossierFooter slug={p.slug} />
-    </Dossier>
+      {/* 4 Essential Legislative Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Declared Assets */}
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Declared Assets</span>
+            <Wallet className="h-4 w-4 text-amber-500" />
+          </div>
+          <div className="text-xl font-bold text-foreground">
+            {p.assets || "Declared in Affidavit"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Self-declared ECI asset affidavit</p>
+        </div>
+
+        {/* Legal & Criminal Records */}
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Criminal Cases</span>
+            {hasZeroCriminalCases ? (
+              <CheckCircle className="h-4 w-4 text-emerald-500" />
+            ) : (
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+            )}
+          </div>
+          <div className={cn("text-xl font-bold", hasZeroCriminalCases ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400")}>
+            {hasZeroCriminalCases ? "0 Cases" : `${p.criminalCases} Cases Declared`}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">ECI election compliance status</p>
+        </div>
+
+        {/* Education Qualification */}
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Education</span>
+            <GraduationCap className="h-4 w-4 text-blue-500" />
+          </div>
+          <div className="text-base font-bold text-foreground line-clamp-1">
+            {p.education || "Graduate"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Highest completed level</p>
+        </div>
+
+        {/* Chamber & Term */}
+        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">House Chamber</span>
+            <Landmark className="h-4 w-4 text-purple-500" />
+          </div>
+          <div className="text-base font-bold text-foreground">
+            {p.chamber || "Parliament"}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Active legislative seat</p>
+        </div>
+      </div>
+
+      {/* Biography Section */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">
+        <h3 className="text-lg font-bold text-foreground">Biography & Public Profile</h3>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          {p.bio || `${p.name} is an active public representative in India, serving in the ${p.chamber || "Parliament"} representing ${p.constituency ? `the constituency of ${p.constituency} in ${p.state}` : p.state || "the nation"}. As a key member of ${p.partyName || "their political party"}, they participate in legislative debates, regional constituency development, and national policy initiatives.`}
+        </p>
+      </div>
+
+      {/* Direct Quick Nav to State & Party */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {p.party && (
+          <Link
+            href={`/parties/${p.party}`}
+            className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:border-primary/50 hover:shadow-md transition-all flex items-center justify-between group"
+          >
+            <div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Affiliated Party</span>
+              <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-0.5">
+                {p.partyName}
+              </h4>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+        )}
+
+        {p.state && (
+          <Link
+            href={`/states/${p.state ? p.state.toLowerCase().replace(/\s+/g, '-') : ''}`}
+            className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:border-primary/50 hover:shadow-md transition-all flex items-center justify-between group"
+          >
+            <div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Representing State</span>
+              <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-0.5">
+                {p.state}
+              </h4>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+        )}
+      </div>
+    </div>
   );
 }
-
