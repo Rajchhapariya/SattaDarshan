@@ -13,6 +13,7 @@ import {
   ChevronRight, 
   UserCheck
 } from "lucide-react";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { escapeRegex } from "@/lib/utils";
 
 type StateDetails = {
@@ -117,6 +118,13 @@ export default async function StatePage({ params }: StatePageProps) {
         <span className="text-foreground font-semibold truncate">{s.name}</span>
       </nav>
 
+      {/* Non-Government Transparency Banner */}
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/70 text-xs text-muted-foreground flex items-center justify-between gap-3">
+        <p className="leading-relaxed">
+          <strong className="font-semibold text-foreground">Independent Civic Overview:</strong> Compiled from public state government portals and legislative registries. SattaDarshan is an independent, non-government platform and is not affiliated with or endorsed by the Government of {s.name}.
+        </p>
+      </div>
+
       {/* State Hero Header Card */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-start sm:items-center gap-4 sm:gap-6">
@@ -199,6 +207,15 @@ export default async function StatePage({ params }: StatePageProps) {
           </div>
         )}
       </div>
+
+      {/* Data Accuracy & State Source Provenance Notice */}
+      <DataAccuracyNotice
+        variant="detailed"
+        recordSlug={s.slug}
+        recordType="state"
+        source={`Official Government of ${s.name} / Legislative Assembly`}
+        sourceUrl="https://www.india.gov.in/"
+      />
     </div>
   );
 }

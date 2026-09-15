@@ -92,6 +92,16 @@ export default function TermsPage() {
           </p>
         </section>
 
+        <section className="space-y-2">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <Scale className="h-4 w-4 text-primary" />
+            5. Acknowledgment of Independent Non-Government Status
+          </h2>
+          <p>
+            By using SattaDarshan, you expressly acknowledge that SattaDarshan is an independent, non-government civic platform and is not affiliated with, operated by, endorsed by, or connected to any government body, legislature, or election authority. SattaDarshan does not issue certified records or replace official government sources.
+          </p>
+        </section>
+
         <section className="space-y-2 border-t border-border/60 pt-4">
           <h2 className="text-base font-bold text-foreground">Questions or Legal Inquiries</h2>
           <p>

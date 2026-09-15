@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Search, Flag, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { PartyTable } from "@/components/party/PartyTable";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 const ALLIANCES = ["All", "NDA", "INDIA", "Others"];
@@ -71,7 +72,7 @@ export function PartiesClient() {
             Political Parties of India
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
-            Registry of active recognized parties, state parties, and national alliances with official seat allocations.
+            Directory of active recognized parties, state parties, and national alliances with parliamentary seat allocations compiled from public election records.
           </p>
         </div>
 
@@ -259,6 +260,9 @@ export function PartiesClient() {
           </div>
         </div>
       )}
+
+      {/* Data Accuracy Notice */}
+      <DataAccuracyNotice variant="compact" recordType="party" />
     </div>
   );
 }

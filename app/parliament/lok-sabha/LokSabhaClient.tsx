@@ -20,6 +20,7 @@ import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 type MP = {
@@ -84,6 +85,13 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Non-Government Transparency Banner */}
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-muted/30 border border-border/70 text-xs text-muted-foreground">
+        <p className="leading-relaxed">
+          <strong className="font-semibold text-foreground">Independent Legislative Visualization:</strong> Compiled from publicly available information (Source: Parliament of India / Sansad.in: <a href="https://sansad.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">sansad.in</a> and Lok Sabha Secretariat: <a href="https://loksabha.nic.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">loksabha.nic.in</a>). SattaDarshan is an independent, non-government platform and is not affiliated with or authorized by the Parliament of India.
+        </p>
+      </div>
+
       {/* Header Banner */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
@@ -330,6 +338,14 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
           </div>
         </div>
       )}
+
+      {/* Data Accuracy Notice */}
+      <DataAccuracyNotice
+        variant="compact"
+        recordType="chamber"
+        source="Parliament of India / Sansad.in"
+        sourceUrl="https://sansad.in/"
+      />
     </div>
   );
 }

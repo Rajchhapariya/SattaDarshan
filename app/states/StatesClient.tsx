@@ -5,6 +5,7 @@ import Link from "next/link";
 import { StateIcon } from "@/components/ui/StateIcon";
 import { StateTable } from "@/components/state/StateTable";
 import { MapPin, ChevronRight, LayoutGrid, List, Landmark } from "lucide-react";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 export function StatesClient({ initialStates }: { initialStates: any[] }) {
@@ -119,6 +120,9 @@ export function StatesClient({ initialStates }: { initialStates: any[] }) {
       ) : (
         <StateTable data={filteredStates} />
       )}
+
+      {/* Data Accuracy Notice */}
+      <DataAccuracyNotice variant="compact" recordType="state" />
     </div>
   );
 }

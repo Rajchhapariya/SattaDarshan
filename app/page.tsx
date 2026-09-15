@@ -19,6 +19,7 @@ import { IndiaMap } from "@/components/home/IndiaMap";
 import { FeaturedPoliticians } from "@/components/home/FeaturedPoliticians";
 import { PartiesSection } from "@/components/home/PartiesSection";
 import { StatesSection } from "@/components/home/StatesSection";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 export const revalidate = 3600;
 
@@ -36,18 +37,18 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative pt-6 sm:pt-10 pb-4 text-center max-w-4xl mx-auto space-y-5">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 shadow-sm">
-          <ShieldCheck className="h-3.5 w-3.5" /> Indian Legislative & Parliamentary Intelligence
+          <Landmark className="h-3.5 w-3.5" /> Independent Civic & Legislative Platform
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
           Indian Parliamentary & <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
-            Political Intelligence
-          </span> Portal
+            Civic Information
+          </span> Platform
         </h1>
 
         <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Comprehensive, verified records for the 18th Lok Sabha, Rajya Sabha, Chief Ministers, and national political parties—featuring real-time 3D chamber visualization and geospatial territory mapping.
+          Public legislative and electoral records for the 18th Lok Sabha, Rajya Sabha, Chief Ministers, and national political parties—featuring 3D chamber visualization and geospatial territory mapping.
         </p>
 
         {/* Hero Quick Action Buttons */}
@@ -127,6 +128,9 @@ export default async function Home() {
 
       {/* Major Legislative Jurisdictions */}
       <StatesSection />
+
+      {/* Site-wide Data Accuracy Notice */}
+      <DataAccuracyNotice variant="compact" />
     </div>
   );
 }

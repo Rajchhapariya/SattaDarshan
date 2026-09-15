@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Database, ShieldCheck, CheckCircle2, ChevronRight } from "lucide-react";
+import { BookOpen, Database, ShieldCheck, CheckCircle2, ChevronRight, Landmark } from "lucide-react";
+import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 export const metadata: Metadata = {
   title: "Data Sources & Editorial Methodology",
-  description: "Detailed documentation of statutory data sources, normalization rules, verification workflows, and provenance protocols utilized by SattaDarshan.",
+  description: "Documentation of statutory data sources, normalization rules, verification workflows, and provenance protocols utilized by SattaDarshan.",
 };
 
 export default function MethodologyPage() {
@@ -30,6 +31,9 @@ export default function MethodologyPage() {
         </p>
       </div>
 
+      {/* Data Accuracy Notice */}
+      <DataAccuracyNotice variant="detailed" recordType="general" />
+
       {/* Main Content Sections */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-8 text-sm text-muted-foreground leading-relaxed">
         {/* Source Hierarchy */}
@@ -39,28 +43,28 @@ export default function MethodologyPage() {
             1. Authoritative Source Hierarchy
           </h2>
           <p>
-            SattaDarshan prioritizes statutory, official government archives and legislative registries. Our data collection strictly observes the following hierarchy:
+            SattaDarshan compiles data exclusively from publicly available official government archives, parliamentary directories, and statutory gazettes. Our data collection strictly observes the following hierarchy:
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-2">
               <span className="font-bold text-foreground text-xs uppercase tracking-wider block">Parliamentary Secretariats</span>
               <p className="text-xs">
-                Member rosters, parliamentary house allocations, committee assignments, and official house bulletins directly from <a href="https://sansad.in" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">Sansad.in</a>, the Lok Sabha Secretariat, and the Rajya Sabha Secretariat.
+                Member rosters, parliamentary house allocations, committee assignments, and official bulletins directly from <a href="https://sansad.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">Sansad.in</a>, the Lok Sabha Secretariat (<a href="https://loksabha.nic.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">loksabha.nic.in</a>), and the Rajya Sabha Secretariat (<a href="https://rajyasabha.nic.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">rajyasabha.nic.in</a>).
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-2">
               <span className="font-bold text-foreground text-xs uppercase tracking-wider block">Election Commission of India (ECI)</span>
               <p className="text-xs">
-                General election results, gazette notifications of elected members, party recognition tiers (National, State, RUPP), and candidate nomination affidavits filed under Form 26 of the Conduct of Elections Rules, 1961.
+                General election outcomes, gazette notifications of elected candidates, political party recognition tiers (National, State, RUPP), and candidate nomination affidavits filed under Form 26 of the Conduct of Elections Rules, 1961 (<a href="https://www.eci.gov.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">eci.gov.in</a>).
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-2">
-              <span className="font-bold text-foreground text-xs uppercase tracking-wider block">State Legislative Secretariats</span>
+              <span className="font-bold text-foreground text-xs uppercase tracking-wider block">State Government & Legislative Assemblies</span>
               <p className="text-xs">
-                Chief Minister swearing-in notifications, state council of ministers gazettes, assembly seat compositions, and official state government departmental portals.
+                Chief Minister notifications, state council of ministers gazettes, assembly compositions, and official state government departmental portals accessible via the National Portal of India (<a href="https://www.india.gov.in/" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold">india.gov.in</a>).
               </p>
             </div>
 
@@ -87,13 +91,13 @@ export default function MethodologyPage() {
               <strong>Name Standardization:</strong> Salutations and honorific prefixes (&ldquo;Shri&rdquo;, &ldquo;Smt.&rdquo;, &ldquo;Dr.&rdquo;, &ldquo;Prof.&rdquo;) are parsed separately from legal names to ensure accurate alphabetical indexing and prevent duplicate listings.
             </li>
             <li>
-              <strong>Constituency Mapping:</strong> Lok Sabha constituencies are cross-referenced with the Delimitation Commission orders to ensure standardized spelling and matching against state jurisdictions.
+              <strong>Constituency Mapping:</strong> Lok Sabha constituencies are cross-referenced with Delimitation Commission orders to ensure standardized spelling and matching against state jurisdictions.
             </li>
             <li>
               <strong>Affidavit Valuation:</strong> Financial assets and legal disclosures are recorded exactly as sworn by candidates in statutory Form 26 nomination filings, without speculative revaluations.
             </li>
             <li>
-              <strong>Alliance Classifications:</strong> National parliamentary coalitions (NDA, INDIA, Regional/Others) reflect formal pre-poll and post-poll seating agreements registered with the parliamentary secretariat.
+              <strong>Alliance Classifications:</strong> National parliamentary coalitions (NDA, INDIA, Regional/Others) reflect formal seating agreements registered with the parliamentary secretariats.
             </li>
           </ul>
         </section>
@@ -105,10 +109,10 @@ export default function MethodologyPage() {
             3. Treatment of Disputed or Contested Data
           </h2>
           <p>
-            In instances of party factional disputes, splits, or contested symbol allocations, SattaDarshan adheres strictly to the official orders and symbol notifications issued by the Election Commission of India and the rulings of the respective Legislative Presiding Officers (Speaker of Lok Sabha or Chairman of Rajya Sabha).
+            In instances of party factional disputes, splits, or contested symbol allocations, SattaDarshan adheres strictly to the official orders and symbol notifications issued by the Election Commission of India and rulings of the respective Legislative Presiding Officers (Speaker of Lok Sabha or Chairman of Rajya Sabha).
           </p>
           <p>
-            Unverified allegations, social media speculation, and non-gazetted claims are excluded from official candidate profiles.
+            Unverified allegations, social media speculation, and non-gazetted claims are excluded from public representative profiles.
           </p>
         </section>
 
@@ -116,14 +120,20 @@ export default function MethodologyPage() {
         <section className="space-y-3 border-t border-border/60 pt-4">
           <h2 className="text-base font-bold text-foreground">Editorial Review & Correction Protocols</h2>
           <p>
-            Citizens, legal researchers, and parliamentary representatives who discover an outdated portfolio, tenure change, or typographical discrepancy are invited to submit documentation via our reviewed corrections desk.
+            Citizens, researchers, and parliamentary staff who discover an outdated portfolio, tenure change, or typographical discrepancy are invited to submit documentation via our reviewed corrections desk.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-wrap gap-4">
             <Link
               href="/corrections"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
             >
               Report an Inaccuracy or Suggest Correction <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/disclaimer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
+            >
+              Read Platform Disclaimer <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </section>

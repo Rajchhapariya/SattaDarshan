@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MessageSquare, ShieldAlert, FileText, ChevronRight } from "lucide-react";
+import { Mail, MessageSquare, ShieldAlert, FileText, ChevronRight, AlertCircle, Info } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact & Editorial Inquiries",
-  description: "Official contact directory, feedback channels, copyright notice procedures, and editorial inquiry channels for SattaDarshan.",
+  description: "Contact directory, feedback channels, copyright notice procedures, and editorial inquiry channels for SattaDarshan.",
 };
 
 export default function ContactPage() {
@@ -23,10 +23,21 @@ export default function ContactPage() {
           <Mail className="h-3.5 w-3.5" /> Civic Communications & Editorial Desk
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-          Contact & Grievance Redressal
+          Contact & Editorial Inquiries
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed">
           SattaDarshan welcomes feedback, inquiries, and verified correction notices from citizens, researchers, parliamentary staff, and media organizations.
+        </p>
+      </div>
+
+      {/* Important Notice regarding Non-Government Status & RTI */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-muted/30 border border-border/70 text-xs sm:text-sm text-muted-foreground space-y-2">
+        <div className="flex items-center gap-2 text-foreground font-semibold">
+          <Info className="h-4 w-4 text-primary" />
+          <span>Notice Regarding Official Administrative Grievances & RTI Requests</span>
+        </div>
+        <p className="leading-relaxed">
+          SattaDarshan is an independent, non-government civic research platform. SattaDarshan cannot receive, process, or forward official governmental grievances, statutory legal notices, or Right to Information (RTI) applications intended for public authorities. Any such statutory filings must be submitted directly to the relevant government department or official grievance portal.
         </p>
       </div>
 
@@ -85,7 +96,7 @@ export default function ContactPage() {
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">
         <h2 className="text-lg font-bold text-foreground">Editorial Transparency Guidelines</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          SattaDarshan operates as an independent, non-partisan civic data platform. Inquiries regarding statutory research methodologies, open data formats, or academic integrations are reviewed in order of receipt.
+          SattaDarshan operates as an independent, non-partisan civic data platform. Inquiries regarding research methodologies, open data formats, or academic integrations are reviewed in order of receipt.
         </p>
         <div className="flex flex-wrap gap-4 pt-1">
           <Link href="/methodology" className="text-xs font-semibold text-primary hover:underline">
