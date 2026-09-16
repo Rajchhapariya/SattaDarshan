@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
 import { Flag, ChevronRight } from "lucide-react";
+import { CivicPartyLogo } from "@/components/party/CivicPartyLogo";
 
 type PartySummary = {
   slug: string;
@@ -40,19 +41,11 @@ export function PartyTable({ data }: { data: PartySummary[] }) {
           {data.map((p) => (
             <TableRow key={p.slug} className="hover:bg-muted/20 transition-colors">
               <TableCell>
-                <div className="h-10 w-10 rounded-xl border border-border/60 bg-muted/30 p-1 flex items-center justify-center">
-                  {p.logo ? (
-                    <Image
-                      src={p.logo}
-                      alt={p.abbr || p.name}
-                      width={32}
-                      height={32}
-                      className="object-contain max-h-full"
-                    />
-                  ) : (
-                    <Flag className="h-4 w-4 text-muted-foreground/40" />
-                  )}
-                </div>
+                <CivicPartyLogo
+                  src={p.logo}
+                  alt={p.abbr || p.name}
+                  size="md"
+                />
               </TableCell>
               <TableCell>
                 <span className="font-bold text-sm text-foreground hover:text-primary transition-colors">

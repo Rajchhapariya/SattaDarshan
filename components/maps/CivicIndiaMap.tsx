@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Minus, RotateCcw, MapPin, ChevronRight, ExternalLink } from "lucide-react";
+import { Plus, Minus, RotateCcw, MapPin, ChevronRight, ExternalLink, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type CivicStateData = {
@@ -88,7 +88,7 @@ export function CivicIndiaMap({
 
   // Zoom & Pan state
   const [position, setPosition] = useState<{ coordinates: [number, number]; zoom: number }>({
-    coordinates: [82, 22],
+    coordinates: [82.8, 22.0],
     zoom: 1,
   });
 
@@ -139,7 +139,7 @@ export function CivicIndiaMap({
   };
 
   const handleResetZoom = () => {
-    setPosition({ coordinates: [82, 22], zoom: 1 });
+    setPosition({ coordinates: [82.8, 22.0], zoom: 1 });
   };
 
   const handleSelect = useCallback(
@@ -173,7 +173,8 @@ export function CivicIndiaMap({
       <div className={cn("relative w-full overflow-hidden flex items-center justify-center p-2 sm:p-4 bg-gradient-to-b from-card via-background to-muted/10", heightClass)}>
         <ComposableMap
           projection="geoMercator"
-          projectionConfig={{ center: [82, 22], scale: 950 }}
+          projectionConfig={{ center: [82.8, 22.0], scale: 970 }}
+          viewBox="0 0 800 650"
           className="w-full h-full max-w-3xl select-none"
           aria-label={ariaLabel}
         >
@@ -187,26 +188,30 @@ export function CivicIndiaMap({
             <Geographies geography={LOCAL_GEO_URL}>
               {({ geographies }) =>
                 geographies.map((geo) => {
-                  const rawName = String(geo.properties.ST_NM || geo.properties.NAME_1 || "").trim();
+                  const rawName = String(geo.properties.st_nm || geo.properties.ST_NM || geo.properties.NAME_1 || "").trim();
                   const cleanKey = rawName.toLowerCase();
                   const mappedSlug = STATE_GEO_MAP[cleanKey] || STATE_GEO_MAP[toSlug(rawName)] || toSlug(rawName);
                   const info = stateLookup.get(mappedSlug) || stateLookup.get(cleanKey);
                   const isSelected = (activeState && activeState.slug === mappedSlug) || (selectedSlug && selectedSlug === mappedSlug);
 
-                  // Calculate metric color if requested
-                  let fillColor = "hsl(var(--muted))";
+                  // Calculate high-contrast institutional styling
+                  let fillColor = "#F1F5F9"; // crisp neutral slate base
+                  let strokeColor = "#94A3B8"; // distinct slate border
+
                   if (isSelected) {
                     fillColor = "hsl(var(--primary))";
+                    strokeColor = "#1E3A8A";
                   } else if (viewMetric === "Lok Sabha" && info?.totalLokSabhaSeats) {
-                    // Graduated primary tint based on Lok Sabha seats (1 to 80)
-                    const opacity = Math.min(Math.max(info.totalLokSabhaSeats / 80, 0.15), 0.7);
+                    const opacity = Math.min(Math.max(info.totalLokSabhaSeats / 80, 0.18), 0.85);
                     fillColor = `hsl(var(--primary) / ${opacity.toFixed(2)})`;
+                    strokeColor = "hsl(var(--primary) / 0.6)";
                   } else if (viewMetric === "Vidhan Sabha" && info?.totalAssemblySeats) {
-                    // Graduated primary tint based on Assembly seats (30 to 403)
-                    const opacity = Math.min(Math.max(info.totalAssemblySeats / 403, 0.15), 0.7);
+                    const opacity = Math.min(Math.max(info.totalAssemblySeats / 403, 0.18), 0.85);
                     fillColor = `hsl(var(--primary) / ${opacity.toFixed(2)})`;
+                    strokeColor = "hsl(var(--primary) / 0.6)";
                   } else if (info?.rulingParty) {
-                    fillColor = "hsl(var(--primary) / 0.18)";
+                    fillColor = "#F8FAFC";
+                    strokeColor = "#94A3B8";
                   }
 
                   return (
@@ -234,16 +239,16 @@ export function CivicIndiaMap({
                       style={{
                         default: {
                           fill: fillColor,
-                          stroke: "hsl(var(--border))",
-                          strokeWidth: 0.8,
+                          stroke: strokeColor,
+                          strokeWidth: isSelected ? 1.5 : 0.8,
                           outline: "none",
                           transition: "fill 150ms ease, stroke 150ms ease",
                           cursor: "pointer",
                         },
                         hover: {
-                          fill: isSelected ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.45)",
+                          fill: isSelected ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.35)",
                           stroke: "hsl(var(--primary))",
-                          strokeWidth: 1.6,
+                          strokeWidth: 1.8,
                           outline: "none",
                           cursor: "pointer",
                         },
@@ -291,9 +296,9 @@ export function CivicIndiaMap({
           </div>
         )}
 
-        {/* Floating Details Preview Card (Desktop & Mobile) */}
+        {/* Floating Details Preview Card (Desktop: bottom-right floating; Mobile: non-obscuring below canvas) */}
         {showCard && displayedState && (
-          <div className="absolute bottom-3 left-3 right-3 sm:left-auto sm:right-4 sm:w-80 p-4 rounded-2xl bg-card/95 backdrop-blur-md border border-border/90 shadow-xl z-10 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="hidden sm:block absolute bottom-4 right-4 w-80 p-4 rounded-2xl bg-card/98 backdrop-blur-md border border-border/90 shadow-xl z-10 animate-in fade-in slide-in-from-bottom-2 duration-200">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <div className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-primary tracking-wider">
@@ -306,6 +311,14 @@ export function CivicIndiaMap({
                   </p>
                 )}
               </div>
+              <button
+                onClick={() => { setActiveState(null); setHovered(null); }}
+                className="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                title="Close"
+                aria-label="Close jurisdiction preview"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             </div>
 
             <div className="mt-2.5 pt-2 border-t border-border/60 grid grid-cols-2 gap-2 text-xs">
@@ -341,6 +354,64 @@ export function CivicIndiaMap({
           </div>
         )}
       </div>
+
+      {/* Mobile-Only Dedicated Preview Card (Rendered below map canvas so it NEVER covers southern India) */}
+      {showCard && displayedState && (
+        <div className="block sm:hidden p-4 bg-muted/20 border-t border-border/70 animate-in fade-in duration-200">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-primary tracking-wider">
+                <MapPin className="h-3 w-3" /> Selected Jurisdiction
+              </div>
+              <h4 className="font-bold text-base text-foreground truncate">{displayedState.name}</h4>
+              {displayedState.capital && (
+                <p className="text-xs text-muted-foreground truncate">
+                  Capital: <span className="font-medium text-foreground">{displayedState.capital}</span>
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => { setActiveState(null); setHovered(null); }}
+              className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              title="Close"
+              aria-label="Close jurisdiction preview"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-2 pt-2 border-t border-border/60 grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Lok Sabha</span>
+              <span className="font-bold text-foreground">{displayedState.totalLokSabhaSeats ?? 0} Seats</span>
+            </div>
+            <div className="border-l border-border/60 pl-2">
+              <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Assembly</span>
+              <span className="font-bold text-foreground">{displayedState.totalAssemblySeats ?? 0} Seats</span>
+            </div>
+          </div>
+
+          {displayedState.cm && (
+            <p className="text-xs text-muted-foreground mt-2 truncate">
+              Chief Minister: <span className="font-medium text-foreground">{displayedState.cm}</span>
+            </p>
+          )}
+
+          {displayedState.rulingParty && (
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              Administration: <span className="font-semibold text-primary">{displayedState.rulingParty}</span>
+            </p>
+          )}
+
+          <Link
+            href={`/states/${displayedState.slug}`}
+            className="mt-3 flex items-center justify-center gap-1.5 w-full min-h-[44px] py-2.5 px-3 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity shadow-sm"
+          >
+            <span>Explore State Directory</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
 
       {/* Quick Select Chips for Small UTs & Compact States */}
       {showQuickChips && (

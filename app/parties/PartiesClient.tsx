@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, Flag, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
+import { CivicPartyLogo } from "@/components/party/CivicPartyLogo";
 import { PartyTable } from "@/components/party/PartyTable";
 import { CivicSearchInput } from "@/components/ui/CivicSearchInput";
 import { CivicSelect } from "@/components/ui/CivicSelect";
@@ -210,19 +211,11 @@ export function PartiesClient() {
               className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex items-center justify-between gap-4 group"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="relative h-12 w-12 rounded-xl border border-border/60 bg-muted/30 p-1.5 flex-shrink-0 flex items-center justify-center">
-                  {p.logo ? (
-                    <Image
-                      src={p.logo}
-                      alt={p.abbr || p.name}
-                      width={38}
-                      height={38}
-                      className="object-contain max-h-full"
-                    />
-                  ) : (
-                    <Flag className="h-6 w-6 text-muted-foreground/40" />
-                  )}
-                </div>
+                <CivicPartyLogo
+                  src={p.logo}
+                  alt={p.abbr || p.name}
+                  size="lg"
+                />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">

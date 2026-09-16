@@ -6,6 +6,7 @@ import Party from "@/models/Party";
 import Politician from "@/models/Politician";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
+import { CivicPartyLogo } from "@/components/party/CivicPartyLogo";
 import { 
   Flag, 
   Building2, 
@@ -74,19 +75,12 @@ export default async function PartyPage({ params }: PartyPageProps) {
       {/* Hero Party Header Card */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-start sm:items-center gap-4 sm:gap-6">
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-muted/30 border border-border/60 p-2.5 flex items-center justify-center flex-shrink-0">
-            {p.logo ? (
-              <Image
-                src={p.logo}
-                alt={p.abbr || p.name}
-                width={80}
-                height={80}
-                className="object-contain max-h-full"
-              />
-            ) : (
-              <Flag className="h-10 w-10 text-muted-foreground/40" />
-            )}
-          </div>
+          <CivicPartyLogo
+            src={p.logo}
+            alt={p.abbr || p.name}
+            size="xl"
+            className="border-2 border-border/70 shadow-sm"
+          />
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <AllianceBadge alliance={p.alliance} size="sm" />

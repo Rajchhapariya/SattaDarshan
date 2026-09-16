@@ -21,6 +21,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/Command";
+import { getCivicImageUrl } from "@/lib/utils";
 
 type SearchResult = {
   type: "politician" | "party" | "state" | "chamber";
@@ -30,6 +31,46 @@ type SearchResult = {
   photo?: string;
   logo?: string;
 };
+
+function SearchItemAvatar({
+  photo,
+  logo,
+  label,
+  FallbackIcon,
+  iconClass,
+}: {
+  photo?: string;
+  logo?: string;
+  label: string;
+  FallbackIcon: React.ElementType;
+  iconClass: string;
+}) {
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [photo, logo]);
+
+  const rawSrc = photo || logo;
+  const resolvedSrc = getCivicImageUrl(rawSrc);
+
+  return (
+    <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center flex-shrink-0">
+      {resolvedSrc && !imgError ? (
+        <Image
+          src={resolvedSrc}
+          alt={label}
+          fill
+          sizes="32px"
+          className={photo ? "object-cover" : "object-contain p-0.5"}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <FallbackIcon className={`h-4 w-4 ${iconClass}`} />
+      )}
+    </div>
+  );
+}
 
 const TYPE_BADGE_CONFIG: Record<
   SearchResult["type"],
@@ -173,15 +214,13 @@ export function GlobalSearch() {
                     className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg cursor-pointer min-h-[44px] hover:bg-accent transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center flex-shrink-0">
-                        {item.photo ? (
-                          <Image src={item.photo} alt={item.label} fill className="object-cover" />
-                        ) : item.logo ? (
-                          <Image src={item.logo} alt={item.label} width={24} height={24} className="object-contain" />
-                        ) : (
-                          <FallbackIcon className={`h-4 w-4 ${config.iconClass}`} />
-                        )}
-                      </div>
+                      <SearchItemAvatar
+                        photo={item.photo}
+                        logo={item.logo}
+                        label={item.label}
+                        FallbackIcon={FallbackIcon}
+                        iconClass={config.iconClass}
+                      />
                       <div className="flex flex-col min-w-0">
                         <span className="font-semibold text-sm text-foreground truncate">{item.label}</span>
                         <span className="text-xs text-muted-foreground truncate">{item.sub}</span>

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Landmark, User } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getCivicImageUrl } from "@/lib/utils";
 
 type CivicAvatarProps = {
   src?: string | null;
@@ -43,8 +43,13 @@ export function CivicAvatar({
 }: CivicAvatarProps) {
   const [hasError, setHasError] = useState(false);
 
-  // Clean URL check - empty, null, or known broken
-  const isValidSrc = src && src.trim() !== "" && !hasError;
+  // Reset error when src changes
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const resolvedSrc = getCivicImageUrl(src);
+  const isValidSrc = resolvedSrc && !hasError;
 
   return (
     <div
@@ -57,7 +62,7 @@ export function CivicAvatar({
     >
       {isValidSrc ? (
         <Image
-          src={src}
+          src={resolvedSrc}
           alt={alt}
           fill
           priority={priority}

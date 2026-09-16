@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Flag, ChevronRight } from "lucide-react";
+import { Flag, ArrowRight, ShieldCheck } from "lucide-react";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
+import { CivicPartyLogo } from "@/components/party/CivicPartyLogo";
 
 export function PartiesSection() {
   const [parties, setParties] = useState<any[]>([]);
@@ -63,19 +63,11 @@ export function PartiesSection() {
               className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex items-center justify-between gap-4 group"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="relative h-12 w-12 rounded-xl border border-border/60 bg-muted/30 p-1.5 flex-shrink-0 flex items-center justify-center">
-                  {p.logo ? (
-                    <Image
-                      src={p.logo}
-                      alt={p.abbr || p.name}
-                      width={36}
-                      height={36}
-                      className="object-contain max-h-full"
-                    />
-                  ) : (
-                    <Flag className="h-6 w-6 text-muted-foreground/40" />
-                  )}
-                </div>
+                <CivicPartyLogo
+                  src={p.logo}
+                  alt={p.abbr || p.name}
+                  size="lg"
+                />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-sm text-foreground group-hover:text-primary transition-colors truncate">
