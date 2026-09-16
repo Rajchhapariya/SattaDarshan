@@ -342,6 +342,7 @@ The codebase has undergone production security hardening:
   - `Strict-Transport-Security (HSTS)`: Enforces HTTPS with preload.
   - `Permissions-Policy`: Restricts camera, microphone, and geolocation APIs.
 - **Input Validation & Anti-Abuse:** Query strings and search parameters are length-clamped (e.g., search queries clamped to 80 characters with regex escaping) to prevent ReDoS and memory abuse.
+- **Vulnerability Disclosure Policy:** For instructions on responsibly reporting security vulnerabilities, please see our [Security Policy](SECURITY.md).
 
 ---
 
