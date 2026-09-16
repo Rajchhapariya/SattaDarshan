@@ -65,11 +65,11 @@ export function Navbar() {
         <div className="flex items-center gap-2.5 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90 flex-shrink-0">
             <Image
-              src="/logo.png"
+              src="/logo-header.png"
               alt="SattaDarshan Logo"
               width={36}
               height={36}
-              className="h-9 w-9 rounded-xl object-contain flex-shrink-0 border border-border/60 shadow-xs"
+              className="h-9 w-9 object-contain flex-shrink-0"
               priority
             />
             <div className="flex flex-col">

@@ -37,11 +37,11 @@ export function Footer() {
         <div className="space-y-3">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/logo.png"
+              src="/logo-header.png"
               alt="SattaDarshan Logo"
               width={32}
               height={32}
-              className="h-8 w-8 rounded-lg object-contain flex-shrink-0 border border-border/60 shadow-xs"
+              className="h-8 w-8 object-contain flex-shrink-0"
             />
             <span className="font-extrabold text-foreground text-base tracking-tight">
               Satta<span className="text-amber-500">Darshan</span>
