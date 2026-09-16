@@ -27,15 +27,17 @@ export function DisclaimerModal() {
     return () => window.removeEventListener("reopen-disclaimer-modal", handleReopen);
   }, []);
 
-  // Trap focus and manage body scroll
+  // Trap focus and manage body scroll (also lock html for iOS Safari)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
       setTimeout(() => {
         understandBtnRef.current?.focus();
       }, 50);
     } else {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -47,6 +49,7 @@ export function DisclaimerModal() {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
@@ -66,22 +69,22 @@ export function DisclaimerModal() {
       aria-modal="true"
       aria-labelledby="disclaimer-title"
       aria-describedby="disclaimer-description"
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md animate-in fade-in duration-300"
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-background/80 backdrop-blur-md overflow-hidden animate-in fade-in duration-300"
     >
       <div 
-        className="relative w-full max-w-2xl rounded-3xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300"
+        className="relative w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col max-h-[92vh] max-h-[92dvh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300"
       >
         {/* Header Ribbon - Professional, civic & transparent (not alarming) */}
-        <div className="p-6 sm:p-7 border-b border-border/70 bg-muted/40 flex items-start gap-4">
-          <div className="h-11 w-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Landmark className="h-6 w-6" />
+        <div className="p-4 sm:p-7 border-b border-border/70 bg-muted/40 flex items-start gap-3 sm:gap-4">
+          <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Landmark className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
               Independent Civic Platform Notice
             </span>
-            <h2 id="disclaimer-title" className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-              Notice: Independent, Non-Government Website
+            <h2 id="disclaimer-title" className="text-lg sm:text-2xl font-extrabold text-foreground tracking-tight leading-tight">
+              Independent, Non-Government Website
             </h2>
           </div>
         </div>
@@ -89,7 +92,7 @@ export function DisclaimerModal() {
         {/* Modal Scrollable Body */}
         <div 
           id="disclaimer-description" 
-          className="p-6 sm:p-7 overflow-y-auto space-y-4 text-xs sm:text-sm text-muted-foreground leading-relaxed divide-y divide-border/40"
+          className="p-4 sm:p-7 overflow-y-auto overflow-x-hidden space-y-4 text-xs sm:text-sm text-muted-foreground leading-relaxed divide-y divide-border/40"
         >
           <div className="space-y-3 pb-4">
             <p className="font-semibold text-foreground text-sm sm:text-base">
@@ -113,7 +116,7 @@ export function DisclaimerModal() {
             <p className="font-medium text-foreground">
               For authoritative, current, and official information, please refer directly to the relevant official government or institutional sources:
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1 w-full">
               <a 
                 href="https://sansad.in/" 
                 target="_blank" 
@@ -155,7 +158,7 @@ export function DisclaimerModal() {
         </div>
 
         {/* Action Footer */}
-        <div className="p-4 sm:p-6 border-t border-border/70 bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="p-4 sm:p-6 border-t border-border/70 bg-muted/20 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
           <Link
             href="/disclaimer"
             onClick={handleAcknowledge}

@@ -79,14 +79,14 @@ export function GlobalSearch() {
 
   return (
     <>
+      {/* Mobile: compact icon-only button. sm+: full labelled search bar */}
       <button
         onClick={() => setOpen(true)}
-        className="group relative flex h-9 w-full sm:w-56 lg:w-48 xl:w-64 items-center justify-between gap-2 rounded-xl border border-border bg-card px-3 text-sm text-muted-foreground transition-all hover:bg-muted hover:text-foreground shadow-sm flex-shrink-0"
+        aria-label="Open search"
+        className="group relative flex h-10 w-10 sm:h-9 sm:w-56 lg:w-48 xl:w-64 flex-shrink-0 items-center justify-center sm:justify-between gap-2 rounded-xl border border-border bg-card sm:px-3 text-sm text-muted-foreground transition-all hover:bg-muted hover:text-foreground shadow-sm"
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate text-xs sm:text-sm">Search leaders, parties, states...</span>
-        </div>
+        <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <span className="hidden sm:block truncate text-xs sm:text-sm">Search leaders, parties, states...</span>
         <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex flex-shrink-0">
           <span className="text-xs">⌘</span>K
         </kbd>

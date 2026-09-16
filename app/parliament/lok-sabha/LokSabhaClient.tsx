@@ -175,29 +175,32 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
         </div>
 
         {/* Filter Dropdowns & View Switcher */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* State Filter */}
-          <CivicSelect
-            value={selectedState}
-            onChange={handleStateChange}
-            options={stateOptions}
-            placeholder="Select State"
-            ariaLabel="Filter by State"
-            className="w-full sm:w-52"
-          />
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          {/* State + Party filters share a row on mobile */}
+          <div className="grid grid-cols-2 gap-2 sm:contents">
+            {/* State Filter */}
+            <CivicSelect
+              value={selectedState}
+              onChange={handleStateChange}
+              options={stateOptions}
+              placeholder="Select State"
+              ariaLabel="Filter by State"
+              className="w-full sm:w-52"
+            />
 
-          {/* Party Filter */}
-          <CivicSelect
-            value={selectedParty}
-            onChange={handlePartyChange}
-            options={partyOptions}
-            placeholder="Select Party"
-            ariaLabel="Filter by Party"
-            className="w-full sm:w-52"
-          />
+            {/* Party Filter */}
+            <CivicSelect
+              value={selectedParty}
+              onChange={handlePartyChange}
+              options={partyOptions}
+              placeholder="Select Party"
+              ariaLabel="Filter by Party"
+              className="w-full sm:w-52"
+            />
+          </div>
 
           {/* View Toggle (Grid / Table) */}
-          <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1 ml-auto lg:ml-0">
+          <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1 self-start sm:ml-auto lg:ml-0">
             <button
               onClick={() => setViewMode("grid")}
               className={cn(

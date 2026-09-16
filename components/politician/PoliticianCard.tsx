@@ -81,14 +81,14 @@ export function PoliticianCard({
           </p>
         </div>
 
-        <div className="pt-2.5 border-t border-border/50 flex items-center justify-between text-xs">
-          <span className="font-semibold text-primary truncate max-w-[120px]">
+        <div className="pt-2.5 border-t border-border/50 flex items-center justify-between text-xs gap-1">
+          <span className="font-semibold text-primary truncate min-w-0 flex-1">
             {partyName || "Independent"}
           </span>
           {state && (
-            <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
-              <StateIcon stateName={state} statePath={statePath} className="h-3 w-3 opacity-70" />
-              <span className="truncate max-w-[80px]">{state}</span>
+            <div className="flex items-center gap-1 text-muted-foreground text-[11px] flex-shrink-0 ml-1">
+              <StateIcon stateName={state} statePath={statePath} className="h-3 w-3 opacity-70 flex-shrink-0" />
+              <span className="truncate max-w-[72px]">{state}</span>
             </div>
           )}
         </div>

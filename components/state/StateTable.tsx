@@ -13,7 +13,7 @@ import { ChevronRight } from "lucide-react";
 
 export function StateTable({ data }: { data: any[] }) {
   return (
-    <div className="rounded-2xl border border-border/80 overflow-hidden bg-card shadow-sm">
+    <div className="rounded-2xl border border-border/80 overflow-x-auto bg-card shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/30">
