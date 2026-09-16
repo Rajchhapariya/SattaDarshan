@@ -185,10 +185,10 @@ export function PoliticiansClient() {
       </div>
 
       {/* Grid or Table Listing */}
-      {loading ? (
+      {loading && data.length === 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {[...Array(12)].map((_, i) => (
-            <div key={i} className="h-72 rounded-2xl bg-muted/40 animate-pulse" />
+            <div key={i} className="h-72 rounded-2xl bg-slate-200/70 border border-slate-200/50 animate-pulse" />
           ))}
         </div>
       ) : data.length === 0 ? (
@@ -215,14 +215,23 @@ export function PoliticiansClient() {
             </div>
           )}
         </div>
-      ) : view === "grid" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {data.map((p) => (
-            <PoliticianCard key={p.slug} {...p} />
-          ))}
-        </div>
       ) : (
-        <PoliticianTable data={data} />
+        <div className={cn("transition-opacity duration-150 relative", loading ? "opacity-60 pointer-events-none" : "opacity-100")}>
+          {loading && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20 rounded-full overflow-hidden z-10">
+              <div className="h-full bg-primary animate-pulse w-1/3 rounded-full" />
+            </div>
+          )}
+          {view === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {data.map((p) => (
+                <PoliticianCard key={p.slug} {...p} />
+              ))}
+            </div>
+          ) : (
+            <PoliticianTable data={data} />
+          )}
+        </div>
       )}
 
       {/* Pagination */}

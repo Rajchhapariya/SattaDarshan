@@ -71,16 +71,28 @@ export async function GET(req: NextRequest) {
       .limit(limit)
       .lean();
 
-    return NextResponse.json({
-      politicians,
-      total,
-      page,
-      pages: Math.ceil(total / limit) || 1,
-    });
+    const isFiltered = Boolean(rawQ || (role && role !== "All") || (chamber && chamber !== "All") || (party && party !== "All") || (state && state !== "All"));
+    const cacheHeader = isFiltered
+      ? "public, s-maxage=60, stale-while-revalidate=300"
+      : "public, s-maxage=300, stale-while-revalidate=1800";
+
+    return NextResponse.json(
+      {
+        politicians,
+        total,
+        page,
+        pages: Math.ceil(total / limit) || 1,
+      },
+      {
+        headers: {
+          "Cache-Control": cacheHeader,
+        },
+      }
+    );
   } catch {
     return NextResponse.json(
       { politicians: [], total: 0, page: 1, pages: 1, error: "Failed to retrieve records" },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }

@@ -126,8 +126,18 @@ export async function GET(req: NextRequest) {
 
     const items = [...chamberMatches, ...combinedEntities].slice(0, 16);
 
-    return NextResponse.json({ items });
+    return NextResponse.json(
+      { items },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=900",
+        },
+      }
+    );
   } catch {
-    return NextResponse.json({ items: [] }, { status: 500 });
+    return NextResponse.json(
+      { items: [] },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }

@@ -172,10 +172,10 @@ export function PartiesClient() {
       </div>
 
       {/* Grid or Table Listing */}
-      {loading ? (
+      {loading && data.length === 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(9)].map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl bg-muted/40 animate-pulse" />
+            <div key={i} className="h-32 rounded-2xl bg-slate-200/70 border border-slate-200/50 animate-pulse" />
           ))}
         </div>
       ) : data.length === 0 ? (
@@ -202,12 +202,19 @@ export function PartiesClient() {
             </div>
           )}
         </div>
-      ) : view === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {data.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/parties/${p.slug}`}
+      ) : (
+        <div className={cn("transition-opacity duration-150 relative", loading ? "opacity-60 pointer-events-none" : "opacity-100")}>
+          {loading && (
+            <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20 rounded-full overflow-hidden z-10">
+              <div className="h-full bg-primary animate-pulse w-1/3 rounded-full" />
+            </div>
+          )}
+          {view === "grid" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {data.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/parties/${p.slug}`}
               className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:shadow-md hover:border-primary/50 transition-all flex items-center justify-between gap-4 group"
             >
               <div className="flex items-center gap-3.5 min-w-0">
@@ -248,6 +255,8 @@ export function PartiesClient() {
       ) : (
         <PartyTable data={data} />
       )}
+    </div>
+  )}
 
       {/* Pagination */}
       {pages > 1 && (

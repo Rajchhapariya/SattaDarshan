@@ -81,23 +81,30 @@ export async function GET(req: NextRequest) {
     seatNumber: idx + 1,
   }));
 
-  return NextResponse.json({
-    chamber,
-    totalSeats: chamber === "Lok Sabha" ? 543 : 245,
-    activeSeats: seats.length,
-    majorityThreshold: chamber === "Lok Sabha" ? 272 : 123,
-    alliances: {
-      NDA: { count: ndaCount, color: ALLIANCE_COLORS["NDA"] },
-      INDIA: { count: indiaCount, color: ALLIANCE_COLORS["INDIA"] },
-      Others: { count: othersCount, color: ALLIANCE_COLORS["Others"] },
-    },
-    partyBreakdown: Object.values(partyCounts).sort((a, b) => b.count - a.count),
-    seats
-  });
+    return NextResponse.json(
+      {
+        chamber,
+        totalSeats: chamber === "Lok Sabha" ? 543 : 245,
+        activeSeats: seats.length,
+        majorityThreshold: chamber === "Lok Sabha" ? 272 : 123,
+        alliances: {
+          NDA: { count: ndaCount, color: ALLIANCE_COLORS["NDA"] },
+          INDIA: { count: indiaCount, color: ALLIANCE_COLORS["INDIA"] },
+          Others: { count: othersCount, color: ALLIANCE_COLORS["Others"] },
+        },
+        partyBreakdown: Object.values(partyCounts).sort((a, b) => b.count - a.count),
+        seats,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      }
+    );
   } catch {
     return NextResponse.json(
       { error: "Failed to retrieve parliament seats data", seats: [] },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }

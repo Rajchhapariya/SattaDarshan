@@ -22,35 +22,17 @@ import {
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { ShareButton } from "@/components/common/ShareButton";
 
+import { getPartyBySlug } from "@/lib/server/queries";
+
+export const revalidate = 3600;
+
 type PartyPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-async function getParty(slug: string) {
-  try {
-    await connectDB();
-    const party = await Party.findOne({ slug }).lean() as any;
-    if (!party) return null;
-
-    // Search for MPs belonging to this party by slug or abbreviation
-    const leaders = await Politician.find({
-      $or: [
-        { party: slug },
-        { party: party.abbr?.toLowerCase() },
-        { partyName: party.name },
-        { partyName: party.abbr }
-      ]
-    }).sort({ role: 1, name: 1 }).limit(24).lean();
-
-    return { ...party, leaders };
-  } catch {
-    return null;
-  }
-}
-
 export async function generateMetadata({ params }: PartyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const p = await getParty(slug);
+  const p = await getPartyBySlug(slug);
   if (!p) return { title: "Party Not Found" };
 
   const abbrPart = p.abbr ? ` (${p.abbr})` : "";
@@ -91,7 +73,7 @@ export async function generateMetadata({ params }: PartyPageProps): Promise<Meta
 
 export default async function PartyPage({ params }: PartyPageProps) {
   const { slug } = await params;
-  const p = await getParty(slug);
+  const p = await getPartyBySlug(slug);
   if (!p) notFound();
 
   return (

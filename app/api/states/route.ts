@@ -22,11 +22,21 @@ export async function GET(req: NextRequest) {
     const states = await State.find(filter)
       .select("slug name capital region rulingParty rulingPartySlug cm cmSlug totalAssemblySeats totalLokSabhaSeats createdAt updatedAt")
       .sort({ name: 1 })
-      .lean();
+    const isFiltered = Boolean(rawQ);
+    const cacheHeader = isFiltered
+      ? "public, s-maxage=300, stale-while-revalidate=1800"
+      : "public, s-maxage=86400, stale-while-revalidate=604800";
 
-    return NextResponse.json(states);
+    return NextResponse.json(states, {
+      headers: {
+        "Cache-Control": cacheHeader,
+      },
+    });
   } catch {
-    return NextResponse.json({ error: "Failed to retrieve states" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to retrieve states" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
 

@@ -35,66 +35,13 @@ type StatePageProps = {
   params: Promise<{ state: string }>;
 };
 
-function slugToStateRegex(slug: string) {
-  const clean = slug.replace(/-/g, " ");
-  return new RegExp(`^${clean}$`, "i");
-}
+import { getStateBySlug, getStatePoliticians } from "@/lib/server/queries";
 
-const STATE_ALIASES: Record<string, string> = {
-  "andaman-and-nicobar-islands": "andaman-nicobar",
-  "andaman-and-nicobar": "andaman-nicobar",
-  "andaman-nicobar-islands": "andaman-nicobar",
-  "dadra-and-nagar-haveli": "dadra-nagar-haveli",
-  "dadra-and-nagar-haveli-and-daman-and-diu": "dadra-nagar-haveli",
-  "daman-and-diu": "dadra-nagar-haveli",
-  "daman-diu": "dadra-nagar-haveli",
-  "jammu-and-kashmir": "jammu-kashmir",
-  "nct-of-delhi": "delhi",
-  "national-capital-territory-of-delhi": "delhi",
-  "telengana": "telangana",
-  "orissa": "odisha",
-  "uttaranchal": "uttarakhand",
-  "pondicherry": "puducherry",
-};
-
-async function getState(slug: string): Promise<StateDetails | null> {
-  try {
-    await connectDB();
-    const normalizedSlug = STATE_ALIASES[slug.toLowerCase()] || slug.toLowerCase();
-    
-    // 1. Direct slug match
-    let s = await State.findOne({ slug: normalizedSlug }).lean();
-    if (s) return (s as unknown) as StateDetails;
-
-    // 2. Try raw slug
-    s = await State.findOne({ slug }).lean();
-    if (s) return (s as unknown) as StateDetails;
-
-    // 3. Try matching by name regex
-    const clean = normalizedSlug.replace(/-/g, " ");
-    const pattern = clean
-      .replace(/\band\b/g, "(&|and)")
-      .replace(/\bplus\b/g, "\\+");
-    const byName = await State.findOne({ name: new RegExp(`^${pattern}$`, "i") }).lean();
-    if (byName) return (byName as unknown) as StateDetails;
-
-    // 4. Fuzzy search by contains
-    const fuzzy = await State.findOne({ name: new RegExp(clean.split(" ")[0], "i") }).lean();
-    return fuzzy ? ((fuzzy as unknown) as StateDetails) : null;
-  } catch {
-    return null;
-  }
-}
-
-async function getStatePoliticians(stateName: string) {
-  await connectDB();
-  const regex = new RegExp(`^${stateName}$`, "i");
-  return await Politician.find({ state: regex }).sort({ name: 1 }).lean();
-}
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: StatePageProps): Promise<Metadata> {
   const { state } = await params;
-  const s = await getState(state);
+  const s = await getStateBySlug(state);
   if (!s) return { title: "State Not Found" };
 
   const cmPart = s.cm ? ` • CM: ${s.cm}` : "";
@@ -135,7 +82,7 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
 
 export default async function StatePage({ params }: StatePageProps) {
   const { state } = await params;
-  const s = await getState(state);
+  const s = await getStateBySlug(state);
   if (!s) notFound();
 
   const politicians = await getStatePoliticians(s.name);

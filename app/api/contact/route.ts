@@ -34,10 +34,12 @@ export async function POST(req: NextRequest) {
       .update(rawIp + "satta_darshan_civic_salt")
       .digest("hex");
 
+    const NO_STORE = { headers: { "Cache-Control": "no-store, max-age=0" } };
+
     if (!checkRateLimit(ipHash)) {
       return NextResponse.json(
         { error: "Too many submissions from this connection. Please try again in 15 minutes." },
-        { status: 429 }
+        { status: 429, ...NO_STORE }
       );
     }
 
@@ -49,18 +51,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         message: "Your message has been submitted successfully." 
-      });
+      }, NO_STORE);
     }
 
     // 2. Input validation
     const rawSubject = String(body.subject || "").trim().slice(0, 150);
     if (!rawSubject || rawSubject.length < 2) {
-      return NextResponse.json({ error: "Please provide an inquiry subject (minimum 2 characters)." }, { status: 400 });
+      return NextResponse.json({ error: "Please provide an inquiry subject (minimum 2 characters)." }, { status: 400, ...NO_STORE });
     }
 
     const rawMessage = String(body.message || "").trim().slice(0, 3000);
     if (!rawMessage || rawMessage.length < 10) {
-      return NextResponse.json({ error: "Please enter your message (minimum 10 characters)." }, { status: 400 });
+      return NextResponse.json({ error: "Please enter your message (minimum 10 characters)." }, { status: 400, ...NO_STORE });
     }
 
     const rawEmail = String(body.userEmail || body.contactEmail || "").trim().slice(0, 120);
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
     if (rawEmail) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(rawEmail)) {
-        return NextResponse.json({ error: "Invalid email address format." }, { status: 400 });
+        return NextResponse.json({ error: "Invalid email address format." }, { status: 400, ...NO_STORE });
       }
       userEmail = rawEmail;
     }
@@ -83,14 +85,17 @@ export async function POST(req: NextRequest) {
       status: "Unread",
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Your message has been submitted successfully.",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Your message has been submitted successfully.",
+      },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch (err: any) {
     return NextResponse.json(
       { error: err.message || "An unexpected error occurred while processing your message." },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
     );
   }
 }

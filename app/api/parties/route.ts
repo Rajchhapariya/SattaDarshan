@@ -38,16 +38,28 @@ export async function GET(req: NextRequest) {
       .limit(limit)
       .lean();
 
-    return NextResponse.json({
-      parties,
-      total,
-      page,
-      pages: Math.ceil(total / limit) || 1,
-    });
+    const isFiltered = Boolean(rawQ || (tier && tier !== "All") || (alliance && alliance !== "All"));
+    const cacheHeader = isFiltered
+      ? "public, s-maxage=120, stale-while-revalidate=600"
+      : "public, s-maxage=3600, stale-while-revalidate=86400";
+
+    return NextResponse.json(
+      {
+        parties,
+        total,
+        page,
+        pages: Math.ceil(total / limit) || 1,
+      },
+      {
+        headers: {
+          "Cache-Control": cacheHeader,
+        },
+      }
+    );
   } catch {
     return NextResponse.json(
       { parties: [], total: 0, page: 1, pages: 1, error: "Failed to retrieve parties" },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }
 }

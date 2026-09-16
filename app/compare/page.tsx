@@ -19,6 +19,7 @@ import { Combobox, ComboboxItem } from "@/components/ui/Combobox";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { ShareButton } from "@/components/common/ShareButton";
+import { ComparePageSkeleton } from "@/components/skeletons/ComparePageSkeleton";
 import { cn } from "@/lib/utils";
 
 type Politician = {
@@ -94,6 +95,10 @@ export default function ComparePage() {
       }
     },
   ];
+
+  if (loading && all.length === 0) {
+    return <ComparePageSkeleton />;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">

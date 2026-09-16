@@ -28,29 +28,17 @@ import {
 import { ShareButton } from "@/components/common/ShareButton";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
+import { getPoliticianBySlug } from "@/lib/server/queries";
+
+export const revalidate = 3600;
+
 type PoliticianPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-async function getPolitician(slug: string) {
-  await connectDB();
-  const p = await Politician.findOne({ slug }).lean() as any;
-  if (!p) return null;
-
-  if (p.party) {
-    const party = await Party.findOne({ slug: p.party }).lean() as any;
-    if (party) {
-      p.partyName = party.name;
-      p.partyLogo = party.logo;
-      p.partyAbbr = party.abbr;
-    }
-  }
-  return p;
-}
-
 export async function generateMetadata({ params }: PoliticianPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const p = await getPolitician(slug);
+  const p = await getPoliticianBySlug(slug);
   if (!p) return { title: "Representative Not Found" };
 
   const officeTitle = p.currentOffice || p.ministerialRank || p.role || "Representative";
@@ -92,7 +80,7 @@ export async function generateMetadata({ params }: PoliticianPageProps): Promise
 
 export default async function PoliticianPage({ params }: PoliticianPageProps) {
   const { slug } = await params;
-  const p = await getPolitician(slug);
+  const p = await getPoliticianBySlug(slug);
   if (!p) notFound();
 
   const statePath = p.state ? getStatePath(p.state) : undefined;

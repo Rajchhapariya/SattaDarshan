@@ -859,10 +859,17 @@ export function ThreeParliamentChamber({
       <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[540px] cursor-grab active:cursor-grabbing bg-gradient-to-b from-card via-background to-background select-none">
         {/* Loading Overlay */}
         {loading && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-card/85 backdrop-blur-sm">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent mb-3" />
-            <p className="text-sm font-semibold text-foreground">Constructing 3D Parliament Chamber...</p>
-            <p className="text-xs text-muted-foreground mt-1">Arranging parliamentary seating blocs</p>
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-card/85 backdrop-blur-xs overflow-hidden">
+            {/* Concentric Seating Tier Arcs */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[340px] sm:w-[500px] h-[340px] sm:h-[500px] rounded-full border border-dashed border-slate-300/50 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[240px] sm:w-[380px] h-[240px] sm:h-[380px] rounded-full border border-dashed border-slate-300/60 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[160px] sm:w-[260px] h-[160px] sm:h-[260px] rounded-full border border-dashed border-slate-300/70 pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col items-center text-center p-6 rounded-2xl bg-card/90 border border-border/80 shadow-xs max-w-sm">
+              <div className="h-9 w-9 animate-spin rounded-full border-2 border-primary border-t-transparent mb-3" />
+              <p className="text-sm font-semibold text-foreground">Constructing 3D {chamber} Chamber...</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Mapping parliamentary seating tiers and alliances</p>
+            </div>
           </div>
         )}
 

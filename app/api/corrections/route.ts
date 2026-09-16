@@ -34,10 +34,12 @@ export async function POST(req: NextRequest) {
       .update(rawIp + "satta_darshan_civic_salt")
       .digest("hex");
 
+    const NO_STORE = { headers: { "Cache-Control": "no-store, max-age=0" } };
+
     if (!checkRateLimit(ipHash)) {
       return NextResponse.json(
         { error: "Too many submissions from this connection. Please try again in 15 minutes." },
-        { status: 429 }
+        { status: 429, ...NO_STORE }
       );
     }
 
@@ -49,33 +51,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         message: "Your correction has been submitted successfully. Thank you for helping improve the accuracy of Satta Darshan." 
-      });
+      }, NO_STORE);
     }
 
     // 2. Input validation
     const recordType = String(body.recordType || "").trim();
     if (!["politician", "party", "state", "general"].includes(recordType)) {
-      return NextResponse.json({ error: "Invalid record category." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid record category." }, { status: 400, ...NO_STORE });
     }
 
     const recordIdentifier = String(body.recordIdentifier || "").trim().slice(0, 150);
     if (!recordIdentifier || recordIdentifier.length < 2) {
-      return NextResponse.json({ error: "Record identifier (name or slug) is required." }, { status: 400 });
+      return NextResponse.json({ error: "Record identifier (name or slug) is required." }, { status: 400, ...NO_STORE });
     }
 
     const issueType = String(body.issueType || "").trim();
     if (!["outdated_info", "factual_error", "broken_link_image", "party_affiliation", "other"].includes(issueType)) {
-      return NextResponse.json({ error: "Invalid issue classification." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid issue classification." }, { status: 400, ...NO_STORE });
     }
 
     const description = String(body.description || "").trim().slice(0, 2000);
     if (!description || description.length < 10) {
-      return NextResponse.json({ error: "Please provide a detailed description of the error (minimum 10 characters)." }, { status: 400 });
+      return NextResponse.json({ error: "Please provide a detailed description of the error (minimum 10 characters)." }, { status: 400, ...NO_STORE });
     }
 
     const suggestedCorrection = String(body.suggestedCorrection || "").trim().slice(0, 2000);
     if (!suggestedCorrection || suggestedCorrection.length < 5) {
-      return NextResponse.json({ error: "Please provide the suggested factual correction (minimum 5 characters)." }, { status: 400 });
+      return NextResponse.json({ error: "Please provide the suggested factual correction (minimum 5 characters)." }, { status: 400, ...NO_STORE });
     }
 
     const rawSourceUrl = String(body.sourceUrl || "").trim().slice(0, 500);
@@ -86,10 +88,10 @@ export async function POST(req: NextRequest) {
         if (parsed.protocol === "http:" || parsed.protocol === "https:") {
           sourceUrl = parsed.toString();
         } else {
-          return NextResponse.json({ error: "Source URL must use http or https protocol." }, { status: 400 });
+          return NextResponse.json({ error: "Source URL must use http or https protocol." }, { status: 400, ...NO_STORE });
         }
       } catch {
-        return NextResponse.json({ error: "Invalid source URL format." }, { status: 400 });
+        return NextResponse.json({ error: "Invalid source URL format." }, { status: 400, ...NO_STORE });
       }
     }
 
@@ -98,7 +100,7 @@ export async function POST(req: NextRequest) {
     if (rawEmail) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(rawEmail)) {
-        return NextResponse.json({ error: "Invalid contact email address format." }, { status: 400 });
+        return NextResponse.json({ error: "Invalid contact email address format." }, { status: 400, ...NO_STORE });
       }
       contactEmail = rawEmail;
     }
@@ -117,14 +119,17 @@ export async function POST(req: NextRequest) {
       status: "Pending",
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Your correction has been submitted successfully. Thank you for helping improve the accuracy of Satta Darshan.",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Your correction has been submitted successfully. Thank you for helping improve the accuracy of Satta Darshan.",
+      },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch (err: any) {
     return NextResponse.json(
       { error: err.message || "An unexpected error occurred while saving the correction report." },
-      { status: 500 }
+      { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
     );
   }
 }

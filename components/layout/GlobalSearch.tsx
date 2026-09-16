@@ -108,6 +108,7 @@ export function GlobalSearch() {
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState<SearchResult[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const searchCacheRef = React.useRef<Map<string, SearchResult[]>>(new Map());
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -128,6 +129,13 @@ export function GlobalSearch() {
       return;
     }
 
+    // Check in-memory search cache for instantaneous 0ms response
+    if (searchCacheRef.current.has(trimmed.toLowerCase())) {
+      setResults(searchCacheRef.current.get(trimmed.toLowerCase())!);
+      setLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
     setLoading(true);
 
@@ -138,7 +146,9 @@ export function GlobalSearch() {
         });
         if (!res.ok) throw new Error("Search failed");
         const data = await res.json();
-        setResults(data.items || []);
+        const items: SearchResult[] = data.items || [];
+        searchCacheRef.current.set(trimmed.toLowerCase(), items);
+        setResults(items);
       } catch (error: unknown) {
         if (error instanceof DOMException && error.name === "AbortError") {
           // Request was aborted due to new input, ignore
