@@ -244,7 +244,11 @@ npm install
 ```
 
 ### 3. Environment Configuration
-Create a `.env.local` file in the project root:
+Copy the provided `.env.example` template to `.env.local`:
+```bash
+cp .env.example .env.local
+```
+Or create a `.env.local` file in the project root:
 ```env
 # Required: MongoDB Connection String
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/sattadarshan?retryWrites=true&w=majority
@@ -383,5 +387,7 @@ The following scripts are defined in `package.json`:
 ---
 
 ## License
-
-This project is marked as private in `package.json`. All rights are reserved by the project maintainers. No open-source license has been specified.
+ 
+This project is open source and available under the [MIT License](LICENSE).
+ 
+See the [LICENSE](LICENSE) file for full copyright and permission notices.
