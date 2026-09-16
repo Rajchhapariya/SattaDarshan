@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,14 +48,45 @@ async function getPolitician(slug: string) {
   return p;
 }
 
-export async function generateMetadata({ params }: PoliticianPageProps) {
+export async function generateMetadata({ params }: PoliticianPageProps): Promise<Metadata> {
   const { slug } = await params;
   const p = await getPolitician(slug);
   if (!p) return { title: "Representative Not Found" };
 
+  const officeTitle = p.currentOffice || p.ministerialRank || p.role || "Representative";
+  const title = `${p.name} (${officeTitle}) — Public Profile & Records`;
+  const location = p.constituency ? `${p.constituency}, ${p.state}` : p.state || "India";
+  const description = `Verified public records and legislative profile for ${p.name}, ${officeTitle} (${p.partyName || "Independent"}), representing ${location}.`;
+  const ogImageUrl = `/api/og/politician/${slug}`;
+
   return {
-    title: `${p.name} — Political Profile & Legislative Records`,
-    description: `Public legislative profile and records for ${p.name} (${p.role || "Representative"}), representing ${p.constituency || p.state || "India"}. Compiled from public sources.`,
+    title,
+    description,
+    alternates: {
+      canonical: `https://satta-darshan-7jgo.vercel.app/politicians/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://satta-darshan-7jgo.vercel.app/politicians/${slug}`,
+      siteName: "SattaDarshan",
+      type: "profile",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${p.name} — Civic Profile`,
+          type: "image/png",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
   };
 }
 
@@ -90,8 +122,13 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
             className="border border-border/80 shadow-md"
           />
           <div className="absolute top-2.5 left-2.5 z-10">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-primary-foreground shadow-sm">
-              {p.role || "Leader"}
+            <span className={cn(
+              "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold shadow-sm",
+              p.ministerialRank && p.tenureStatus !== "former"
+                ? "bg-amber-500 text-white"
+                : "bg-primary text-primary-foreground"
+            )}>
+              {p.ministerialRank || p.role || "Leader"}
             </span>
           </div>
         </div>
@@ -123,6 +160,11 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
                   {p.partyName || "Independent"}
                   {p.chamber && ` • ${p.chamber}`}
                 </p>
+                {p.currentOffice && (
+                  <p className="text-sm font-bold text-amber-600 dark:text-amber-500 mt-1">
+                    {p.currentOffice}
+                  </p>
+                )}
               </div>
               <ShareButton
                 title={`${p.name} — Political Profile & Legislative Records`}
@@ -249,6 +291,70 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
           <p className="text-[11px] text-muted-foreground mt-1">Active legislative seat</p>
         </div>
       </div>
+
+      {/* Portfolios & Executive Responsibilities */}
+      {p.portfolios && p.portfolios.length > 0 && (
+        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">
+          <div className="flex items-center gap-2">
+            <Landmark className="h-5 w-5 text-amber-600" />
+            <h3 className="text-lg font-bold text-foreground">Ministerial Portfolios & Responsibilities</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {p.portfolios.map((portfolio: string, idx: number) => (
+              <div key={idx} className="p-4 rounded-2xl bg-muted/30 border border-border/60 flex items-start gap-3">
+                <span className="h-6 w-6 rounded-lg bg-amber-500/15 text-amber-700 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                  {idx + 1}
+                </span>
+                <div>
+                  <h4 className="font-bold text-sm text-foreground">{portfolio}</h4>
+                  <span className="text-[11px] text-muted-foreground">Union Council of Ministers</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Structured Public Offices & Tenure History */}
+      {p.offices && p.offices.length > 0 && (
+        <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-bold text-foreground">Public Offices & Tenure History</h3>
+            </div>
+            <span className="text-xs text-muted-foreground font-medium">Verified Historical Record</span>
+          </div>
+          <div className="space-y-3 divide-y divide-border/40">
+            {p.offices.map((office: any, idx: number) => (
+              <div key={idx} className={cn("pt-3 first:pt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2")}>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-sm text-foreground">{office.title}</span>
+                    <span className={cn(
+                      "px-2 py-0.5 rounded-full text-[10px] font-bold",
+                      office.status === "serving" 
+                        ? "bg-emerald-500/15 text-emerald-700 border border-emerald-500/20" 
+                        : "bg-amber-500/15 text-amber-700 border border-amber-500/20"
+                    )}>
+                      {office.status === "serving" ? "Serving" : "Former Tenure"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {office.jurisdiction || "Republic of India"}
+                    {office.startDate && ` • ${office.startDate} to ${office.endDate || "Present"}`}
+                  </p>
+                </div>
+                {office.source && (
+                  <span className="text-[11px] text-muted-foreground bg-muted/40 px-2.5 py-1 rounded-lg border border-border/50 self-start sm:self-auto">
+                    Source: {office.source}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Biography Section */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Landmark, ExternalLink, Check, Info } from "lucide-react";
 
 export function DisclaimerModal() {
@@ -74,19 +75,24 @@ export function DisclaimerModal() {
       <div 
         className="relative w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col max-h-[92vh] max-h-[92dvh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300"
       >
-        {/* Header Ribbon - Professional, civic & transparent (not alarming) */}
-        <div className="p-4 sm:p-7 border-b border-border/70 bg-muted/40 flex items-start gap-3 sm:gap-4">
-          <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Landmark className="h-5 w-5 sm:h-6 sm:w-6" />
+        {/* Header Ribbon - Centered with SattaDarshan Logo & Dignified Civic Typography */}
+        <div className="p-4 sm:p-6 border-b border-border/70 bg-muted/30 flex flex-col items-center text-center">
+          <div className="mb-2 sm:mb-2.5 flex items-center justify-center">
+            <Image
+              src="/logo-header.png"
+              alt="SattaDarshan Logo"
+              width={44}
+              height={44}
+              className="h-9 w-9 sm:h-11 sm:w-11 object-contain flex-shrink-0"
+              priority
+            />
           </div>
-          <div className="min-w-0">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
-              Independent Civic Platform Notice
-            </span>
-            <h2 id="disclaimer-title" className="text-lg sm:text-2xl font-extrabold text-foreground tracking-tight leading-tight">
-              Independent, Non-Government Website
-            </h2>
-          </div>
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-primary block mb-1">
+            Independent Civic Platform Notice
+          </span>
+          <h2 id="disclaimer-title" className="text-base sm:text-2xl font-extrabold text-foreground tracking-tight leading-tight">
+            Independent, Non-Government Website
+          </h2>
         </div>
 
         {/* Modal Scrollable Body */}

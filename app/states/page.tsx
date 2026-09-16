@@ -3,7 +3,22 @@ import State from "@/models/State";
 import { getStatePath } from "@/lib/server/statePaths";
 import { StatesClient } from "./StatesClient";
 
-export const metadata = { title: "States & Union Territories — India" };
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "States & Union Territories of India — Civic & Electoral Data",
+  description:
+    "Explore governance, Chief Ministers, ruling parties, Lok Sabha seats, and Vidhan Sabha assemblies across all 28 Indian States and 8 Union Territories.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/states",
+  },
+  openGraph: {
+    title: "States & Union Territories of India — SattaDarshan",
+    description:
+      "Explore governance, Chief Ministers, ruling parties, Lok Sabha seats, and Vidhan Sabha assemblies across all 28 Indian States and 8 Union Territories.",
+    url: "https://satta-darshan-7jgo.vercel.app/states",
+  },
+};
 
 async function getStates() {
   try {

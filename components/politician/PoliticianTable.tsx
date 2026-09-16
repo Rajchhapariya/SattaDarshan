@@ -16,6 +16,9 @@ type PoliticianSummary = {
   name: string;
   photo?: string;
   role?: string;
+  currentOffice?: string;
+  ministerialRank?: string;
+  portfolios?: string[];
   partyName?: string;
   constituency?: string;
   state?: string;
@@ -50,9 +53,16 @@ export function PoliticianTable({ data }: { data: PoliticianSummary[] }) {
                 </Link>
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className="text-[11px] font-semibold">
-                  {p.role || "Leader"}
-                </Badge>
+                <div className="flex flex-col items-start gap-1">
+                  <Badge variant="outline" className="text-[11px] font-semibold">
+                    {p.ministerialRank || p.role || "Leader"}
+                  </Badge>
+                  {p.portfolios && p.portfolios.length > 0 && (
+                    <span className="text-[10px] text-amber-700 font-medium line-clamp-1 max-w-[220px]" title={p.portfolios[0]}>
+                      {p.portfolios[0]}
+                    </span>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <span className="font-semibold text-xs text-primary">{p.partyName || "Independent"}</span>

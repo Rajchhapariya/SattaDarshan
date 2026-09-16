@@ -2,9 +2,39 @@ import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import { RajyaSabhaClient } from "./RajyaSabhaClient";
 
-export const metadata = {
-  title: "Rajya Sabha — Council of States",
-  description: "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Rajya Sabha — Council of States | Members Directory & Seating Chamber",
+  description:
+    "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/parliament/rajya-sabha",
+  },
+  openGraph: {
+    title: "Rajya Sabha — Council of States | Indian Parliament",
+    description:
+      "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+    url: "https://satta-darshan-7jgo.vercel.app/parliament/rajya-sabha",
+    siteName: "SattaDarshan",
+    type: "website",
+    images: [
+      {
+        url: "/api/og/parliament/rajya-sabha",
+        width: 1200,
+        height: 630,
+        alt: "Rajya Sabha — Council of States",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rajya Sabha — Council of States | Indian Parliament",
+    description:
+      "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+    images: ["/api/og/parliament/rajya-sabha"],
+  },
 };
 
 export const revalidate = 3600;

@@ -1,5 +1,19 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+export interface IPublicOffice {
+  title: string;
+  category: "executive" | "legislative" | "party" | "constitutional";
+  rank?: string;
+  jurisdiction?: string;
+  portfolios?: string[];
+  startDate?: string;
+  endDate?: string;
+  status: "serving" | "former";
+  source?: string;
+  sourceUrl?: string;
+  verifiedAt?: Date;
+}
+
 export interface IPolitician extends Document {
   slug: string;
   name: string;
@@ -7,6 +21,10 @@ export interface IPolitician extends Document {
   dob?: string;
   gender?: "Male" | "Female" | "Other";
   role: string;
+  currentOffice?: string;
+  ministerialRank?: string;
+  portfolios?: string[];
+  offices?: IPublicOffice[];
   status: string;
   party: string;
   partyName?: string;
@@ -44,6 +62,22 @@ const S = new Schema<IPolitician>({
   dob: String,
   gender: { type: String, enum: ["Male", "Female", "Other"] },
   role: { type: String, required: true, index: true },
+  currentOffice: String,
+  ministerialRank: { type: String, index: true },
+  portfolios: [String],
+  offices: [{
+    title: { type: String, required: true },
+    category: { type: String, enum: ["executive", "legislative", "party", "constitutional"] },
+    rank: String,
+    jurisdiction: String,
+    portfolios: [String],
+    startDate: String,
+    endDate: String,
+    status: { type: String, enum: ["serving", "former"] },
+    source: String,
+    sourceUrl: String,
+    verifiedAt: Date,
+  }],
   status: { type: String, default: "Active", index: true },
   party: { type: String, required: true, index: true },
   partyName: String,

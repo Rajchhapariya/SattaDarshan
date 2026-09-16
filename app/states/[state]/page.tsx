@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import connectDB from "@/lib/db";
@@ -91,12 +92,44 @@ async function getStatePoliticians(stateName: string) {
   return await Politician.find({ state: regex }).sort({ name: 1 }).lean();
 }
 
-export async function generateMetadata({ params }: StatePageProps) {
+export async function generateMetadata({ params }: StatePageProps): Promise<Metadata> {
   const { state } = await params;
   const s = await getState(state);
+  if (!s) return { title: "State Not Found" };
+
+  const cmPart = s.cm ? ` • CM: ${s.cm}` : "";
+  const title = `${s.name}${cmPart} — Political & Legislative Profile`;
+  const description = `Governance details, Chief Minister, Assembly seats (${s.totalAssemblySeats || 0}), and Lok Sabha seats (${s.totalLokSabhaSeats || 0}) for ${s.name}. Verified public records.`;
+  const ogImageUrl = `/api/og/state/${s.slug}`;
+
   return { 
-    title: s ? `${s.name} — Political & Legislative Profile` : "State Not Found",
-    description: s ? `Governance details, Chief Minister, Assembly seats, and parliamentary representatives for ${s.name}.` : "",
+    title,
+    description,
+    alternates: {
+      canonical: `https://satta-darshan-7jgo.vercel.app/states/${s.slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://satta-darshan-7jgo.vercel.app/states/${s.slug}`,
+      siteName: "SattaDarshan",
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${s.name} — State Jurisdiction`,
+          type: "image/png",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
   };
 }
 
@@ -155,7 +188,13 @@ export default async function StatePage({ params }: StatePageProps) {
           </div>
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[110px]">
             <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Chief Minister</span>
-            <span className="text-sm font-bold text-foreground truncate max-w-[120px] block">{s.cm || "Governor"}</span>
+            {s.cmSlug ? (
+              <Link href={`/politicians/${s.cmSlug}`} className="text-sm font-bold text-primary hover:underline truncate max-w-[140px] block mx-auto" title={s.cm}>
+                {s.cm}
+              </Link>
+            ) : (
+              <span className="text-sm font-bold text-foreground truncate max-w-[140px] block mx-auto">{s.cm || "Governor"}</span>
+            )}
           </div>
           <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 text-center min-w-[90px]">
             <span className="text-[10px] uppercase font-semibold text-muted-foreground block">Lok Sabha</span>

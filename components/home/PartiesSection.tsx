@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Flag, ArrowRight, ShieldCheck } from "lucide-react";
+import { Flag, ArrowRight, ShieldCheck, ChevronRight } from "lucide-react";
 import { AllianceBadge } from "@/components/common/AllianceBadge";
 import { CivicPartyLogo } from "@/components/party/CivicPartyLogo";
 

@@ -32,9 +32,14 @@ type PoliticianSummary = {
   name: string;
   photo?: string;
   role?: string;
+  currentOffice?: string;
+  ministerialRank?: string;
+  portfolios?: string[];
   partyName?: string;
   constituency?: string;
   state?: string;
+  tenureStatus?: "serving" | "former" | "historical";
+  verificationStatus?: string;
 };
 
 export function PoliticiansClient() {

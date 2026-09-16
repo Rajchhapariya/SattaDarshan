@@ -35,30 +35,45 @@ export const metadata: Metadata = {
     "Indian Elections",
     "Non-Government Portal",
   ],
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app",
+  },
   openGraph: {
     title: "SattaDarshan — Independent Political & Legislative Platform",
     description:
-      "SattaDarshan is an independent, non-government platform for exploring publicly available political and legislative information.",
+      "Transparent, structured civic intelligence tracking the 18th Lok Sabha, Rajya Sabha, Chief Ministers, Portfolios, and 36 States & UTs.",
     url: "https://satta-darshan-7jgo.vercel.app",
     siteName: "SattaDarshan (Independent)",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SattaDarshan — Independent Political & Legislative Platform",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "SattaDarshan — Independent Political & Legislative Platform",
     description:
-      "SattaDarshan is an independent, non-government platform for exploring publicly available political and legislative information.",
+      "Transparent, structured civic intelligence tracking the 18th Lok Sabha, Rajya Sabha, Chief Ministers, Portfolios, and 36 States & UTs.",
+    images: ["/og-image.png"],
   },
   icons: {
     icon: [
-      { url: "/icon.png", type: "image/png" },
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", sizes: "64x64", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
     apple: [
       { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
     ],
+    shortcut: "/favicon.ico",
   },
 };
 

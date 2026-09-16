@@ -8,6 +8,9 @@ type PoliticianCardProps = {
   name: string;
   photo?: string;
   role?: string;
+  currentOffice?: string;
+  ministerialRank?: string;
+  portfolios?: string[];
   partyName?: string;
   constituency?: string;
   state?: string;
@@ -22,6 +25,9 @@ export function PoliticianCard({
   name, 
   photo, 
   role, 
+  currentOffice,
+  ministerialRank,
+  portfolios,
   partyName, 
   constituency, 
   state, 
@@ -31,6 +37,7 @@ export function PoliticianCard({
   className
 }: PoliticianCardProps) {
   const isFormer = tenureStatus === "former";
+  const displayRole = ministerialRank || (role === "Minister" ? "Cabinet Minister" : role) || "Representative";
 
   return (
     <Link 
@@ -46,8 +53,13 @@ export function PoliticianCard({
 
         {/* Role Tag */}
         <div className="absolute top-2.5 left-2.5 z-10">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-background/90 text-foreground backdrop-blur-md shadow-sm border border-border/50">
-            {role || "Representative"}
+          <span className={cn(
+            "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md shadow-sm border",
+            ministerialRank && !isFormer
+              ? "bg-amber-500/95 text-white border-amber-600/30"
+              : "bg-background/90 text-foreground border-border/50"
+          )}>
+            {displayRole}
           </span>
         </div>
 
@@ -76,9 +88,19 @@ export function PoliticianCard({
           <h3 className="font-bold text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
             {name}
           </h3>
-          <p className="text-xs font-medium text-muted-foreground line-clamp-1 mt-0.5">
-            {constituency ? `${constituency}, ${state}` : state || "India"}
-          </p>
+          {portfolios && portfolios.length > 0 && !isFormer ? (
+            <p className="text-[11px] font-semibold text-amber-600 line-clamp-1 mt-0.5" title={portfolios[0]}>
+              {portfolios[0]}
+            </p>
+          ) : currentOffice && !isFormer ? (
+            <p className="text-[11px] font-semibold text-primary line-clamp-1 mt-0.5" title={currentOffice}>
+              {currentOffice}
+            </p>
+          ) : (
+            <p className="text-xs font-medium text-muted-foreground line-clamp-1 mt-0.5">
+              {constituency ? `${constituency}, ${state}` : state || "India"}
+            </p>
+          )}
         </div>
 
         <div className="pt-2.5 border-t border-border/50 flex items-center justify-between text-xs gap-1">

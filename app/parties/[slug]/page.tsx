@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -47,12 +48,44 @@ async function getParty(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: PartyPageProps) {
+export async function generateMetadata({ params }: PartyPageProps): Promise<Metadata> {
   const { slug } = await params;
   const p = await getParty(slug);
+  if (!p) return { title: "Party Not Found" };
+
+  const abbrPart = p.abbr ? ` (${p.abbr})` : "";
+  const title = `${p.name}${abbrPart} — Party Profile & Seat Distribution`;
+  const description = `Party profile, seat distribution, and public legislative records for ${p.name}. Compiled from official election records.`;
+  const ogImageUrl = `/api/og/party/${slug}`;
+
   return {
-    title: p ? `${p.name} (${p.abbr || ""}) — Party Profile & Seat Distribution` : "Party Not Found",
-    description: p ? `Party profile, seat distribution, and public legislative records for ${p.name}. Compiled from public election records.` : "",
+    title,
+    description,
+    alternates: {
+      canonical: `https://satta-darshan-7jgo.vercel.app/parties/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://satta-darshan-7jgo.vercel.app/parties/${slug}`,
+      siteName: "SattaDarshan",
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${p.name} — Political Party`,
+          type: "image/png",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
   };
 }
 

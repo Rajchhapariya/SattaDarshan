@@ -45,7 +45,14 @@ export async function GET(req: NextRequest) {
 
     if (role && role !== "All") {
       const roles = role.split(",").map((item) => item.trim()).filter(Boolean);
-      filter.role = roles.length > 1 ? { $in: roles } : roles[0];
+      if (roles.includes("Minister")) {
+        filter.$or = [
+          { role: { $in: roles } },
+          { ministerialRank: { $in: ["Prime Minister", "Cabinet Minister", "Minister of State (Independent Charge)", "Minister of State"] } }
+        ];
+      } else {
+        filter.role = roles.length > 1 ? { $in: roles } : roles[0];
+      }
     }
     if (chamber && chamber !== "All") filter.chamber = chamber;
     if (party && party !== "All") filter.party = party;
@@ -58,7 +65,7 @@ export async function GET(req: NextRequest) {
 
     const total = await Politician.countDocuments(filter);
     const politicians = await Politician.find(filter)
-      .select("slug name photo role status party partyName state constituency chamber education assets criminalCases createdAt updatedAt")
+      .select("slug name photo role currentOffice ministerialRank portfolios tenureStatus verificationStatus status party partyName state constituency chamber education assets criminalCases createdAt updatedAt")
       .sort(sortObj)
       .skip((page - 1) * limit)
       .limit(limit)

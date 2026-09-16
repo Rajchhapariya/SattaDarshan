@@ -21,6 +21,41 @@ import { PartiesSection } from "@/components/home/PartiesSection";
 import { StatesSection } from "@/components/home/StatesSection";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SattaDarshan — Independent Political & Legislative Information Platform",
+  description:
+    "Transparent, structured civic intelligence tracking the 18th Lok Sabha, Rajya Sabha, Chief Ministers, Portfolios, and 36 States & UTs.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app",
+  },
+  openGraph: {
+    title: "SattaDarshan — Independent Political & Legislative Platform",
+    description:
+      "Transparent, structured civic intelligence tracking the 18th Lok Sabha, Rajya Sabha, Chief Ministers, Portfolios, and 36 States & UTs.",
+    url: "https://satta-darshan-7jgo.vercel.app",
+    siteName: "SattaDarshan",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SattaDarshan Platform Preview",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SattaDarshan — Independent Political & Legislative Platform",
+    description:
+      "Transparent, structured civic intelligence tracking the 18th Lok Sabha, Rajya Sabha, Chief Ministers, Portfolios, and 36 States & UTs.",
+    images: ["/og-image.png"],
+  },
+};
+
 export const revalidate = 3600;
 
 export default async function Home() {
