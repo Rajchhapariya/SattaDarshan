@@ -5,7 +5,7 @@ const POPULAR_STATES = [
   { name: "Uttar Pradesh", slug: "uttar-pradesh", seats: 80, cm: "Yogi Adityanath", party: "BJP" },
   { name: "Maharashtra", slug: "maharashtra", seats: 48, cm: "Devendra Fadnavis", party: "BJP" },
   { name: "West Bengal", slug: "west-bengal", seats: 42, cm: "Shri Suvendu Adhikari", party: "BJP" },
-  { name: "Bihar", slug: "bihar", seats: 40, cm: "Nitish Kumar", party: "JDU" },
+  { name: "Bihar", slug: "bihar", seats: 40, cm: "Samrat Choudhary", party: "BJP" },
   { name: "Tamil Nadu", slug: "tamil-nadu", seats: 39, cm: "M. K. Stalin", party: "DMK" },
   { name: "Karnataka", slug: "karnataka", seats: 28, cm: "Siddaramaiah", party: "INC" },
   { name: "Gujarat", slug: "gujarat", seats: 26, cm: "Bhupendrabhai Patel", party: "BJP" },

@@ -1,7 +1,7 @@
 {
   "politicians": {
-    "count": 845,
-    "hash": "ca2d1566c4d2e156bbc2ec24816732d7df8e9be719ffd3c0a607eb768c21d250"
+    "count": 846,
+    "hash": "351a6097a9a10e5712ca29fc5c84c13c4bbd46c9e8b636ea92846677c4c13d59"
   },
   "parties": {
     "count": 102,
@@ -9,6 +9,6 @@
   },
   "states": {
     "count": 36,
-    "hash": "dcebc0b1e28f38068e4214a2b3cc829868ebc6f418b2549bc587f71ba6d19669"
+    "hash": "f40d4bec348c47cac2ff8ee42ed8ecd4947e639f17ac43581e70b2d3b989a25e"
   }
 }
