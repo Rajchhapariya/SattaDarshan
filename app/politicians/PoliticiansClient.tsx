@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Search, Users, LayoutGrid, List, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { PoliticianTable } from "@/components/politician/PoliticianTable";
+import { CivicSearchInput } from "@/components/ui/CivicSearchInput";
 import { CivicSelect } from "@/components/ui/CivicSelect";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
@@ -122,17 +123,16 @@ export function PoliticiansClient() {
 
       {/* Search, Sort, View Controls */}
       <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
+        <div className="flex-1 max-w-md">
+          <CivicSearchInput
             value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
+            onChange={(val) => {
+              setQ(val);
               setPage(1);
             }}
             placeholder="Search by leader name, constituency, or party..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+            loading={loading}
+            debounceMs={300}
           />
         </div>
 

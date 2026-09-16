@@ -21,6 +21,7 @@ import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { CivicSelect } from "@/components/ui/CivicSelect";
+import { CivicSearchInput } from "@/components/ui/CivicSearchInput";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
@@ -163,14 +164,12 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
       {/* Search & Filter Control Bar */}
       <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
         {/* Search Bar */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
+        <div className="flex-1 max-w-md">
+          <CivicSearchInput
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search MP name or constituency..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+            debounceMs={200}
           />
         </div>
 

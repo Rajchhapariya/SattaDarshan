@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { StateIcon } from "@/components/ui/StateIcon";
 import { StateTable } from "@/components/state/StateTable";
+import { CivicSearchInput } from "@/components/ui/CivicSearchInput";
 import { MapPin, ChevronRight, LayoutGrid, List, Landmark } from "lucide-react";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
@@ -42,13 +43,14 @@ export function StatesClient({ initialStates }: { initialStates: any[] }) {
 
       {/* Filter & View Switcher */}
       <div className="p-4 rounded-2xl bg-card border border-border/80 shadow-sm flex flex-col sm:flex-row gap-3 justify-between items-stretch sm:items-center">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Filter by state name, Chief Minister, or ruling party..."
-          className="w-full sm:max-w-md px-4 py-2 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-        />
+        <div className="flex-1 sm:max-w-md">
+          <CivicSearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Filter by state name, Chief Minister, or ruling party..."
+            debounceMs={150}
+          />
+        </div>
 
         <div className="flex items-center rounded-xl border border-border bg-muted/40 p-1 self-end sm:self-auto">
           <button

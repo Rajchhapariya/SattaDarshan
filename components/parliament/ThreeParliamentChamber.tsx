@@ -334,17 +334,66 @@ export function ThreeParliamentChamber({
     selectionBeacon.visible = false;
     scene.add(selectionBeacon);
 
-    // --- 8. Refined Parliamentary Chair Geometry (Shared BufferGeometry) ---
-    const cushionGeo = new THREE.BoxGeometry(0.82, 0.24, 0.72);
-    cushionGeo.translate(0, 0.12, 0);
+    // --- 8. Refined Parliamentary Bench & Chair Geometry ---
+    const PRESIDING_CHAIR = new THREE.Vector3(0, 2.3, -1.5);
 
-    const backrestGeo = new THREE.BoxGeometry(0.82, 0.58, 0.16);
-    backrestGeo.translate(0, 0.41, -0.28);
+    // Cushion: Local +Z is front (facing dais), local -Z is rear
+    const cushionGeo = new THREE.BoxGeometry(0.82, 0.22, 0.62);
+    cushionGeo.translate(0, 0.11, 0.02);
 
-    const legGeo = new THREE.CylinderGeometry(0.14, 0.2, 0.32, 10);
-    legGeo.translate(0, -0.12, 0);
+    // Backrest: positioned behind cushion along -Z
+    const backrestGeo = new THREE.BoxGeometry(0.82, 0.54, 0.16);
+    backrestGeo.translate(0, 0.39, -0.32);
 
-    const seatSharedGeometry = mergeGeometries([cushionGeo, backrestGeo, legGeo]);
+    // Armrests / bench dividers: on sides
+    const armLeftGeo = new THREE.BoxGeometry(0.06, 0.30, 0.46);
+    armLeftGeo.translate(-0.41, 0.25, 0.02);
+    const armRightGeo = new THREE.BoxGeometry(0.06, 0.30, 0.46);
+    armRightGeo.translate(0.41, 0.25, 0.02);
+
+    // Pedestal beneath seat
+    const pedestalGeo = new THREE.CylinderGeometry(0.12, 0.18, 0.28, 10);
+    pedestalGeo.translate(0, -0.10, 0.02);
+
+    const seatSharedGeometry = mergeGeometries([
+      cushionGeo, 
+      backrestGeo, 
+      armLeftGeo, 
+      armRightGeo, 
+      pedestalGeo
+    ]);
+
+    cushionGeo.dispose();
+    backrestGeo.dispose();
+    armLeftGeo.dispose();
+    armRightGeo.dispose();
+    pedestalGeo.dispose();
+
+    // Front Desk / Ledger: In front of member along local +Z facing the dais
+    const deskTopGeo = new THREE.BoxGeometry(0.84, 0.08, 0.28);
+    deskTopGeo.translate(0, 0.38, 0.48);
+
+    const deskFrontGeo = new THREE.BoxGeometry(0.84, 0.38, 0.04);
+    deskFrontGeo.translate(0, 0.19, 0.60);
+
+    const deskStanchionGeo = new THREE.CylinderGeometry(0.03, 0.04, 0.38, 8);
+    deskStanchionGeo.translate(0, 0.19, 0.46);
+
+    const deskSharedGeometry = mergeGeometries([
+      deskTopGeo, 
+      deskFrontGeo, 
+      deskStanchionGeo
+    ]);
+
+    deskTopGeo.dispose();
+    deskFrontGeo.dispose();
+    deskStanchionGeo.dispose();
+
+    const benchWoodMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b, // Dignified dark slate/teak bench ledger
+      metalness: 0.18,
+      roughness: 0.45,
+    });
 
     // --- 9. Procedural Parliamentary Bloc Seating Distribution ---
     const ndaList = seats.filter((s) => s.alliance === "NDA");
@@ -446,18 +495,34 @@ export function ThreeParliamentChamber({
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
 
+      // Create each seat as a THREE.Group() at the calculated seat coordinates
+      const seatGroup = new THREE.Group();
+      seatGroup.position.set(x, yElevation, z);
+
+      // Calculate direction from seat 3D position toward the Presiding Chair
+      const direction = PRESIDING_CHAIR.clone().sub(new THREE.Vector3(x, yElevation, z));
+      direction.y = 0;
+      direction.normalize();
+
+      // Orient the entire seat group so front (+Z) points along direction
+      seatGroup.rotation.y = Math.atan2(direction.x, direction.z);
+
+      // A. Alliance-colored seat cushion & backrest
       const seatMesh = new THREE.Mesh(seatSharedGeometry, defaultMaterial);
-      seatMesh.position.set(x, yElevation, z);
-      // Turn chair to face inward toward the Speaker's Dais at (0, y, 0)
-      seatMesh.rotation.y = -angle + Math.PI / 2;
       seatMesh.userData = { 
         seatData, 
+        seatGroup,
         originalY: yElevation, 
         alliance,
         targetScale: 1.0,
       };
+      seatGroup.add(seatMesh);
 
-      scene.add(seatMesh);
+      // B. Bench desk / table ledge in front facing the dais
+      const deskMesh = new THREE.Mesh(deskSharedGeometry, benchWoodMat);
+      seatGroup.add(deskMesh);
+
+      scene.add(seatGroup);
       seatMeshes.push(seatMesh);
     }
 
@@ -491,7 +556,8 @@ export function ThreeParliamentChamber({
     selectSeatIn3DRef.current = (slug: string | null) => {
       if (!slug) {
         if (currentSelectedMesh) {
-          currentSelectedMesh.position.y = currentSelectedMesh.userData.originalY;
+          const group = currentSelectedMesh.userData.seatGroup;
+          if (group) group.position.y = currentSelectedMesh.userData.originalY;
           currentSelectedMesh = null;
         }
         selectionRing.visible = false;
@@ -502,18 +568,22 @@ export function ThreeParliamentChamber({
       const match = seatMeshes.find((m) => m.userData.seatData.slug === slug);
       if (match) {
         if (currentSelectedMesh && currentSelectedMesh !== match) {
-          currentSelectedMesh.position.y = currentSelectedMesh.userData.originalY;
+          const prevGroup = currentSelectedMesh.userData.seatGroup;
+          if (prevGroup) prevGroup.position.y = currentSelectedMesh.userData.originalY;
         }
         currentSelectedMesh = match;
-        // Elevate selected chair slightly
-        match.position.y = match.userData.originalY + 0.35;
+        const group = match.userData.seatGroup;
+        if (group) {
+          // Elevate selected seat assembly slightly
+          group.position.y = match.userData.originalY + 0.35;
 
-        // Position halo ring and beacon
-        selectionRing.position.set(match.position.x, match.userData.originalY + 0.05, match.position.z);
-        selectionRing.visible = true;
+          // Position halo ring and beacon at the seat group's coordinates
+          selectionRing.position.set(group.position.x, match.userData.originalY + 0.05, group.position.z);
+          selectionRing.visible = true;
 
-        selectionBeacon.position.set(match.position.x, match.userData.originalY, match.position.z);
-        selectionBeacon.visible = true;
+          selectionBeacon.position.set(group.position.x, match.userData.originalY, group.position.z);
+          selectionBeacon.visible = true;
+        }
       }
     };
 
@@ -588,9 +658,10 @@ export function ThreeParliamentChamber({
           const seatData = hitMesh.userData.seatData;
           handleSelectSeat(seatData);
 
+          const group = hitMesh.userData.seatGroup || hitMesh;
           // Gentle camera pivot towards selected seat
           controls.target.lerp(
-            new THREE.Vector3(hitMesh.position.x * 0.35, hitMesh.position.y, hitMesh.position.z * 0.35),
+            new THREE.Vector3(group.position.x * 0.35, group.position.y, group.position.z * 0.35),
             0.4
           );
           controls.update();
@@ -643,8 +714,9 @@ export function ThreeParliamentChamber({
       // Smooth scale interpolation for alliance filter transitions
       seatMeshes.forEach((mesh) => {
         const target = mesh.userData.targetScale || 1.0;
-        if (Math.abs(mesh.scale.x - target) > 0.005) {
-          mesh.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
+        const group = mesh.userData.seatGroup;
+        if (group && Math.abs(group.scale.x - target) > 0.005) {
+          group.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
         }
       });
 
@@ -671,6 +743,8 @@ export function ThreeParliamentChamber({
 
       // Dispose shared geometries
       seatSharedGeometry.dispose();
+      deskSharedGeometry.dispose();
+      benchWoodMat.dispose();
       lowerDaisGeo.dispose();
       upperDaisGeo.dispose();
       trimGeo.dispose();

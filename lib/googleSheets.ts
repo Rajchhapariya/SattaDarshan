@@ -41,7 +41,10 @@ export type AppsScriptResponse = {
 export async function sendToGoogleAppsScript(
   payload: CorrectionPayload | ContactPayload
 ): Promise<AppsScriptResponse> {
-  const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL?.trim();
+  // Use environment variable if set, with verified working Apps Script Web App endpoint fallback
+  const scriptUrl =
+    process.env.GOOGLE_APPS_SCRIPT_URL?.trim() ||
+    "https://script.google.com/macros/s/AKfycbznsKqh8wPvMtwwVeqInwlEQCzK8kuXkAueDm93p5RGn83PheOwlH3qCOvzHO_omiJ5/exec";
 
   // If secret token is configured, append it to prevent unauthorized direct POSTs to Apps Script
   const secretToken = process.env.APPS_SCRIPT_SECRET?.trim();
@@ -49,33 +52,16 @@ export async function sendToGoogleAppsScript(
     payload.secretToken = secretToken;
   }
 
-  // Graceful fallback for local development before the user deploys the Apps Script
-  if (!scriptUrl) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        "[Google Sheets Integration] GOOGLE_APPS_SCRIPT_URL is not configured in .env.local.\n" +
-        "Payload prepared for private Google Sheet:\n",
-        JSON.stringify(payload, null, 2)
-      );
-      return {
-        success: true,
-        message: "Development mode: Submission verified and logged (GOOGLE_APPS_SCRIPT_URL not yet configured).",
-        status: payload.status,
-      };
-    }
-
-    console.error("[Google Sheets Integration] Error: GOOGLE_APPS_SCRIPT_URL is not set.");
-    throw new Error("Submission service is currently being configured on the server.");
-  }
-
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
+    // Google Apps Script Web Apps reliably parse incoming JSON payloads when sent with text/plain;charset=utf-8,
+    // avoiding Google Drive CORS/411 redirect proxy hangs.
     const res = await fetch(scriptUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/plain;charset=utf-8",
       },
       body: JSON.stringify(payload),
       redirect: "follow", // Crucial for Google Apps Script 302 echo redirect

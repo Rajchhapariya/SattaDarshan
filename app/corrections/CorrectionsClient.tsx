@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { 
   FileEdit, 
@@ -44,6 +44,9 @@ export function CorrectionsClient() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
   // Read URL query parameters post-mount without causing Next.js SSR Suspense bail-out
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -60,8 +63,19 @@ export function CorrectionsClient() {
     }
   }, []);
 
+  const handleResetForm = () => {
+    setDescription("");
+    setSuggestedCorrection("");
+    setSourceUrl("");
+    setContactEmail("");
+    setError(null);
+    setSuccessMessage(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return; // Prevent duplicate submissions
+
     setError(null);
     setSuccessMessage(null);
     setLoading(true);
@@ -88,15 +102,23 @@ export function CorrectionsClient() {
       }
 
       setSuccessMessage(
-        data.message || "Your report has been logged and routed to our editorial verification pipeline."
+        data.message || "Your correction report has been received and logged to our editorial verification pipeline."
       );
-      // Reset sensitive form fields
+      // Clear content fields while preserving category selection
       setDescription("");
       setSuggestedCorrection("");
       setSourceUrl("");
       setContactEmail("");
+
+      // Smooth micro-scroll to keep inline feedback squarely in mobile viewport if needed
+      setTimeout(() => {
+        feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
     } catch (err: any) {
       setError(err.message || "An unexpected network error occurred.");
+      setTimeout(() => {
+        feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
     } finally {
       setLoading(false);
     }
@@ -133,185 +155,223 @@ export function CorrectionsClient() {
         </div>
       </div>
 
-      {/* Success Notification Banner */}
-      {successMessage && (
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 space-y-2">
-          <div className="flex items-center gap-2 font-bold text-sm">
-            <CheckCircle className="h-5 w-5 text-emerald-600" />
-            Submission Confirmed
-          </div>
-          <p className="text-xs leading-relaxed">{successMessage}</p>
-          <div className="pt-2">
-            <button
-              onClick={() => setSuccessMessage(null)}
-              className="text-xs font-semibold underline hover:opacity-80"
-            >
-              Submit another correction
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Error Notification Banner */}
-      {error && (
-        <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-800 flex items-start gap-2.5">
-          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-          <div className="text-xs space-y-1">
-            <p className="font-bold">Submission Incomplete</p>
-            <p>{error}</p>
-          </div>
-        </div>
-      )}
-
       {/* Form Container */}
-      {!successMessage && (
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-6">
-          {/* Honeypot field (hidden from legitimate users) */}
-          <div style={{ display: "none" }} aria-hidden="true">
-            <label htmlFor="website_trap">Leave this field blank</label>
-            <input
-              type="text"
-              id="website_trap"
-              name="website_trap"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-              tabIndex={-1}
-              autoComplete="off"
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-6">
+        {/* Honeypot field (hidden from legitimate users) */}
+        <div style={{ display: "none" }} aria-hidden="true">
+          <label htmlFor="website_trap">Leave this field blank</label>
+          <input
+            type="text"
+            id="website_trap"
+            name="website_trap"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {/* Record Category */}
-            <div className="space-y-1.5">
-              <label htmlFor="recordType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
-                Record Category <span className="text-red-500">*</span>
-              </label>
-              <CivicSelect
-                id="recordType"
-                value={recordType}
-                onChange={setRecordType}
-                options={RECORD_TYPE_OPTIONS}
-                ariaLabel="Record Category"
-                className="w-full"
-              />
-            </div>
-
-            {/* Record Name or Identifier */}
-            <div className="space-y-1.5">
-              <label htmlFor="recordIdentifier" className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Record Identifier / Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="recordIdentifier"
-                type="text"
-                value={recordIdentifier}
-                onChange={(e) => setRecordIdentifier(e.target.value)}
-                placeholder="e.g. Narendra Modi or /politicians/narendra-modi"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Issue Classification */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          {/* Record Category */}
           <div className="space-y-1.5">
-            <label htmlFor="issueType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
-              Nature of Issue <span className="text-red-500">*</span>
+            <label htmlFor="recordType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
+              Record Category <span className="text-red-500">*</span>
             </label>
             <CivicSelect
-              id="issueType"
-              value={issueType}
-              onChange={setIssueType}
-              options={ISSUE_TYPE_OPTIONS}
-              ariaLabel="Nature of Issue"
+              id="recordType"
+              value={recordType}
+              onChange={setRecordType}
+              options={RECORD_TYPE_OPTIONS}
+              ariaLabel="Record Category"
               className="w-full"
             />
           </div>
 
-          {/* What Appears Incorrect */}
+          {/* Record Name or Identifier */}
           <div className="space-y-1.5">
-            <label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-foreground">
-              What appears incorrect? <span className="text-red-500">*</span>
+            <label htmlFor="recordIdentifier" className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Record Identifier / Name <span className="text-red-500">*</span>
             </label>
-            <textarea
-              id="description"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the inaccurate or outdated detail as currently displayed on SattaDarshan..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            <input
+              id="recordIdentifier"
+              type="text"
+              value={recordIdentifier}
+              onChange={(e) => setRecordIdentifier(e.target.value)}
+              placeholder="e.g. Narendra Modi or /politicians/narendra-modi"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
               required
             />
           </div>
+        </div>
 
-          {/* Suggested Correction */}
-          <div className="space-y-1.5">
-            <label htmlFor="suggestedCorrection" className="text-xs font-bold uppercase tracking-wider text-foreground">
-              Suggested Correction <span className="text-red-500">*</span>
+        {/* Issue Classification */}
+        <div className="space-y-1.5">
+          <label htmlFor="issueType" className="text-xs font-bold uppercase tracking-wider text-foreground block">
+            Nature of Issue <span className="text-red-500">*</span>
+          </label>
+          <CivicSelect
+            id="issueType"
+            value={issueType}
+            onChange={setIssueType}
+            options={ISSUE_TYPE_OPTIONS}
+            ariaLabel="Nature of Issue"
+            className="w-full"
+          />
+        </div>
+
+        {/* What Appears Incorrect */}
+        <div className="space-y-1.5">
+          <label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-foreground">
+            What appears incorrect? <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            id="description"
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe the inaccurate or outdated detail as currently displayed on SattaDarshan..."
+            className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            required
+          />
+        </div>
+
+        {/* Suggested Correction */}
+        <div className="space-y-1.5">
+          <label htmlFor="suggestedCorrection" className="text-xs font-bold uppercase tracking-wider text-foreground">
+            Suggested Correction <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            id="suggestedCorrection"
+            rows={3}
+            value={suggestedCorrection}
+            onChange={(e) => setSuggestedCorrection(e.target.value)}
+            placeholder="State the verified accurate facts according to official parliamentary or electoral records..."
+            className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            required
+          />
+        </div>
+
+        {/* Primary Source URL */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="sourceUrl" className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Authoritative Source URL
             </label>
-            <textarea
-              id="suggestedCorrection"
-              rows={3}
-              value={suggestedCorrection}
-              onChange={(e) => setSuggestedCorrection(e.target.value)}
-              placeholder="State the verified accurate facts according to official parliamentary or electoral records..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-              required
-            />
+            <span className="text-[11px] text-muted-foreground">ECI, Sansad.in, or Official Gazette preferred</span>
           </div>
+          <input
+            id="sourceUrl"
+            type="url"
+            value={sourceUrl}
+            onChange={(e) => setSourceUrl(e.target.value)}
+            placeholder="https://sansad.in/ls/members or https://eci.gov.in/..."
+            className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
+          />
+        </div>
 
-          {/* Primary Source URL */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label htmlFor="sourceUrl" className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Authoritative Source URL
-              </label>
-              <span className="text-[11px] text-muted-foreground">ECI, Sansad.in, or Official Gazette preferred</span>
-            </div>
-            <input
-              id="sourceUrl"
-              type="url"
-              value={sourceUrl}
-              onChange={(e) => setSourceUrl(e.target.value)}
-              placeholder="https://sansad.in/ls/members or https://eci.gov.in/..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
-            />
+        {/* Optional Contact Email */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="contactEmail" className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Contact Email <span className="text-muted-foreground font-normal">(Optional)</span>
+            </label>
+            <span className="text-[11px] text-muted-foreground">Only if you wish to receive verification feedback</span>
           </div>
+          <input
+            id="contactEmail"
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder="name@example.com"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
+          />
+        </div>
 
-          {/* Optional Contact Email */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label htmlFor="contactEmail" className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Contact Email <span className="text-muted-foreground font-normal">(Optional)</span>
-              </label>
-              <span className="text-[11px] text-muted-foreground">Only if you wish to receive verification feedback</span>
-            </div>
-            <input
-              id="contactEmail"
-              type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="name@example.com"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 min-h-[44px]"
-            />
-          </div>
-
-          {/* Submit Action */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">
+        {/* Submit Action & Immediate Inline Feedback */}
+        <div className="pt-4 border-t border-border/60 space-y-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground order-2 sm:order-1">
               By submitting, you confirm this information is provided in good faith for civic accuracy.
             </p>
             <button
+              ref={submitButtonRef}
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
+              className={cn(
+                "order-1 sm:order-2 w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 min-h-[44px] shadow-sm",
+                successMessage
+                  ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                  : "bg-primary text-primary-foreground hover:opacity-90",
+                loading && "opacity-60 cursor-not-allowed"
+              )}
             >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {loading ? "Submitting Report..." : "Submit Correction Report"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Submitting Report...</span>
+                </>
+              ) : successMessage ? (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Submitted Successfully</span>
+                </>
+              ) : (
+                <span>Submit Correction Report</span>
+              )}
             </button>
           </div>
-        </form>
-      )}
+
+          {/* Immediate Inline Success State */}
+          {successMessage && (
+            <div
+              ref={feedbackRef}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-900 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200 outline-none"
+            >
+              <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
+                <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                <span>✓ Correction report submitted successfully</span>
+              </div>
+              <p className="text-xs text-emerald-800/90 leading-relaxed">
+                Thank you — your correction has been received and routed to our editorial verification pipeline.
+              </p>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleResetForm}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 underline"
+                >
+                  Submit another correction
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Immediate Inline Error State */}
+          {error && (
+            <div
+              ref={feedbackRef}
+              tabIndex={-1}
+              role="alert"
+              aria-live="assertive"
+              className="p-4 rounded-2xl bg-red-500/10 border border-red-500/25 text-red-900 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200 outline-none"
+            >
+              <div className="flex items-center gap-2 font-bold text-sm text-red-800">
+                <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                <span>⚠ We couldn&apos;t submit your correction report</span>
+              </div>
+              <p className="text-xs text-red-700 leading-relaxed">
+                {error}
+              </p>
+              <p className="text-xs text-red-600/90">
+                Please verify the details above or check your connection, then tap Submit to try again.
+              </p>
+            </div>
+          )}
+        </div>
+      </form>
     </div>
   );
 }

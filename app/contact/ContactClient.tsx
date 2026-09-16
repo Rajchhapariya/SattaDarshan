@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { 
   Mail, 
   Send, 
@@ -11,6 +11,7 @@ import {
   ShieldCheck 
 } from "lucide-react";
 import { CivicSelect } from "@/components/ui/CivicSelect";
+import { cn } from "@/lib/utils";
 
 const INQUIRY_SUBJECT_OPTIONS = [
   { value: "editorial_inquiry", label: "Editorial & Research Inquiry" },
@@ -31,8 +32,20 @@ export function ContactClient() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  const handleResetForm = () => {
+    setMessage("");
+    setCustomSubject("");
+    setUserEmail("");
+    setError(null);
+    setSuccessMessage(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
     setError(null);
     setSuccessMessage(null);
     setLoading(true);
@@ -63,8 +76,15 @@ export function ContactClient() {
       setMessage("");
       setCustomSubject("");
       setUserEmail("");
+
+      setTimeout(() => {
+        feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
     } catch (err: any) {
       setError(err.message || "An unexpected network error occurred.");
+      setTimeout(() => {
+        feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
     } finally {
       setLoading(false);
     }
@@ -72,41 +92,9 @@ export function ContactClient() {
 
   return (
     <div className="space-y-6">
-      {/* Success Notification Banner */}
-      {successMessage && (
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 space-y-2">
-          <div className="flex items-center gap-2 font-bold text-sm">
-            <CheckCircle className="h-5 w-5 text-emerald-600" />
-            Message Received
-          </div>
-          <p className="text-xs leading-relaxed">{successMessage}</p>
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => setSuccessMessage(null)}
-              className="text-xs font-semibold underline hover:opacity-80"
-            >
-              Send another message
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Error Notification Banner */}
-      {error && (
-        <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-800 flex items-start gap-2.5">
-          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-          <div className="text-xs space-y-1">
-            <p className="font-bold">Submission Incomplete</p>
-            <p>{error}</p>
-          </div>
-        </div>
-      )}
-
       {/* Contact Form */}
-      {!successMessage && (
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-6">
-          {/* Honeypot field (hidden from users) */}
+      <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-6">
+        {/* Honeypot field (hidden from users) */}
           <div style={{ display: "none" }} aria-hidden="true">
             <label htmlFor="contact_website_trap">Leave this field blank</label>
             <input
@@ -201,32 +189,94 @@ export function ContactClient() {
             />
           </div>
 
-          {/* Submit Button & Privacy Note */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-              <span>Your email is kept confidential and stored strictly in our private review system.</span>
-            </p>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Sending Message...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4" />
-                  <span>Send Message</span>
-                </>
-              )}
-            </button>
+          {/* Submit Action & Immediate Inline Feedback */}
+          <div className="pt-4 border-t border-border/60 space-y-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5 order-2 sm:order-1">
+                <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                <span>Your email is kept confidential and stored strictly in our private review system.</span>
+              </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className={cn(
+                  "order-1 sm:order-2 w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 min-h-[44px] shadow-sm",
+                  successMessage
+                    ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                    : "bg-primary text-primary-foreground hover:opacity-90",
+                  loading && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Sending Message...</span>
+                  </>
+                ) : successMessage ? (
+                  <>
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Sent Successfully</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    <span>Send Message</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Immediate Inline Success State */}
+            {successMessage && (
+              <div
+                ref={feedbackRef}
+                tabIndex={-1}
+                role="status"
+                aria-live="polite"
+                className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-900 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200 outline-none"
+              >
+                <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
+                  <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                  <span>✓ Message submitted successfully</span>
+                </div>
+                <p className="text-xs text-emerald-800/90 leading-relaxed">
+                  Thank you — your inquiry has been received and logged to our editorial review system.
+                </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={handleResetForm}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 underline"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Immediate Inline Error State */}
+            {error && (
+              <div
+                ref={feedbackRef}
+                tabIndex={-1}
+                role="alert"
+                aria-live="assertive"
+                className="p-4 rounded-2xl bg-red-500/10 border border-red-500/25 text-red-900 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200 outline-none"
+              >
+                <div className="flex items-center gap-2 font-bold text-sm text-red-800">
+                  <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                  <span>⚠ We couldn&apos;t send your message</span>
+                </div>
+                <p className="text-xs text-red-700 leading-relaxed">
+                  {error}
+                </p>
+                <p className="text-xs text-red-600/90">
+                  Please verify your message or connection, then tap Send Message to try again.
+                </p>
+              </div>
+            )}
           </div>
         </form>
-      )}
     </div>
   );
 }
