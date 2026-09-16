@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { 
   FileEdit, 
@@ -32,14 +31,8 @@ const ISSUE_TYPE_OPTIONS = [
 ];
 
 export function CorrectionsClient() {
-  const searchParams = useSearchParams();
-  const initialRecord = searchParams.get("record") || "";
-  const initialType = searchParams.get("type") || "politician";
-
-  const [recordType, setRecordType] = useState(
-    ["politician", "party", "state", "general"].includes(initialType) ? initialType : "politician"
-  );
-  const [recordIdentifier, setRecordIdentifier] = useState(initialRecord);
+  const [recordType, setRecordType] = useState("politician");
+  const [recordIdentifier, setRecordIdentifier] = useState("");
   const [issueType, setIssueType] = useState("outdated_info");
   const [description, setDescription] = useState("");
   const [suggestedCorrection, setSuggestedCorrection] = useState("");
@@ -51,11 +44,21 @@ export function CorrectionsClient() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // Read URL query parameters post-mount without causing Next.js SSR Suspense bail-out
   useEffect(() => {
-    if (initialRecord && !recordIdentifier) {
-      setRecordIdentifier(initialRecord);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const initialRecord = params.get("record");
+      const initialType = params.get("type");
+
+      if (initialRecord) {
+        setRecordIdentifier(initialRecord);
+      }
+      if (initialType && ["politician", "party", "state", "general"].includes(initialType)) {
+        setRecordType(initialType);
+      }
     }
-  }, [initialRecord, recordIdentifier]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

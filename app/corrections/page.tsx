@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Metadata } from "next";
 import { CorrectionsClient } from "./CorrectionsClient";
 
@@ -9,9 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function CorrectionsPage() {
-  return (
-    <Suspense fallback={<div className="max-w-3xl mx-auto py-12 text-center text-sm text-muted-foreground">Loading form...</div>}>
-      <CorrectionsClient />
-    </Suspense>
-  );
+  return <CorrectionsClient />;
 }

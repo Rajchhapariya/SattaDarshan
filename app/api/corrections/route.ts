@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import connectDB from "@/lib/db";
-import Correction from "@/models/Correction";
+import { sendToGoogleAppsScript } from "@/lib/googleSheets";
 
 // In-memory rate limiting tracker: ipHash -> array of timestamps
 const rateLimitMap = new Map<string, number[]>();
@@ -47,7 +46,10 @@ export async function POST(req: NextRequest) {
     // 1. Anti-spam honeypot verification
     // If the hidden 'website_trap' field is filled, bot detected. Silently succeed without storing.
     if (body.website_trap && String(body.website_trap).trim().length > 0) {
-      return NextResponse.json({ success: true, message: "Report received." });
+      return NextResponse.json({ 
+        success: true, 
+        message: "Your correction has been submitted successfully. Thank you for helping improve the accuracy of Satta Darshan." 
+      });
     }
 
     // 2. Input validation
@@ -101,27 +103,27 @@ export async function POST(req: NextRequest) {
       contactEmail = rawEmail;
     }
 
-    // 3. Save to database with status "pending"
-    await connectDB();
-    await Correction.create({
-      recordType,
-      recordIdentifier,
-      issueType,
+    // 3. Forward to private Google Spreadsheet via Google Apps Script Web App (NO MongoDB)
+    await sendToGoogleAppsScript({
+      action: "correction",
+      submittedAt: new Date().toISOString(),
+      correctionType: issueType,
+      entityType: recordType,
+      entitySlug: recordIdentifier,
       description,
-      suggestedCorrection,
-      sourceUrl,
-      contactEmail,
-      status: "pending",
-      ipHash,
+      proposedCorrection: suggestedCorrection,
+      sourceUrl: sourceUrl || "",
+      userEmail: contactEmail || "",
+      status: "Pending",
     });
 
     return NextResponse.json({
       success: true,
-      message: "Your correction report has been received and routed for editorial verification against official gazettes.",
+      message: "Your correction has been submitted successfully. Thank you for helping improve the accuracy of Satta Darshan.",
     });
-  } catch {
+  } catch (err: any) {
     return NextResponse.json(
-      { error: "An unexpected error occurred while saving the correction report." },
+      { error: err.message || "An unexpected error occurred while saving the correction report." },
       { status: 500 }
     );
   }

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MessageSquare, ShieldAlert, FileText, ChevronRight, AlertCircle, Info } from "lucide-react";
+import { Mail, ShieldAlert, FileText, ChevronRight, Info } from "lucide-react";
+import { ContactClient } from "./ContactClient";
 
 export const metadata: Metadata = {
   title: "Contact & Editorial Inquiries",
@@ -40,6 +41,9 @@ export default function ContactPage() {
           SattaDarshan is an independent, non-government civic research platform. SattaDarshan cannot receive, process, or forward official governmental grievances, statutory legal notices, or Right to Information (RTI) applications intended for public authorities. Any such statutory filings must be submitted directly to the relevant government department or official grievance portal.
         </p>
       </div>
+
+      {/* Direct Contact Form */}
+      <ContactClient />
 
       {/* Inquiry Channels Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
