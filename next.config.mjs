@@ -12,6 +12,8 @@ const cspDirectives = [
 ].join("; ");
 
 const nextConfig = {
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   images: {
     unoptimized: true,
     remotePatterns: [

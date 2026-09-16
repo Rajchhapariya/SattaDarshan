@@ -22,19 +22,28 @@ function checkRateLimit(ipHash: string): boolean {
   return true;
 }
 
+const NO_STORE = { headers: { "Cache-Control": "no-store, max-age=0" } };
+
 export async function POST(req: NextRequest) {
   try {
+    // 1. Guard against oversized payloads (64KB max)
+    const contentLength = parseInt(req.headers.get("content-length") || "0", 10);
+    if (contentLength > 65536) {
+      return NextResponse.json(
+        { error: "Payload too large." },
+        { status: 413, ...NO_STORE }
+      );
+    }
+
     const rawIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
                   req.headers.get("x-real-ip") || 
                   "127.0.0.1";
     
-    // Hash the IP with salt to protect privacy
+    // Hash the IP with salt to protect user privacy
     const ipHash = crypto
       .createHash("sha256")
       .update(rawIp + "satta_darshan_civic_salt")
       .digest("hex");
-
-    const NO_STORE = { headers: { "Cache-Control": "no-store, max-age=0" } };
 
     if (!checkRateLimit(ipHash)) {
       return NextResponse.json(
@@ -43,9 +52,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON format." },
+        { status: 400, ...NO_STORE }
+      );
+    }
 
-    // 1. Anti-spam honeypot verification
+    // 2. Anti-spam honeypot verification
     // If the hidden 'website_trap' field is filled, bot detected. Silently succeed without storing.
     if (body.website_trap && String(body.website_trap).trim().length > 0) {
       return NextResponse.json({ 
@@ -54,7 +71,7 @@ export async function POST(req: NextRequest) {
       }, NO_STORE);
     }
 
-    // 2. Input validation
+    // 3. Input validation & sanitization
     const rawSubject = String(body.subject || "").trim().slice(0, 150);
     if (!rawSubject || rawSubject.length < 2) {
       return NextResponse.json({ error: "Please provide an inquiry subject (minimum 2 characters)." }, { status: 400, ...NO_STORE });
@@ -75,7 +92,7 @@ export async function POST(req: NextRequest) {
       userEmail = rawEmail;
     }
 
-    // 3. Forward to private Google Spreadsheet via Google Apps Script Web App (NO MongoDB)
+    // 4. Forward to private Google Spreadsheet via Google Apps Script Web App (NO MongoDB write)
     await sendToGoogleAppsScript({
       action: "contact",
       submittedAt: new Date().toISOString(),
@@ -90,12 +107,35 @@ export async function POST(req: NextRequest) {
         success: true,
         message: "Your message has been submitted successfully.",
       },
-      { headers: { "Cache-Control": "no-store, max-age=0" } }
+      NO_STORE
     );
-  } catch (err: any) {
+  } catch {
+    // Return sanitized generic message; never leak implementation, hostnames, or error stack traces
     return NextResponse.json(
-      { error: err.message || "An unexpected error occurred while processing your message." },
-      { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
+      { error: "Unable to process message at this time. Please try again later." },
+      { status: 500, ...NO_STORE }
     );
   }
 }
+
+export async function GET() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, ...NO_STORE }
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, ...NO_STORE }
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, ...NO_STORE }
+  );
+}
+

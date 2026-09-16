@@ -1,50 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
+import crypto from "crypto";
 
 /**
  * On-Demand Cache Invalidation Endpoint
  *
- * Allows data ingestion scripts and administrators to trigger instant revalidation
- * of specific paths or cache tags when database records are updated.
+ * Allows verified data ingestion workflows and authorized administrative processes
+ * to trigger instant revalidation of specific paths or cache tags when records change.
  *
- * Usage:
- * POST /api/revalidate
- * Headers: { "x-revalidate-secret": process.env.REVALIDATE_SECRET }
- * Body: { path?: string, tag?: string }
+ * Security:
+ * - Requires server-configured REVALIDATE_SECRET environment variable
+ * - Requires token in 'x-revalidate-secret' header (query parameters prohibited to prevent log leaks)
+ * - Timing-safe token comparison to prevent side-channel analysis
+ * - Request payload size bounding (16KB)
+ * - Sanitized generic error responses (zero implementation/stack leakage)
  */
+
+function timingSafeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a, "utf8");
+  const bufB = Buffer.from(b, "utf8");
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+const NO_STORE_HEADERS = { "Cache-Control": "no-store, max-age=0" };
+
 export async function POST(req: NextRequest) {
   try {
-    const secret = req.headers.get("x-revalidate-secret") || req.nextUrl.searchParams.get("secret");
-    const configuredSecret = process.env.REVALIDATE_SECRET || "satta_revalidate_civic_key";
-
-    if (!secret || secret !== configuredSecret) {
+    // 1. Guard against oversized payloads (16KB max)
+    const contentLength = parseInt(req.headers.get("content-length") || "0", 10);
+    if (contentLength > 16384) {
       return NextResponse.json(
-        { error: "Unauthorized: Invalid revalidation token" },
-        { status: 401, headers: { "Cache-Control": "no-store" } }
+        { error: "Payload too large." },
+        { status: 413, headers: NO_STORE_HEADERS }
       );
     }
 
-    const body = await req.json().catch(() => ({}));
-    const targetPath = body.path || req.nextUrl.searchParams.get("path");
-    const targetTag = body.tag || req.nextUrl.searchParams.get("tag");
+    // 2. Require secret in header only. Reject query parameter tokens to prevent URL/log exposure.
+    const secret = req.headers.get("x-revalidate-secret")?.trim() || "";
+    const configuredSecret = process.env.REVALIDATE_SECRET?.trim();
 
-    if (!targetPath && !targetTag) {
+    // Constant-time comparison; return 401 if missing, unconfigured, or invalid
+    if (!secret || !configuredSecret || !timingSafeCompare(secret, configuredSecret)) {
       return NextResponse.json(
-        { error: "Missing path or tag parameter to revalidate" },
-        { status: 400, headers: { "Cache-Control": "no-store" } }
+        { error: "Unauthorized: Invalid revalidation token." },
+        { status: 401, headers: NO_STORE_HEADERS }
+      );
+    }
+
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON payload." },
+        { status: 400, headers: NO_STORE_HEADERS }
+      );
+    }
+
+    const rawPath = typeof body.path === "string" ? body.path.trim().slice(0, 256) : "";
+    const rawTag = typeof body.tag === "string" ? body.tag.trim().slice(0, 128) : "";
+
+    if (!rawPath && !rawTag) {
+      return NextResponse.json(
+        { error: "Missing path or tag parameter to revalidate." },
+        { status: 400, headers: NO_STORE_HEADERS }
       );
     }
 
     const revalidated: string[] = [];
 
-    if (targetPath) {
-      revalidatePath(targetPath);
-      revalidated.push(`path:${targetPath}`);
+    if (rawPath) {
+      revalidatePath(rawPath);
+      revalidated.push(`path:${rawPath}`);
     }
 
-    if (targetTag) {
-      revalidateTag(targetTag, { expire: 0 });
-      revalidated.push(`tag:${targetTag}`);
+    if (rawTag) {
+      revalidateTag(rawTag, { expire: 0 });
+      revalidated.push(`tag:${rawTag}`);
     }
 
     return NextResponse.json(
@@ -55,13 +91,35 @@ export async function POST(req: NextRequest) {
       },
       {
         status: 200,
-        headers: { "Cache-Control": "no-store" },
+        headers: NO_STORE_HEADERS,
       }
     );
-  } catch (err: any) {
+  } catch {
     return NextResponse.json(
-      { error: err.message || "Failed to process revalidation" },
-      { status: 500, headers: { "Cache-Control": "no-store" } }
+      { error: "Failed to process revalidation." },
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }
+
+export async function GET() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, headers: NO_STORE_HEADERS }
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, headers: NO_STORE_HEADERS }
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: "Method Not Allowed" },
+    { status: 405, headers: NO_STORE_HEADERS }
+  );
+}
+

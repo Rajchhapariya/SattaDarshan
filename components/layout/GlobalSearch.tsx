@@ -154,7 +154,6 @@ export function GlobalSearch() {
           // Request was aborted due to new input, ignore
           return;
         }
-        console.error("Search fetch failed:", error);
         setResults([]);
       } finally {
         if (!controller.signal.aborted) {

@@ -1,0 +1,14 @@
+{
+  "politicians": {
+    "count": 845,
+    "hash": "ca2d1566c4d2e156bbc2ec24816732d7df8e9be719ffd3c0a607eb768c21d250"
+  },
+  "parties": {
+    "count": 102,
+    "hash": "d7e582a54eb7e6b5a8258d5234e9fcb446cf89e0b7e450a0388d6703e2edbd40"
+  },
+  "states": {
+    "count": 36,
+    "hash": "dcebc0b1e28f38068e4214a2b3cc829868ebc6f418b2549bc587f71ba6d19669"
+  }
+}

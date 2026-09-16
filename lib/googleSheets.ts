@@ -76,21 +76,21 @@ export async function sendToGoogleAppsScript(
     try {
       data = JSON.parse(text);
     } catch {
-      console.error("[Google Sheets Integration] Non-JSON response from Google Apps Script:", text.slice(0, 300));
+      console.error("[Google Sheets Integration] Non-JSON response from spreadsheet service.");
       throw new Error("Received an invalid response from the spreadsheet service.");
     }
 
     if (!res.ok || data.success === false) {
-      throw new Error(data.error || "Failed to record submission in Google Sheet.");
+      throw new Error("Failed to record submission.");
     }
 
     return data;
   } catch (err: any) {
     if (err.name === "AbortError") {
-      console.error("[Google Sheets Integration] Request timed out after 15 seconds.");
+      console.error("[Google Sheets Integration] Request timed out.");
       throw new Error("Submission service timed out. Please check your connection and try again.");
     }
-    console.error("[Google Sheets Integration] Error forwarding to Google Apps Script:", err.message);
+    console.error("[Google Sheets Integration] Failed to forward submission.");
     throw err;
   }
 }

@@ -82,8 +82,7 @@ export function ThreeParliamentChamber({
         computeStats(fetchedSeats);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("Failed to load parliament seats:", err);
+      .catch(() => {
         setError("Unable to load parliamentary seat records. Please try again.");
         setLoading(false);
       });

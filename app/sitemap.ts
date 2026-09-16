@@ -69,8 +69,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
 
     return [...staticPaths, ...politicianEntries, ...partyEntries, ...stateEntries];
-  } catch (error) {
-    console.error("Failed to generate dynamic sitemap entries:", error);
+  } catch {
+    // Graceful fallback to static sitemap paths without dumping internal DB errors
     return staticPaths;
   }
 }

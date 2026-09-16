@@ -1,6 +1,12 @@
 node_modules/
 .next/
+.env
+.env*.local
 .env.local
+.env.production
+.env.development
+.env.test
 *.log
 .DS_Store
 rupps_india.json
+

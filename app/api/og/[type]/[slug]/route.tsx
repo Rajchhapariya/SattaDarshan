@@ -72,8 +72,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ type: stri
         meta3 = "State Legislative Representation";
       }
     }
-  } catch (e) {
-    console.error("OG generation error:", e);
+  } catch {
+    // Graceful fallback to default civic card branding without leaking internal exceptions
   }
 
   return new ImageResponse(
