@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "Website Direct Inaccuracy Reporter"
+    url: "https://satta-darshan-7jgo.vercel.app/corrections"
+    about: "Submit a quick data correction directly to our editorial spreadsheet desk without a GitHub account."
+  - name: "Civic Inquiries & Security Contact"
+    url: "https://satta-darshan-7jgo.vercel.app/contact"
+    about: "Send private inquiries, general civic feedback, or responsible security disclosures."

@@ -1,0 +1,52 @@
+name: "Feature Suggestion"
+description: "Propose an idea, civic visualization, or analytical enhancement for SattaDarshan"
+title: "[Feature Proposal]: "
+labels: ["enhancement", "civic-feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping envision the future of **SattaDarshan**!
+        
+        Please outline your feature proposal, ensuring that it upholds our core pillars: strict political neutrality, information density, high performance, and institutional trust.
+
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: "Civic Problem or Opportunity"
+      description: "What citizen need, research challenge, or gap in civic understanding does this feature address?"
+      placeholder: "e.g. Citizens currently find it difficult to understand how coalitions reach the 272-seat majority mark..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Feature / Solution"
+      description: "Describe how the proposed feature would work and look."
+      placeholder: "e.g. A Coalition Builder tool where users can toggle parties and see if the alliance crosses 272 seats..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: data_source
+    attributes:
+      label: "Data Requirements & Neutrality Check"
+      description: "What public data is required, where is it published, and how does this feature avoid partisan bias?"
+      placeholder: "e.g. Uses existing Lok Sabha seat counts from the official Sansad registry; strictly quantitative and non-editorial..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives Considered"
+      description: "Have you considered any alternative designs or approaches?"
+
+  - type: checkboxes
+    id: alignment
+    attributes:
+      label: "Platform Alignment"
+      options:
+        - label: "I have read CONTRIBUTING.md and confirm this proposal aligns with SattaDarshan's non-partisan, public-benefit civic mandate."
+          required: true

@@ -1,0 +1,90 @@
+name: "Data Inaccuracy Report"
+description: "Report an out-of-date or incorrect politician, party, state, or parliamentary record"
+title: "[Data Correction]: "
+labels: ["data-accuracy", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping keep SattaDarshan accurate and up-to-date!
+        
+        **Important:** SattaDarshan relies exclusively on published, official primary sources (*sansad.in*, *eci.gov.in*, State Gazettes, *india.gov.in*). Please provide the authoritative source URL verifying this correction.
+
+  - type: dropdown
+    id: entity_type
+    attributes:
+      label: "Entity Type"
+      description: "What category of political data does this inaccuracy relate to?"
+      options:
+        - "Politician / Member of Parliament"
+        - "Political Party / Alliance"
+        - "State / Union Territory"
+        - "Parliamentary Chamber (Lok Sabha / Rajya Sabha)"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: entity_name
+    attributes:
+      label: "Entity Name & SattaDarshan URL"
+      description: "Provide the name and the link to the page on SattaDarshan (e.g. Narendra Modi, https://satta-darshan-7jgo.vercel.app/politicians/narendra-modi)."
+      placeholder: "e.g. Narendra Modi (https://satta-darshan-7jgo.vercel.app/politicians/narendra-modi)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: "Nature of Inaccuracy"
+      description: "Select the classification of the issue."
+      options:
+        - "Outdated Portfolio or Ministerial Office"
+        - "Incorrect Seat Count or Representation"
+        - "Incorrect Party Affiliation or Alliance"
+        - "Name, Constituency, or Biographical Error"
+        - "Broken or Outdated Reference Link"
+        - "Other Factual Discrepancy"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_data
+    attributes:
+      label: "Current Information on SattaDarshan"
+      description: "What does SattaDarshan currently display that is inaccurate?"
+      placeholder: "Describe the existing data on the website..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_correction
+    attributes:
+      label: "Proposed Correction"
+      description: "What should the accurate factual data be?"
+      placeholder: "Provide the exact corrected value or wording..."
+    validations:
+      required: true
+
+  - type: input
+    id: primary_source_url
+    attributes:
+      label: "Authoritative Primary Source URL"
+      description: "Direct link to Sansad.in, ECI, Gazette notification, or official government portal confirming this fact."
+      placeholder: "https://sansad.in/ls/members/..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: "Additional Context / Gazette Notification Reference"
+      description: "Any relevant notification number, swearing-in date, or context."
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: "Verification Checklist"
+      options:
+        - label: "I confirm this correction is derived from an official government or legislative registry, and not from unverified news reports or partisan commentary."
+          required: true

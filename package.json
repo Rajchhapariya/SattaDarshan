@@ -13,7 +13,8 @@
     "lint": "eslint app components lib models",
     "audit:data": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/audit-db.ts",
     "sync:data": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/clean-and-update-data.ts",
-    "cache:portraits": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/cache-politician-portraits.ts"
+    "cache:portraits": "node --env-file=.env.local node_modules/tsx/dist/cli.mjs scripts/cache-politician-portraits.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -56,9 +57,16 @@
     "dotenv": "^16.6.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.1.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "tsx": "^4.10.2",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0"
+    ]
   }
 }

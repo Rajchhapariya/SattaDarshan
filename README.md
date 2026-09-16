@@ -356,7 +356,9 @@ Detailed legal documentation is maintained across dedicated public routes:
 
 ---
 
-## Development Guidelines
+## Development & Contributing Guidelines
+
+We welcome community contributions, analytical features, and data corrections! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our setup instructions, PR workflows, and data verification standards.
 
 Contributors and maintainers must adhere to the following principles:
 

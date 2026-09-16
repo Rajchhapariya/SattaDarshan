@@ -1,0 +1,64 @@
+name: "Constituency Boundary / Representation Update"
+description: "Report a parliamentary constituency update, vacancy, by-election certification, or reclassification"
+title: "[Constituency Update]: "
+labels: ["constituency", "electoral-data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to report changes in parliamentary representation, such as a certified by-election, seat vacancy, or official delimitation order.
+
+  - type: input
+    id: constituency_name
+    attributes:
+      label: "Constituency Name"
+      description: "Official name of the parliamentary constituency."
+      placeholder: "e.g. Wayanad, Varanasi, Baramati"
+    validations:
+      required: true
+
+  - type: input
+    id: state_name
+    attributes:
+      label: "State / Union Territory"
+      description: "State or UT containing the constituency."
+      placeholder: "e.g. Kerala, Uttar Pradesh, Maharashtra"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: update_type
+    attributes:
+      label: "Nature of Update"
+      options:
+        - "By-Election Winner Certification"
+        - "Seat Vacancy (Resignation / Demise / Disqualification)"
+        - "Delimitation / Boundary Reclassification"
+        - "Reserved Category Update (SC / ST / General)"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: representative_details
+    attributes:
+      label: "Updated Representative Details (if applicable)"
+      description: "Name of MP, party affiliation, winning date, or status."
+      placeholder: "e.g. Name, Party, Swearing-in / Gazette Notification date..."
+
+  - type: input
+    id: gazette_url
+    attributes:
+      label: "Official ECI or Sansad Notification URL"
+      description: "Mandatory link to the Election Commission of India result certification or Lok Sabha Secretariat bulletin."
+      placeholder: "https://eci.gov.in/... or https://sansad.in/..."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: "Verification Checklist"
+      options:
+        - label: "I confirm that this election or vacancy has been formally gazetted by the Election Commission or the Parliamentary Secretariat."
+          required: true
