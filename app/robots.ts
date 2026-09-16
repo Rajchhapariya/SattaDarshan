@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/'],
     },
-    sitemap: 'https://sattadarshan.vercel.app/sitemap.xml',
+    sitemap: 'https://satta-darshan-7jgo.vercel.app/sitemap.xml',
   };
 }

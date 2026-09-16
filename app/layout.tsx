@@ -17,6 +17,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://satta-darshan-7jgo.vercel.app"),
   title: {
     default: "SattaDarshan — Independent Political & Legislative Information Platform",
     template: "%s | SattaDarshan (Independent Platform)",
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     title: "SattaDarshan — Independent Political & Legislative Platform",
     description:
       "SattaDarshan is an independent, non-government platform for exploring publicly available political and legislative information.",
-    url: "https://sattadarshan.vercel.app",
+    url: "https://satta-darshan-7jgo.vercel.app",
     siteName: "SattaDarshan (Independent)",
     locale: "en_IN",
     type: "website",
@@ -48,6 +49,16 @@ export const metadata: Metadata = {
     title: "SattaDarshan — Independent Political & Legislative Platform",
     description:
       "SattaDarshan is an independent, non-government platform for exploring publicly available political and legislative information.",
+  },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 

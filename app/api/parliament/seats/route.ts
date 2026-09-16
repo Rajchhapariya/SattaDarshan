@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   const partyCounts: Record<string, { count: number; name: string; alliance: string }> = {};
 
-  const seats = politicians.map((p: any, idx: number) => {
+  const rawSeats = politicians.map((p: any) => {
     let alliance = allianceMap[p.party] || "Others";
     // Check partyName heuristics if slug didn't match
     if (alliance === "Others") {
@@ -53,7 +53,6 @@ export async function GET(req: NextRequest) {
     partyCounts[pName].count++;
 
     return {
-      seatNumber: idx + 1,
       name: p.name,
       slug: p.slug,
       partyName: p.partyName || "Independent",
@@ -65,6 +64,22 @@ export async function GET(req: NextRequest) {
       state: p.state || "India",
     };
   });
+
+  // Deterministic grouping: Alliance (NDA -> Others -> INDIA) -> Party -> Politician
+  const allianceOrder: Record<string, number> = { NDA: 0, Others: 1, INDIA: 2 };
+  rawSeats.sort((a, b) => {
+    const aOrder = allianceOrder[a.alliance] ?? 1;
+    const bOrder = allianceOrder[b.alliance] ?? 1;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    const partyDiff = a.partyName.localeCompare(b.partyName);
+    if (partyDiff !== 0) return partyDiff;
+    return a.name.localeCompare(b.name);
+  });
+
+  const seats = rawSeats.map((s, idx) => ({
+    ...s,
+    seatNumber: idx + 1,
+  }));
 
   return NextResponse.json({
     chamber,

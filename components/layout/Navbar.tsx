@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Menu, 
@@ -63,9 +64,14 @@ export function Navbar() {
         {/* Brand Logo */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
           <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90 flex-shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-sm">
-              <Landmark className="h-5 w-5" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="SattaDarshan Logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-xl object-contain flex-shrink-0 border border-border/60 shadow-xs"
+              priority
+            />
             <div className="flex flex-col">
               <span className="font-extrabold text-foreground text-base tracking-tight leading-none">
                 Satta<span className="text-amber-500">Darshan</span>

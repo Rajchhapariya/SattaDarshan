@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Landmark, ExternalLink, ShieldAlert, FileCheck } from "lucide-react";
 
 export function Footer() {
@@ -35,9 +36,13 @@ export function Footer() {
         {/* Brand & Mission Statement */}
         <div className="space-y-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white shadow-sm">
-              <Landmark className="h-4 w-4" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="SattaDarshan Logo"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg object-contain flex-shrink-0 border border-border/60 shadow-xs"
+            />
             <span className="font-extrabold text-foreground text-base tracking-tight">
               Satta<span className="text-amber-500">Darshan</span>
             </span>

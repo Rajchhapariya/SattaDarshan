@@ -66,7 +66,7 @@ SattaDarshan is optimized for zero-config Vercel deployment.
 1. Push your repository to GitHub.
 2. Import the project into your Vercel dashboard.
 3. Add the `MONGODB_URI` to your Vercel Environment Variables.
-4. Click **Deploy**. Vercel will automatically run `npm run build` and provision your application on a `.vercel.app` domain.
+4. Click **Deploy**. Vercel will automatically run `npm run build` and provision your application on `https://satta-darshan-7jgo.vercel.app`.
 
 ## 🛡️ Data Integrity & SEO
 - **Data Deduplication:** Scrapers are equipped with normalization logic to catch name formatting discrepancies (e.g., merging "Shri Narendra Modi" and "Narendra Modi").
