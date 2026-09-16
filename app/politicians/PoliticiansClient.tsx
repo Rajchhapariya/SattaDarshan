@@ -11,13 +11,13 @@ import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { cn } from "@/lib/utils";
 
 const ROLES = [
-  { label: "All", value: "All" },
-  { label: "Prime Minister", value: "PM" },
-  { label: "Chief Ministers", value: "CM" },
-  { label: "Cabinet Ministers", value: "Minister" },
-  { label: "Lok Sabha MPs", value: "MP" },
-  { label: "Rajya Sabha MPs", value: "MP" },
-  { label: "MLAs", value: "MLA" },
+  { id: "All", label: "All", role: "All" },
+  { id: "PM", label: "Prime Minister", role: "PM" },
+  { id: "CM", label: "Chief Ministers", role: "CM" },
+  { id: "Minister", label: "Cabinet Ministers", role: "Minister" },
+  { id: "LS", label: "Lok Sabha MPs", role: "MP", chamber: "Lok Sabha" },
+  { id: "RS", label: "Rajya Sabha MPs", role: "MP", chamber: "Rajya Sabha" },
+  { id: "MLA", label: "MLAs", role: "MLA" },
 ];
 
 const SORT_OPTIONS = [
@@ -59,7 +59,17 @@ export function PoliticiansClient({
   const [pages, setPages] = useState(initialPages);
   const [loading, setLoading] = useState(initialData.length === 0);
   const [q, setQ] = useState(sp.get("q") ?? "");
-  const [role, setRole] = useState(sp.get("role") ?? "All");
+
+  const initialTab = (() => {
+    const r = sp.get("role");
+    const c = sp.get("chamber");
+    if (c === "Lok Sabha") return "LS";
+    if (c === "Rajya Sabha") return "RS";
+    if (r && ROLES.some((item) => item.id === r)) return r;
+    return "All";
+  })();
+
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"grid" | "table">("grid");
   const [sort, setSort] = useState("name:asc");
@@ -68,14 +78,19 @@ export function PoliticiansClient({
   const fetchData = useCallback(() => {
     setLoading(true);
     const [sortField, sortOrder] = sort.split(":");
+    const currentTab = ROLES.find((item) => item.id === activeTab) || ROLES[0];
+    const isCM = currentTab.role === "CM";
+    const pageLimit = isCM ? "50" : view === "grid" ? "24" : "50";
+
     const p = new URLSearchParams({
       page: String(page),
-      limit: view === "grid" ? "24" : "50",
+      limit: pageLimit,
       sort: sortField,
       order: sortOrder,
     });
     if (q) p.set("q", q);
-    if (role !== "All") p.set("role", role);
+    if (currentTab.role && currentTab.role !== "All") p.set("role", currentTab.role);
+    if (currentTab.chamber) p.set("chamber", currentTab.chamber);
 
     fetch("/api/politicians?" + p)
       .then((r) => r.json())
@@ -86,17 +101,17 @@ export function PoliticiansClient({
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [q, role, page, view, sort]);
+  }, [q, activeTab, page, view, sort]);
 
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      if (initialData.length > 0 && !q && role === "All" && page === 1 && sort === "name:asc") {
+      if (initialData.length > 0 && !q && activeTab === "All" && page === 1 && sort === "name:asc") {
         return;
       }
     }
     fetchData();
-  }, [fetchData, initialData.length, q, role, page, sort]);
+  }, [fetchData, initialData.length, q, activeTab, page, sort]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -126,14 +141,14 @@ export function PoliticiansClient({
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {ROLES.map((r) => (
           <button
-            key={r.value + r.label}
+            key={r.id}
             onClick={() => {
-              setRole(r.value);
+              setActiveTab(r.id);
               setPage(1);
             }}
             className={cn(
               "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all border",
-              role === r.value
+              activeTab === r.id
                 ? "bg-foreground text-background border-foreground shadow-sm"
                 : "bg-card text-muted-foreground hover:text-foreground border-border/80"
             )}
@@ -215,13 +230,13 @@ export function PoliticiansClient({
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
             Try adjusting your search keywords or switching role filters.
           </p>
-          {(q || role !== "All" || sort !== "name:asc") && (
+          {(q || activeTab !== "All" || sort !== "name:asc") && (
             <div className="pt-2">
               <button
                 type="button"
                 onClick={() => {
                   setQ("");
-                  setRole("All");
+                  setActiveTab("All");
                   setSort("name:asc");
                   setPage(1);
                 }}
