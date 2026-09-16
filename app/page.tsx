@@ -14,7 +14,7 @@ import {
   Compass
 } from "lucide-react";
 import { StatsCard } from "@/components/common/StatsCard";
-import { ThreeParliamentChamber } from "@/components/parliament/ThreeParliamentChamber";
+import { HomeChamberWrapper } from "@/components/home/HomeChamberWrapper";
 import { IndiaMap } from "@/components/home/IndiaMap";
 import { FeaturedPoliticians } from "@/components/home/FeaturedPoliticians";
 import { PartiesSection } from "@/components/home/PartiesSection";
@@ -147,7 +147,7 @@ export default async function Home() {
 
       {/* Flagship Showpiece: Three.js 3D Parliament Chamber */}
       <section className="space-y-4">
-        <ThreeParliamentChamber chamber="Lok Sabha" />
+        <HomeChamberWrapper />
       </section>
 
       {/* Interactive India Geospatial Map */}
