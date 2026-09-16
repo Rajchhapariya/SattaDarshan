@@ -5,7 +5,17 @@ import { ContactClient } from "./ContactClient";
 
 export const metadata: Metadata = {
   title: "Contact & Editorial Inquiries",
-  description: "Contact directory, feedback channels, copyright notice procedures, and editorial inquiry channels for SattaDarshan.",
+  description:
+    "Contact directory, feedback channels, copyright notice procedures, and editorial inquiry channels for SattaDarshan.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/contact",
+  },
+  openGraph: {
+    title: "Contact & Editorial Inquiries — SattaDarshan",
+    description:
+      "Contact directory, feedback channels, copyright notice procedures, and editorial inquiry channels for SattaDarshan.",
+    url: "https://satta-darshan-7jgo.vercel.app/contact",
+  },
 };
 
 export default function ContactPage() {

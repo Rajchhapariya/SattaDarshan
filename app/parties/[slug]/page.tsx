@@ -23,6 +23,7 @@ import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 import { ShareButton } from "@/components/common/ShareButton";
 
 import { getPartyBySlug } from "@/lib/server/queries";
+import { JsonLd, generatePartySchema, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
 
 export const revalidate = 3600;
 
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: PartyPageProps): Promise<Meta
   if (!p) return { title: "Party Not Found" };
 
   const abbrPart = p.abbr ? ` (${p.abbr})` : "";
-  const title = `${p.name}${abbrPart} — Party Profile & Seat Distribution`;
+  const title = `${p.name}${abbrPart} — Party Profile & Seats`;
   const description = `Party profile, seat distribution, and public legislative records for ${p.name}. Compiled from official election records.`;
   const ogImageUrl = `/api/og/party/${slug}`;
 
@@ -76,10 +77,23 @@ export default async function PartyPage({ params }: PartyPageProps) {
   const p = await getPartyBySlug(slug);
   if (!p) notFound();
 
+  const canonicalUrl = `https://satta-darshan-7jgo.vercel.app/parties/${slug}`;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      <JsonLd
+        data={[
+          generatePartySchema(p, canonicalUrl),
+          generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Political Parties", url: "/parties" },
+            { name: p.abbr || p.name, url: `/parties/${slug}` },
+          ]),
+        ]}
+      />
+
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
         <span>/</span>
         <Link href="/parties" className="hover:text-foreground transition-colors">Political Parties</Link>

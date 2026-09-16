@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import State from "@/models/State";
 import { getStatePath } from "@/lib/server/statePaths";
 import { StatesClient } from "./StatesClient";
+import { JsonLd, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
 
 import type { Metadata } from "next";
 
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 86400;
+
 async function getStates() {
   try {
     await connectDB();
@@ -34,6 +37,16 @@ async function getStates() {
 export default async function StatesPage() {
   const states = await getStates();
   
-  return <StatesClient initialStates={states} />;
+  return (
+    <>
+      <JsonLd
+        data={generateBreadcrumbSchema([
+          { name: "Home", url: "/" },
+          { name: "States & UTs", url: "/states" },
+        ])}
+      />
+      <StatesClient initialStates={states} />
+    </>
+  );
 }
 

@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { ShareButton } from "@/components/common/ShareButton";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
+import { JsonLd, generatePersonSchema, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
+import { getStateCanonicalSlug } from "@/lib/seo/slugs";
 
 import { getPoliticianBySlug } from "@/lib/server/queries";
 
@@ -41,8 +43,8 @@ export async function generateMetadata({ params }: PoliticianPageProps): Promise
   const p = await getPoliticianBySlug(slug);
   if (!p) return { title: "Representative Not Found" };
 
-  const officeTitle = p.currentOffice || p.ministerialRank || p.role || "Representative";
-  const title = `${p.name} (${officeTitle}) — Public Profile & Records`;
+  const officeTitle = p.currentOffice || p.ministerialRank || (p.chamber ? `${p.chamber} MP` : "Representative");
+  const title = `${p.name} — ${officeTitle}`;
   const location = p.constituency ? `${p.constituency}, ${p.state}` : p.state || "India";
   const description = `Verified public records and legislative profile for ${p.name}, ${officeTitle} (${p.partyName || "Independent"}), representing ${location}.`;
   const ogImageUrl = `/api/og/politician/${slug}`;
@@ -84,12 +86,25 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
   if (!p) notFound();
 
   const statePath = p.state ? getStatePath(p.state) : undefined;
+  const canonicalStateSlug = p.state ? getStateCanonicalSlug(p.state) : undefined;
   const hasZeroCriminalCases = p.criminalCases === 0 || p.criminalCases === undefined;
+  const canonicalUrl = `https://satta-darshan-7jgo.vercel.app/politicians/${slug}`;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-500">
+      <JsonLd
+        data={[
+          generatePersonSchema(p, canonicalUrl),
+          generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Representatives", url: "/politicians" },
+            { name: p.name, url: `/politicians/${slug}` },
+          ]),
+        ]}
+      />
+
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
         <span>/</span>
         <Link href="/politicians" className="hover:text-foreground transition-colors">Representatives</Link>
@@ -145,8 +160,24 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
                   {p.name}
                 </h1>
                 <p className="text-base font-semibold text-primary mt-1">
-                  {p.partyName || "Independent"}
-                  {p.chamber && ` • ${p.chamber}`}
+                  {p.party ? (
+                    <Link href={`/parties/${p.party}`} className="hover:underline transition-colors">
+                      {p.partyName || "Independent"}
+                    </Link>
+                  ) : (
+                    p.partyName || "Independent"
+                  )}
+                  {p.chamber && (
+                    <>
+                      {" • "}
+                      <Link
+                        href={p.chamber === "Lok Sabha" ? "/parliament/lok-sabha" : "/parliament/rajya-sabha"}
+                        className="hover:underline transition-colors"
+                      >
+                        {p.chamber}
+                      </Link>
+                    </>
+                  )}
                 </p>
                 {p.currentOffice && (
                   <p className="text-sm font-bold text-amber-600 dark:text-amber-500 mt-1">
@@ -165,10 +196,20 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
           {/* Key Tag Badges */}
           <div className="flex flex-wrap gap-2 text-xs">
             {p.state && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
-                <StateIcon stateName={p.state} statePath={statePath} className="h-3.5 w-3.5 opacity-70" />
-                {p.state}
-              </span>
+              canonicalStateSlug ? (
+                <Link
+                  href={`/states/${canonicalStateSlug}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 hover:bg-muted text-foreground border border-border/60 font-medium transition-colors"
+                >
+                  <StateIcon stateName={p.state} statePath={statePath} className="h-3.5 w-3.5 opacity-70" />
+                  {p.state}
+                </Link>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
+                  <StateIcon stateName={p.state} statePath={statePath} className="h-3.5 w-3.5 opacity-70" />
+                  {p.state}
+                </span>
+              )
             )}
             {p.constituency && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-muted/60 text-foreground border border-border/60 font-medium">
@@ -376,6 +417,64 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
         lastVerifiedAt={p.lastVerifiedAt}
       />
 
+      {/* Machine-Readable Key Legislative Facts (GEO / AI Search Readiness) */}
+      <section className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 shadow-sm space-y-4">
+        <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-primary" />
+          Key Legislative & Civic Information
+        </h3>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 text-sm">
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">Full Name</dt>
+            <dd className="font-bold text-foreground mt-0.5">{p.name}</dd>
+          </div>
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">Current Office / Designation</dt>
+            <dd className="font-bold text-foreground mt-0.5">{p.currentOffice || p.ministerialRank || p.role || "Member of Parliament"}</dd>
+          </div>
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">Political Party</dt>
+            <dd className="font-bold text-foreground mt-0.5">
+              {p.party ? (
+                <Link href={`/parties/${p.party}`} className="text-primary hover:underline">
+                  {p.partyName || "Independent"}
+                </Link>
+              ) : (
+                p.partyName || "Independent"
+              )}
+            </dd>
+          </div>
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">Parliamentary Chamber</dt>
+            <dd className="font-bold text-foreground mt-0.5">
+              {p.chamber ? (
+                <Link href={p.chamber === "Lok Sabha" ? "/parliament/lok-sabha" : "/parliament/rajya-sabha"} className="text-primary hover:underline">
+                  {p.chamber}
+                </Link>
+              ) : (
+                "Parliament of India"
+              )}
+            </dd>
+          </div>
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">State / Jurisdiction</dt>
+            <dd className="font-bold text-foreground mt-0.5">
+              {canonicalStateSlug ? (
+                <Link href={`/states/${canonicalStateSlug}`} className="text-primary hover:underline">
+                  {p.state || "National"}
+                </Link>
+              ) : (
+                p.state || "National"
+              )}
+            </dd>
+          </div>
+          <div className="p-3.5 rounded-xl bg-muted/20 border border-border/50">
+            <dt className="text-xs font-semibold text-muted-foreground">Constituency</dt>
+            <dd className="font-bold text-foreground mt-0.5">{p.constituency || "State-wide / Nominated"}</dd>
+          </div>
+        </dl>
+      </section>
+
       {/* Direct Quick Nav to State & Party */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {p.party && (
@@ -395,7 +494,7 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
 
         {p.state && (
           <Link
-            href={`/states/${p.state ? p.state.toLowerCase().replace(/\s+/g, '-') : ''}`}
+            href={`/states/${canonicalStateSlug || (p.state ? p.state.toLowerCase().replace(/\s+/g, '-') : '')}`}
             className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm hover:border-primary/50 hover:shadow-md transition-all flex items-center justify-between group"
           >
             <div>

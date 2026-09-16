@@ -5,7 +5,17 @@ import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 export const metadata: Metadata = {
   title: "Data Sources & Editorial Methodology",
-  description: "Documentation of statutory data sources, normalization rules, verification workflows, and provenance protocols utilized by SattaDarshan.",
+  description:
+    "Documentation of statutory data sources, normalization rules, verification workflows, and provenance protocols utilized by SattaDarshan.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/methodology",
+  },
+  openGraph: {
+    title: "Data Sources & Editorial Methodology — SattaDarshan",
+    description:
+      "Documentation of statutory data sources, normalization rules, verification workflows, and provenance protocols utilized by SattaDarshan.",
+    url: "https://satta-darshan-7jgo.vercel.app/methodology",
+  },
 };
 
 export default function MethodologyPage() {

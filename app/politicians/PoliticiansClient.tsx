@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Users, LayoutGrid, List, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
@@ -42,17 +42,28 @@ type PoliticianSummary = {
   verificationStatus?: string;
 };
 
-export function PoliticiansClient() {
+type PoliticiansClientProps = {
+  initialData?: PoliticianSummary[];
+  initialTotal?: number;
+  initialPages?: number;
+};
+
+export function PoliticiansClient({
+  initialData = [],
+  initialTotal = 0,
+  initialPages = 1,
+}: PoliticiansClientProps) {
   const sp = useSearchParams();
-  const [data, setData] = useState<PoliticianSummary[]>([]);
-  const [total, setTotal] = useState(0);
-  const [pages, setPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<PoliticianSummary[]>(initialData);
+  const [total, setTotal] = useState(initialTotal);
+  const [pages, setPages] = useState(initialPages);
+  const [loading, setLoading] = useState(initialData.length === 0);
   const [q, setQ] = useState(sp.get("q") ?? "");
   const [role, setRole] = useState(sp.get("role") ?? "All");
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"grid" | "table">("grid");
   const [sort, setSort] = useState("name:asc");
+  const isInitialMount = useRef(true);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -78,8 +89,14 @@ export function PoliticiansClient() {
   }, [q, role, page, view, sort]);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (initialData.length > 0 && !q && role === "All" && page === 1 && sort === "name:asc") {
+        return;
+      }
+    }
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, initialData.length, q, role, page, sort]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

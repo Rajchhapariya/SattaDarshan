@@ -32,16 +32,27 @@ type PartySummary = {
   seatsRajyaSabha?: number;
 };
 
-export function PartiesClient() {
-  const [data, setData] = useState<PartySummary[]>([]);
-  const [total, setTotal] = useState(0);
-  const [pages, setPages] = useState(1);
+type PartiesClientProps = {
+  initialData?: PartySummary[];
+  initialTotal?: number;
+  initialPages?: number;
+};
+
+export function PartiesClient({
+  initialData = [],
+  initialTotal = 0,
+  initialPages = 1,
+}: PartiesClientProps) {
+  const [data, setData] = useState<PartySummary[]>(initialData);
+  const [total, setTotal] = useState(initialTotal);
+  const [pages, setPages] = useState(initialPages);
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
   const [tier, setTier] = useState("All");
   const [alliance, setAlliance] = useState("All");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialData.length === 0);
   const [view, setView] = useState<"grid" | "table">("grid");
+  const isInitialMount = useState(true);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -65,8 +76,14 @@ export function PartiesClient() {
   }, [q, tier, alliance, page, view]);
 
   useEffect(() => {
+    if (isInitialMount[0]) {
+      isInitialMount[1](false);
+      if (initialData.length > 0 && !q && tier === "All" && alliance === "All" && page === 1 && view === "grid") {
+        return;
+      }
+    }
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, initialData.length, q, tier, alliance, page, view, isInitialMount]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

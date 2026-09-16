@@ -5,7 +5,17 @@ import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
 
 export const metadata: Metadata = {
   title: "Platform Disclaimer & Neutrality Statement",
-  description: "Non-governmental status, independent civic research mission, non-partisan editorial neutrality, and data accuracy notice for SattaDarshan.",
+  description:
+    "Non-governmental status, independent civic research mission, non-partisan editorial neutrality, and data accuracy notice for SattaDarshan.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/disclaimer",
+  },
+  openGraph: {
+    title: "Platform Disclaimer & Neutrality Statement — SattaDarshan",
+    description:
+      "Non-governmental status, independent civic research mission, non-partisan editorial neutrality, and data accuracy notice for SattaDarshan.",
+    url: "https://satta-darshan-7jgo.vercel.app/disclaimer",
+  },
 };
 
 export default function DisclaimerPage() {

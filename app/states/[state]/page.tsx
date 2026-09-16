@@ -36,6 +36,7 @@ type StatePageProps = {
 };
 
 import { getStateBySlug, getStatePoliticians } from "@/lib/server/queries";
+import { JsonLd, generateStateSchema, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
 
 export const revalidate = 86400;
 
@@ -87,11 +88,23 @@ export default async function StatePage({ params }: StatePageProps) {
 
   const politicians = await getStatePoliticians(s.name);
   const statePath = s.name ? getStatePath(s.name) : undefined;
+  const canonicalUrl = `https://satta-darshan-7jgo.vercel.app/states/${s.slug}`;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+      <JsonLd
+        data={[
+          generateStateSchema(s, canonicalUrl),
+          generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "States & UTs", url: "/states" },
+            { name: s.name, url: `/states/${s.slug}` },
+          ]),
+        ]}
+      />
+
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+      <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
         <span>/</span>
         <Link href="/states" className="hover:text-foreground transition-colors">States & UTs</Link>

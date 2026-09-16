@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Interactive India Political & Parliamentary Map — SattaDarshan",
+  title: "Geospatial Civic & Parliamentary Map of India",
   description:
-    "Interactive SVG map of India displaying state-by-state political governance, ruling coalitions, Lok Sabha seats, and Vidhan Sabha assemblies.",
+    "Interactive state and union territory map of India displaying Lok Sabha seat allocations, Vidhan Sabha assemblies, and regional political representation.",
   alternates: {
     canonical: "https://satta-darshan-7jgo.vercel.app/map",
   },
   openGraph: {
-    title: "Interactive India Political Map — SattaDarshan",
+    title: "Geospatial Civic & Parliamentary Map of India — SattaDarshan",
     description:
-      "Interactive SVG map of India displaying state-by-state political governance, ruling coalitions, Lok Sabha seats, and Vidhan Sabha assemblies.",
+      "Interactive state and union territory map of India displaying Lok Sabha seat allocations, Vidhan Sabha assemblies, and regional political representation.",
     url: "https://satta-darshan-7jgo.vercel.app/map",
   },
 };
 
 export default function MapLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <>{children}</>;
 }

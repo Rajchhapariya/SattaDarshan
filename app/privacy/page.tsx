@@ -4,7 +4,17 @@ import { Shield, Lock, EyeOff, Server, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Privacy Policy & Data Protection Practices",
-  description: "Transparent documentation of privacy controls, minimal data collection, cookie usage, and security practices on SattaDarshan.",
+  description:
+    "Transparent documentation of privacy controls, minimal data collection, cookie usage, and security practices on SattaDarshan.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy & Data Protection Practices — SattaDarshan",
+    description:
+      "Transparent documentation of privacy controls, minimal data collection, cookie usage, and security practices on SattaDarshan.",
+    url: "https://satta-darshan-7jgo.vercel.app/privacy",
+  },
 };
 
 export default function PrivacyPage() {

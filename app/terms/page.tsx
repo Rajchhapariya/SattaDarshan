@@ -4,7 +4,17 @@ import { Scale, CheckCircle, AlertTriangle, FileCheck, ChevronRight } from "luci
 
 export const metadata: Metadata = {
   title: "Terms of Use & Civic Access Guidelines",
-  description: "Terms and conditions governing access, permissible research use, fair utilization, and service guidelines for SattaDarshan.",
+  description:
+    "Terms and conditions governing access, permissible research use, fair utilization, and service guidelines for SattaDarshan.",
+  alternates: {
+    canonical: "https://satta-darshan-7jgo.vercel.app/terms",
+  },
+  openGraph: {
+    title: "Terms of Use & Civic Access Guidelines — SattaDarshan",
+    description:
+      "Terms and conditions governing access, permissible research use, fair utilization, and service guidelines for SattaDarshan.",
+    url: "https://satta-darshan-7jgo.vercel.app/terms",
+  },
 };
 
 export default function TermsPage() {

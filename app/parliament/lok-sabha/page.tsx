@@ -1,20 +1,21 @@
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import { LokSabhaClient } from "./LokSabhaClient";
+import { JsonLd, generateParliamentSchema, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
 
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "18th Lok Sabha — Members of Parliament Directory & 3D Chamber",
+  title: "18th Lok Sabha — Members Directory & Chamber",
   description:
-    "Explore the comprehensive directory of the 18th Lok Sabha of India with 3D seating chamber visualization, constituency mappings, and party affiliations.",
+    "Explore the comprehensive directory of the 18th Lok Sabha of India with seating visualization, constituency mappings, and party affiliations.",
   alternates: {
     canonical: "https://satta-darshan-7jgo.vercel.app/parliament/lok-sabha",
   },
   openGraph: {
-    title: "18th Lok Sabha — Members of Parliament & 3D Chamber",
+    title: "18th Lok Sabha — Members of Parliament & Chamber",
     description:
-      "Explore the comprehensive directory of the 18th Lok Sabha of India with 3D seating chamber visualization, constituency mappings, and party affiliations.",
+      "Explore the comprehensive directory of the 18th Lok Sabha of India with seating visualization, constituency mappings, and party affiliations.",
     url: "https://satta-darshan-7jgo.vercel.app/parliament/lok-sabha",
     siteName: "SattaDarshan",
     type: "website",
@@ -30,9 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "18th Lok Sabha — Members of Parliament & 3D Chamber",
+    title: "18th Lok Sabha — Members of Parliament & Chamber",
     description:
-      "Explore the comprehensive directory of the 18th Lok Sabha of India with 3D seating chamber visualization, constituency mappings, and party affiliations.",
+      "Explore the comprehensive directory of the 18th Lok Sabha of India with seating visualization, constituency mappings, and party affiliations.",
     images: ["/api/og/parliament/lok-sabha"],
   },
 };
@@ -60,5 +61,18 @@ export default async function LokSabhaPage() {
   const states = Array.from(statesSet).sort();
   const parties = Array.from(partiesSet).sort();
 
-  return <LokSabhaClient mps={mps} states={states} parties={parties} />;
+  return (
+    <>
+      <JsonLd
+        data={[
+          generateParliamentSchema("Lok Sabha", "https://satta-darshan-7jgo.vercel.app/parliament/lok-sabha"),
+          generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "18th Lok Sabha", url: "/parliament/lok-sabha" },
+          ]),
+        ]}
+      />
+      <LokSabhaClient mps={mps} states={states} parties={parties} />
+    </>
+  );
 }

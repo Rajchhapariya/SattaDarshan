@@ -15,7 +15,19 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { ThreeParliamentChamber } from "@/components/parliament/ThreeParliamentChamber";
+import dynamic from "next/dynamic";
+
+const ThreeParliamentChamber = dynamic(
+  () => import("@/components/parliament/ThreeParliamentChamber").then((mod) => mod.ThreeParliamentChamber),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[420px] w-full rounded-3xl bg-muted/20 border border-border/60 animate-pulse flex items-center justify-center text-muted-foreground text-sm font-medium">
+        Loading 3D Chamber Visualization...
+      </div>
+    ),
+  }
+);
 import { PoliticianCard } from "@/components/politician/PoliticianCard";
 import { CivicAvatar } from "@/components/politician/CivicAvatar";
 import { Badge } from "@/components/ui/Badge";

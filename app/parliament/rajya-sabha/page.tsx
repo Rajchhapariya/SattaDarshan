@@ -1,20 +1,21 @@
 import connectDB from "@/lib/db";
 import Politician from "@/models/Politician";
 import { RajyaSabhaClient } from "./RajyaSabhaClient";
+import { JsonLd, generateParliamentSchema, generateBreadcrumbSchema } from "@/components/seo/JsonLd";
 
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rajya Sabha — Council of States | Members Directory & Seating Chamber",
+  title: "Rajya Sabha — Council of States Directory & Chamber",
   description:
-    "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+    "Directory of the Rajya Sabha (Upper House) of India's Parliament with seating visualization, party representations, and state distributions.",
   alternates: {
     canonical: "https://satta-darshan-7jgo.vercel.app/parliament/rajya-sabha",
   },
   openGraph: {
     title: "Rajya Sabha — Council of States | Indian Parliament",
     description:
-      "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+      "Directory of the Rajya Sabha (Upper House) of India's Parliament with seating visualization, party representations, and state distributions.",
     url: "https://satta-darshan-7jgo.vercel.app/parliament/rajya-sabha",
     siteName: "SattaDarshan",
     type: "website",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Rajya Sabha — Council of States | Indian Parliament",
     description:
-      "Directory of the Rajya Sabha (Upper House) of India's Parliament with 3D seating chamber visualization, party representations, and state distributions.",
+      "Directory of the Rajya Sabha (Upper House) of India's Parliament with seating visualization, party representations, and state distributions.",
     images: ["/api/og/parliament/rajya-sabha"],
   },
 };
@@ -59,5 +60,18 @@ export default async function RajyaSabhaPage() {
   const states = Array.from(statesSet).sort();
   const parties = Array.from(partiesSet).sort();
 
-  return <RajyaSabhaClient mps={mps} states={states} parties={parties} />;
+  return (
+    <>
+      <JsonLd
+        data={[
+          generateParliamentSchema("Rajya Sabha", "https://satta-darshan-7jgo.vercel.app/parliament/rajya-sabha"),
+          generateBreadcrumbSchema([
+            { name: "Home", url: "/" },
+            { name: "Rajya Sabha", url: "/parliament/rajya-sabha" },
+          ]),
+        ]}
+      />
+      <RajyaSabhaClient mps={mps} states={states} parties={parties} />
+    </>
+  );
 }

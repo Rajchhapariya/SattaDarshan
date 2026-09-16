@@ -6,6 +6,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { DisclaimerModal } from "@/components/common/DisclaimerModal";
 
+import { JsonLd, generateWebSiteSchema, generateOrganizationSchema } from "@/components/seo/JsonLd";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -19,8 +21,8 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://satta-darshan-7jgo.vercel.app"),
   title: {
-    default: "SattaDarshan — Independent Political & Legislative Information Platform",
-    template: "%s | SattaDarshan (Independent Platform)",
+    default: "SattaDarshan — Independent Political & Legislative Platform",
+    template: "%s | SattaDarshan",
   },
   description:
     "SattaDarshan is an independent, non-government platform for exploring publicly available political and legislative information, tracking the 18th Lok Sabha, Rajya Sabha, political parties, and state jurisdictions.",
@@ -89,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <Providers>
+          <JsonLd data={[generateWebSiteSchema(), generateOrganizationSchema()]} />
           <DisclaimerModal />
           <Navbar />
           <main id="main-content" className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
