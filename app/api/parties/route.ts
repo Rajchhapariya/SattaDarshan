@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 
     const rawLimit = parseInt(searchParams.get("limit") ?? "50", 10);
-    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 100) : 50;
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 250) : 50;
 
     const rawQ = (searchParams.get("q") ?? "").trim().slice(0, 80);
     const tier = (searchParams.get("tier") ?? "").trim();
@@ -20,12 +20,29 @@ export async function GET(req: NextRequest) {
 
     const filter: any = {};
     if (rawQ) {
-      const safeQ = escapeRegex(rawQ);
-      const regexObj = { $regex: safeQ, $options: "i" };
-      filter.$or = [
-        { name: regexObj },
-        { abbr: regexObj },
-      ];
+      const words = rawQ.split(/\s+/).filter(Boolean);
+      if (words.length <= 1) {
+        const safeQ = escapeRegex(rawQ);
+        const regexObj = { $regex: safeQ, $options: "i" };
+        filter.$or = [
+          { name: regexObj },
+          { abbr: regexObj },
+          { slug: regexObj },
+          { alliance: regexObj },
+        ];
+      } else {
+        filter.$and = words.map((w) => {
+          const regexObj = { $regex: escapeRegex(w), $options: "i" };
+          return {
+            $or: [
+              { name: regexObj },
+              { abbr: regexObj },
+              { slug: regexObj },
+              { alliance: regexObj },
+            ],
+          };
+        });
+      }
     }
     if (tier && tier !== "All") filter.tier = tier;
     if (alliance && alliance !== "All") filter.alliance = alliance;

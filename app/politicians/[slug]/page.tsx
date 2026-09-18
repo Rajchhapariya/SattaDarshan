@@ -88,7 +88,6 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
 
   const statePath = p.state ? getStatePath(p.state) : undefined;
   const canonicalStateSlug = p.state ? getStateCanonicalSlug(p.state) : undefined;
-  const hasZeroCriminalCases = p.criminalCases === 0 || p.criminalCases === undefined;
   const canonicalUrl = `https://satta-darshan-7jgo.vercel.app/politicians/${slug}`;
 
   return (
@@ -283,26 +282,40 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Declared Assets</span>
             <Wallet className="h-4 w-4 text-amber-500" />
           </div>
-          <div className="text-xl font-bold text-foreground">
-            {p.assets || "Declared in Affidavit"}
+          <div className={cn("font-bold text-foreground", p.assets ? "text-xl" : "text-sm text-muted-foreground")}>
+            {p.assets || "Affidavit Pending / Not Available"}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1">Self-declared ECI asset affidavit</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {p.assets ? "Self-declared ECI asset affidavit" : "Not yet digitized in election filings"}
+          </p>
         </div>
 
         {/* Legal & Criminal Records */}
         <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Criminal Cases</span>
-            {hasZeroCriminalCases ? (
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
+            {typeof p.criminalCases === "number" ? (
+              p.criminalCases === 0 ? (
+                <CheckCircle className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+              )
             ) : (
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <AlertTriangle className="h-4 w-4 text-muted-foreground/60" />
             )}
           </div>
-          <div className={cn("text-xl font-bold", hasZeroCriminalCases ? "text-emerald-600" : "text-amber-600")}>
-            {hasZeroCriminalCases ? "0 Cases" : `${p.criminalCases} Cases Declared`}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-1">ECI election compliance status</p>
+          {typeof p.criminalCases === "number" ? (
+            <div className={cn("text-xl font-bold", p.criminalCases === 0 ? "text-emerald-600" : "text-amber-600")}>
+              {p.criminalCases === 0 ? "0 Cases" : `${p.criminalCases} Cases Declared`}
+            </div>
+          ) : (
+            <div className="text-sm font-semibold text-muted-foreground">
+              Affidavit Not Linked
+            </div>
+          )}
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {typeof p.criminalCases === "number" ? "ECI election compliance status" : "Nomination affidavit pending digitization"}
+          </p>
         </div>
 
         {/* Education Qualification */}
@@ -311,10 +324,12 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Education</span>
             <GraduationCap className="h-4 w-4 text-blue-500" />
           </div>
-          <div className="text-base font-bold text-foreground line-clamp-1">
-            {p.education || "Graduate"}
+          <div className={cn("font-bold text-foreground line-clamp-1", p.education ? "text-base" : "text-sm text-muted-foreground")}>
+            {p.education || "Not Specified / Available"}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1">Highest completed level</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {p.education ? "Highest completed level" : "Self-declared educational degree"}
+          </p>
         </div>
 
         {/* Chamber & Term */}

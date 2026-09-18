@@ -11,12 +11,31 @@ export async function GET(req: NextRequest) {
 
     const filter: any = {};
     if (rawQ) {
-      const safeQ = escapeRegex(rawQ);
-      const regexObj = { $regex: safeQ, $options: "i" };
-      filter.$or = [
-        { name: regexObj },
-        { slug: regexObj },
-      ];
+      const words = rawQ.split(/\s+/).filter(Boolean);
+      if (words.length <= 1) {
+        const safeQ = escapeRegex(rawQ);
+        const regexObj = { $regex: safeQ, $options: "i" };
+        filter.$or = [
+          { name: regexObj },
+          { slug: regexObj },
+          { capital: regexObj },
+          { cm: regexObj },
+          { rulingParty: regexObj },
+        ];
+      } else {
+        filter.$and = words.map((w) => {
+          const regexObj = { $regex: escapeRegex(w), $options: "i" };
+          return {
+            $or: [
+              { name: regexObj },
+              { slug: regexObj },
+              { capital: regexObj },
+              { cm: regexObj },
+              { rulingParty: regexObj },
+            ],
+          };
+        });
+      }
     }
 
     const states = await State.find(filter)

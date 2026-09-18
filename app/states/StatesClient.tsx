@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { StateIcon } from "@/components/ui/StateIcon";
 import { StateTable } from "@/components/state/StateTable";
@@ -13,11 +13,14 @@ export function StatesClient({ initialStates }: { initialStates: any[] }) {
   const [view, setView] = useState<"grid" | "table">("grid");
   const [search, setSearch] = useState("");
 
-  const filteredStates = initialStates.filter((s: any) =>
-    !search.trim() || s.name.toLowerCase().includes(search.toLowerCase()) ||
-    (s.cm && s.cm.toLowerCase().includes(search.toLowerCase())) ||
-    (s.rulingParty && s.rulingParty.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredStates = useMemo(() => {
+    if (!search.trim()) return initialStates;
+    const tokens = search.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    return initialStates.filter((s: any) => {
+      const text = `${s.name} ${s.capital || ""} ${s.cm || ""} ${s.rulingParty || ""} ${s.slug}`.toLowerCase();
+      return tokens.every((t) => text.includes(t));
+    });
+  }, [initialStates, search]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

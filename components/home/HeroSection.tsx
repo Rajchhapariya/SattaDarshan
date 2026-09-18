@@ -27,7 +27,7 @@ export function HeroSection() {
       .catch(() => setItems([]));
   }, [q]);
 
-  const suggestions = q.trim() ? fuse.search(q).map((r) => r.item).slice(0, 6) : [];
+  const suggestions = q.trim() ? (items.length > 0 ? items.slice(0, 6) : fuse.search(q).map((r) => r.item).slice(0, 6)) : [];
 
   return (
     <section className="bg-gradient-to-br from-orange-50 via-white to-indigo-50 py-20 px-4">
@@ -43,7 +43,7 @@ export function HeroSection() {
             {open && suggestions.length > 0 && (
               <div className="absolute z-20 left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl p-1 text-left">
                 {suggestions.map((s) => (
-                  <Link key={s.href} href={s.href} className="block px-3 py-2 rounded-lg hover:bg-gray-50:bg-gray-800">
+                  <Link key={s.href} href={s.href} className="block px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
                     <p className="text-sm text-gray-800">{s.label}</p>
                     <p className="text-xs text-gray-400">{s.sub}</p>
                   </Link>

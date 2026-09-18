@@ -64,10 +64,27 @@ export function LokSabhaClient({ mps, states, parties }: LokSabhaClientProps) {
   // Filter MPs based on search and selected state/party
   const filteredMps = useMemo(() => {
     return mps.filter((mp) => {
-      const matchesSearch = 
-        !search.trim() ||
-        mp.name.toLowerCase().includes(search.toLowerCase()) ||
-        (mp.constituency && mp.constituency.toLowerCase().includes(search.toLowerCase()));
+      let matchesSearch = true;
+      if (search.trim()) {
+        const tokens = search.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        let searchable = mp.name;
+        if (mp.name.includes(",")) {
+          const parts = mp.name.split(",").map((p) => p.trim());
+          if (parts.length === 2) {
+            const lastName = parts[0];
+            const firstName = parts[1];
+            const cleanFirst = firstName.replace(/^(shri|smt\.?|dr\.?|prof\.?|adv\.?)\s+/i, "");
+            searchable += ` ${firstName} ${lastName} ${cleanFirst} ${lastName}`;
+          }
+        }
+        if (mp.constituency) searchable += ` ${mp.constituency}`;
+        if (mp.state) searchable += ` ${mp.state}`;
+        if (mp.partyName) searchable += ` ${mp.partyName}`;
+        if (mp.slug) searchable += ` ${mp.slug.replace(/-/g, " ")}`;
+
+        const cleanSearchable = searchable.toLowerCase().replace(/[,.:()]/g, " ");
+        matchesSearch = tokens.every((t) => cleanSearchable.includes(t));
+      }
 
       const matchesState = selectedState === "All" || mp.state === selectedState;
       const matchesParty = selectedParty === "All" || mp.partyName === selectedParty;
