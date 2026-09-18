@@ -8,7 +8,6 @@ import {
   User, 
   Wallet, 
   GraduationCap, 
-  AlertTriangle, 
   CheckCircle, 
   Landmark, 
   MapPin, 
@@ -35,7 +34,6 @@ type Politician = {
   constituency?: string;
   chamber?: string;
   assets?: string;
-  criminalCases?: number;
   education?: string;
   photo?: string;
   tenureStatus?: string;
@@ -115,22 +113,6 @@ export default function ComparePage() {
     { label: "Constituency", icon: MapPin, get: (p?: Politician) => p?.constituency || "N/A" },
     { label: "Education Level", icon: GraduationCap, get: (p?: Politician) => p?.education || "Not Declared / Available" },
     { label: "Declared Assets", icon: Wallet, get: (p?: Politician) => p?.assets || "Not Declared / Available" },
-    { 
-      label: "Criminal Cases", 
-      icon: AlertTriangle, 
-      render: (p?: Politician) => {
-        if (p?.criminalCases === undefined || p?.criminalCases === null) {
-          return <span className="text-muted-foreground italic text-xs">Affidavit Not Linked</span>;
-        }
-        const cases = p.criminalCases;
-        return (
-          <span className={cn("inline-flex items-center gap-1 font-semibold text-xs", cases === 0 ? "text-emerald-600" : "text-amber-600")}>
-            {cases === 0 ? <CheckCircle className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
-            {cases === 0 ? "0 Cases Declared" : `${cases} Active Cases`}
-          </span>
-        );
-      }
-    },
     {
       label: "Tenure & Verification",
       icon: CheckCircle,
@@ -165,7 +147,7 @@ export default function ComparePage() {
             Compare Representatives
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
-            Side-by-side analysis of public records, declared wealth, criminal affidavits, and constituency mandates.
+            Side-by-side analysis of public records, declared wealth, educational qualifications, and constituency mandates.
           </p>
         </div>
 

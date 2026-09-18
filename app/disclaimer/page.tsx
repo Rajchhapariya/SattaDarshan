@@ -109,7 +109,7 @@ export default function DisclaimerPage() {
             5. Candidate Affidavits & Third-Party Disclosures
           </h2>
           <p>
-            Biographical information, educational qualifications, asset valuations, and criminal case counts are compiled directly from candidate nomination affidavits filed with the Election Commission of India under Rule 4A of the Conduct of Elections Rules, 1961. These records reflect self-declared candidate submissions as legally provided at the time of nomination.
+            Biographical information, educational qualifications, and asset valuations are compiled directly from candidate nomination affidavits filed with the Election Commission of India under Rule 4A of the Conduct of Elections Rules, 1961. These records reflect self-declared candidate submissions as legally provided at the time of nomination.
           </p>
         </section>
 

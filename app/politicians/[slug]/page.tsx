@@ -16,7 +16,6 @@ import {
   Landmark, 
   GraduationCap,
   Wallet, 
-  AlertTriangle, 
   CheckCircle, 
   Twitter,
   Facebook, 
@@ -274,8 +273,8 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
         </div>
       </div>
 
-      {/* 4 Essential Legislative Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 3 Essential Legislative Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Declared Assets */}
         <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -287,34 +286,6 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
             {p.assets ? "Self-declared ECI asset affidavit" : "Not yet digitized in election filings"}
-          </p>
-        </div>
-
-        {/* Legal & Criminal Records */}
-        <div className="p-5 rounded-2xl bg-card border border-border/80 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Criminal Cases</span>
-            {typeof p.criminalCases === "number" ? (
-              p.criminalCases === 0 ? (
-                <CheckCircle className="h-4 w-4 text-emerald-500" />
-              ) : (
-                <AlertTriangle className="h-4 w-4 text-amber-500" />
-              )
-            ) : (
-              <AlertTriangle className="h-4 w-4 text-muted-foreground/60" />
-            )}
-          </div>
-          {typeof p.criminalCases === "number" ? (
-            <div className={cn("text-xl font-bold", p.criminalCases === 0 ? "text-emerald-600" : "text-amber-600")}>
-              {p.criminalCases === 0 ? "0 Cases" : `${p.criminalCases} Cases Declared`}
-            </div>
-          ) : (
-            <div className="text-sm font-semibold text-muted-foreground">
-              Affidavit Not Linked
-            </div>
-          )}
-          <p className="text-[11px] text-muted-foreground mt-1">
-            {typeof p.criminalCases === "number" ? "ECI election compliance status" : "Nomination affidavit pending digitization"}
           </p>
         </div>
 
