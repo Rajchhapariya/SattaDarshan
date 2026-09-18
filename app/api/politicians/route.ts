@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const page = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
 
     const rawLimit = parseInt(searchParams.get("limit") ?? "24", 10);
-    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 250) : 24;
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 1000) : 24;
 
     const rawQ = (searchParams.get("q") ?? "").trim().slice(0, 80);
     const role = (searchParams.get("role") ?? "").trim();
@@ -33,14 +33,31 @@ export async function GET(req: NextRequest) {
 
     const filter: any = {};
     if (rawQ) {
-      const safeQ = escapeRegex(rawQ);
-      const regexObj = { $regex: safeQ, $options: "i" };
-      filter.$or = [
-        { name: regexObj },
-        { slug: regexObj },
-        { constituency: regexObj },
-        { partyName: regexObj },
-      ];
+      const words = rawQ.split(/\s+/).filter(Boolean);
+      if (words.length === 1) {
+        const safeQ = escapeRegex(words[0]);
+        const regexObj = { $regex: safeQ, $options: "i" };
+        filter.$or = [
+          { name: regexObj },
+          { slug: regexObj },
+          { constituency: regexObj },
+          { partyName: regexObj },
+          { state: regexObj },
+        ];
+      } else {
+        filter.$and = words.map((w) => {
+          const regexObj = { $regex: escapeRegex(w), $options: "i" };
+          return {
+            $or: [
+              { name: regexObj },
+              { slug: regexObj },
+              { constituency: regexObj },
+              { partyName: regexObj },
+              { state: regexObj },
+            ],
+          };
+        });
+      }
     }
 
     if (role && role !== "All") {

@@ -23,7 +23,8 @@ import {
   Instagram, 
   Globe, 
   Calendar,
-  ChevronRight
+  ChevronRight,
+  ArrowRightLeft
 } from "lucide-react";
 import { ShareButton } from "@/components/common/ShareButton";
 import { DataAccuracyNotice } from "@/components/common/DataAccuracyNotice";
@@ -185,11 +186,19 @@ export default async function PoliticianPage({ params }: PoliticianPageProps) {
                   </p>
                 )}
               </div>
-              <ShareButton
-                title={`${p.name} — Political Profile & Legislative Records`}
-                label="Share Profile"
-                className="self-start sm:self-auto"
-              />
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                <Link
+                  href={`/compare?left=${slug}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground shadow-2xs transition-colors"
+                >
+                  <ArrowRightLeft className="h-3.5 w-3.5 text-primary" />
+                  <span>Compare</span>
+                </Link>
+                <ShareButton
+                  title={`${p.name} — Political Profile & Legislative Records`}
+                  label="Share Profile"
+                />
+              </div>
             </div>
           </div>
 

@@ -11,6 +11,7 @@ export type ComboboxItem = {
   sub?: string;
   photo?: string;
   badge?: string;
+  keywords?: string[];
 };
 
 type ComboboxProps = {
@@ -22,6 +23,28 @@ type ComboboxProps = {
   emptyText?: string;
   className?: string;
 };
+
+function getSearchTokens(item: ComboboxItem): string {
+  let text = item.label;
+
+  // Inverted comma name: "Sibal, Shri Kapil" -> "Kapil Sibal", "Shri Kapil Sibal"
+  if (item.label.includes(",")) {
+    const parts = item.label.split(",").map((p) => p.trim());
+    if (parts.length === 2) {
+      const lastName = parts[0];
+      const firstNameWithHonorific = parts[1];
+      const cleanFirst = firstNameWithHonorific.replace(/^(shri|smt\.?|dr\.?|prof\.?|adv\.?)\s+/i, "");
+      text += ` ${firstNameWithHonorific} ${lastName} ${cleanFirst} ${lastName}`;
+    }
+  }
+
+  if (item.sub) text += ` ${item.sub}`;
+  if (item.badge) text += ` ${item.badge}`;
+  if (item.value) text += ` ${item.value.replace(/-/g, " ")}`;
+  if (item.keywords && item.keywords.length > 0) text += ` ${item.keywords.join(" ")}`;
+
+  return text.toLowerCase().replace(/[,.:()]/g, " ");
+}
 
 export function Combobox({
   items,
@@ -45,11 +68,43 @@ export function Combobox({
   const selectedItem = items.find((item) => item.value === value);
 
   const filteredItems = React.useMemo(() => {
-    if (!query.trim()) return items.slice(0, 100);
-    const q = query.toLowerCase();
-    return items
-      .filter((item) => item.label.toLowerCase().includes(q) || (item.sub && item.sub.toLowerCase().includes(q)))
-      .slice(0, 50);
+    const trimmed = query.trim();
+    if (!trimmed) {
+      return [...items]
+        .sort((a, b) => {
+          const aPri = (a.sub?.includes("Prime Minister") || a.sub?.includes("Opposition") || a.sub?.includes("Chief Minister")) ? 1 : 0;
+          const bPri = (b.sub?.includes("Prime Minister") || b.sub?.includes("Opposition") || b.sub?.includes("Chief Minister")) ? 1 : 0;
+          return bPri - aPri;
+        })
+        .slice(0, 100);
+    }
+
+    const queryTokens = trimmed.toLowerCase().split(/\s+/).filter(Boolean);
+
+    const scored = items
+      .map((item) => {
+        const searchText = getSearchTokens(item);
+        const allMatch = queryTokens.every((token) => searchText.includes(token));
+        if (!allMatch) return null;
+
+        let score = 0;
+        const lowerLabel = item.label.toLowerCase();
+        if (lowerLabel === trimmed.toLowerCase()) score += 100;
+        else if (lowerLabel.startsWith(trimmed.toLowerCase())) score += 50;
+        else if (lowerLabel.includes(trimmed.toLowerCase())) score += 30;
+
+        for (const token of queryTokens) {
+          if (new RegExp(`\\b${token}`).test(searchText)) score += 10;
+        }
+
+        return { item, score };
+      })
+      .filter((res): res is { item: ComboboxItem; score: number } => res !== null)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 50)
+      .map((res) => res.item);
+
+    return scored;
   }, [items, query]);
 
   // Reset highlighted index when filtered items change

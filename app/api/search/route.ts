@@ -38,37 +38,90 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. Fetch database entities
+    const words = q.split(/\s+/).filter(Boolean);
+    const politicianFilter = words.length <= 1
+      ? {
+          $or: [
+            { name: regex },
+            { slug: regex },
+            { constituency: regex },
+            { state: regex },
+            { partyName: regex },
+          ],
+        }
+      : {
+          $and: words.map((w) => {
+            const r = { $regex: escapeRegex(w), $options: "i" };
+            return {
+              $or: [
+                { name: r },
+                { slug: r },
+                { constituency: r },
+                { state: r },
+                { partyName: r },
+              ],
+            };
+          }),
+        };
+
+    const partyFilter = words.length <= 1
+      ? {
+          $or: [
+            { name: regex },
+            { abbr: regex },
+            { slug: regex },
+            { alliance: regex },
+          ],
+        }
+      : {
+          $and: words.map((w) => {
+            const r = { $regex: escapeRegex(w), $options: "i" };
+            return {
+              $or: [
+                { name: r },
+                { abbr: r },
+                { slug: r },
+                { alliance: r },
+              ],
+            };
+          }),
+        };
+
+    const stateFilter = words.length <= 1
+      ? {
+          $or: [
+            { name: regex },
+            { slug: regex },
+            { capital: regex },
+            { cm: regex },
+          ],
+        }
+      : {
+          $and: words.map((w) => {
+            const r = { $regex: escapeRegex(w), $options: "i" };
+            return {
+              $or: [
+                { name: r },
+                { slug: r },
+                { capital: r },
+                { cm: r },
+              ],
+            };
+          }),
+        };
+
     const [politicians, parties, states] = await Promise.all([
-      Politician.find({
-        $or: [
-          { name: regex },
-          { constituency: regex },
-          { state: regex },
-          { partyName: regex },
-        ],
-      })
+      Politician.find(politicianFilter)
         .select("name slug role partyName state constituency photo")
         .limit(10)
         .lean(),
 
-      Party.find({
-        $or: [
-          { name: regex },
-          { abbr: regex },
-          { alliance: regex },
-        ],
-      })
+      Party.find(partyFilter)
         .select("name abbr slug logo alliance totalSeats")
         .limit(6)
         .lean(),
 
-      State.find({
-        $or: [
-          { name: regex },
-          { capital: regex },
-          { cm: regex },
-        ],
-      })
+      State.find(stateFilter)
         .select("name slug capital rulingParty totalLokSabhaSeats")
         .limit(6)
         .lean(),
