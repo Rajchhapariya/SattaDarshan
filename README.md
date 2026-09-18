@@ -33,13 +33,13 @@ SattaDarshan is an independent, non-government civic data and research platform 
 
 ## Core Features
 
-- **Representatives & Leadership Directory:** Comprehensive public directory of Indian parliamentarians and leaders (840+ profiles) with role filtering (Prime Minister, Cabinet Ministers, Chief Ministers, Lok Sabha MPs, Rajya Sabha MPs, MLAs), party affiliation, state, constituency, declared assets, criminal cases, education, and term dates.
+- **Representatives & Leadership Directory:** Comprehensive public directory of Indian parliamentarians and leaders (846 verified profiles) with role filtering (Prime Minister, Cabinet Ministers, Chief Ministers, Lok Sabha MPs, Rajya Sabha MPs, MLAs), party affiliation, state, constituency, declared assets, educational qualifications, executive portfolios, and term dates.
 - **3D Parliamentary Chamber Visualization:** Interactive 3D WebGL semicircular amphitheatre rendering both the 543-seat Lok Sabha and the 245-seat Rajya Sabha. Features alliance-based color-coding (NDA, INDIA, Others), click-to-inspect seat details, camera angle presets, real-time MP search highlighting, and deferred client-side loading.
 - **Interactive Geospatial India Map:** Vector-based SVG map of India allowing users to hover and click through 28 States and 8 Union Territories to inspect ruling parties, Chief Ministers, and parliamentary seat shares.
 - **Political Party Registries:** Directory of 100+ recognized national, state, and un-recognized registered parties tracking parliamentary seat tallies, alliances (NDA, INDIA, Independent), leadership, headquarters, and member delegations.
 - **State & Union Territory Jurisdictions:** Governance dashboards for all 36 States and UTs detailing current Chief Ministers, ruling parties/coalitions, Assembly strength, Lok Sabha representation, and regional classification.
-- **Side-by-Side Representative Comparison (`/compare`):** Multi-factor comparative tool allowing citizens and researchers to evaluate any two leaders across portfolio, chamber, education, declared assets, and legal disclosures.
-- **Global Instant Search:** Fast, debounced keyboard-navigable search modal (`Ctrl+K` / `Cmd+K`) querying representatives, parties, states, and parliamentary chambers simultaneously with ReDoS-safe regex escaping.
+- **Side-by-Side Representative Comparison (`/compare`):** Multi-factor comparative tool allowing citizens and researchers to evaluate any two leaders across executive office, chamber, educational background, declared assets, constituency mandate, and serving status with live URL bookmarking and position swapping.
+- **Intelligent Multi-Token Search:** Fast, keyboard-navigable search modal (`Ctrl+K` / `Cmd+K`) and directory filters supporting multi-attribute queries (name, constituency, state, party) and automatic parliamentary inverted-name normalization (`LastName, Title FirstName` to natural name matching) with ReDoS-safe regex escaping.
 - **Civic Correction Intake Pipeline (`/corrections`):** Public error-reporting workflow allowing users to suggest factual updates, term completions, or photo fixes. Reports are sent directly to a private editorial spreadsheet via a secure Google Apps Script bridge without writing to MongoDB.
 - **Editorial Contact System (`/contact`):** Direct communication desk for research inquiries, feedback, and copyright attribution notices.
 - **Mobile-First Responsive Design:** Clean, dignified civic light-mode aesthetic optimized across mobile, tablet, and desktop viewports.
@@ -370,6 +370,7 @@ Contributors and maintainers must adhere to the following principles:
 5. **Protect Secrets:** Never commit `.env` files, MongoDB credentials, API tokens, or Apps Script URLs. Ensure all local environment variables remain in `.env.local` (protected by `.gitignore`).
 6. **Preserve Light-Mode Aesthetic:** SattaDarshan uses a deliberate civic light-mode design system. Do not introduce unvetted theme toggles or dark-mode overrides unless requested.
 7. **Maintain Accessibility & Mobile Usability:** All interactive components, dialogs, and tables must support keyboard navigation and remain usable on mobile viewports.
+8. **Automated Pre-Commit Validation:** Husky and lint-staged automatically run ESLint (`--max-warnings=0`) and TypeScript compiler checks on staged files before every commit to ensure clean code quality.
 
 ---
 
