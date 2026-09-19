@@ -11,19 +11,23 @@ import { escapeRegex } from "@/lib/utils";
  */
 
 export const getPoliticianBySlug = cache(async (slug: string) => {
-  await connectDB();
-  const p = (await Politician.findOne({ slug }).lean()) as any;
-  if (!p) return null;
+  try {
+    await connectDB();
+    const p = (await Politician.findOne({ slug }).lean()) as any;
+    if (!p) return null;
 
-  if (p.party) {
-    const party = (await Party.findOne({ slug: p.party }).lean()) as any;
-    if (party) {
-      p.partyName = party.name;
-      p.partyLogo = party.logo;
-      p.partyAbbr = party.abbr;
+    if (p.party) {
+      const party = (await Party.findOne({ slug: p.party }).lean()) as any;
+      if (party) {
+        p.partyName = party.name;
+        p.partyLogo = party.logo;
+        p.partyAbbr = party.abbr;
+      }
     }
+    return JSON.parse(JSON.stringify(p));
+  } catch {
+    return null;
   }
-  return JSON.parse(JSON.stringify(p));
 });
 
 export const getPartyBySlug = cache(async (slug: string) => {
@@ -62,16 +66,17 @@ const STATE_ALIASES: Record<string, string> = {
   "jammu-and-kashmir": "jammu-kashmir",
   "nct-of-delhi": "delhi",
   "national-capital-territory-of-delhi": "delhi",
-  "telengana": "telangana",
-  "orissa": "odisha",
-  "uttaranchal": "uttarakhand",
-  "pondicherry": "puducherry",
+  telengana: "telangana",
+  orissa: "odisha",
+  uttaranchal: "uttarakhand",
+  pondicherry: "puducherry",
 };
 
 export const getStateBySlug = cache(async (slug: string) => {
   try {
     await connectDB();
-    const normalizedSlug = STATE_ALIASES[slug.toLowerCase()] || slug.toLowerCase();
+    const normalizedSlug =
+      STATE_ALIASES[slug.toLowerCase()] || slug.toLowerCase();
 
     // 1. Direct slug match
     let s = await State.findOne({ slug: normalizedSlug }).lean();
@@ -86,11 +91,15 @@ export const getStateBySlug = cache(async (slug: string) => {
     const pattern = clean
       .replace(/\band\b/g, "(&|and)")
       .replace(/\bplus\b/g, "\\+");
-    const byName = await State.findOne({ name: new RegExp(`^${pattern}$`, "i") }).lean();
+    const byName = await State.findOne({
+      name: new RegExp(`^${pattern}$`, "i"),
+    }).lean();
     if (byName) return JSON.parse(JSON.stringify(byName));
 
     // 4. Fuzzy search by contains
-    const fuzzy = await State.findOne({ name: new RegExp(clean.split(" ")[0], "i") }).lean();
+    const fuzzy = await State.findOne({
+      name: new RegExp(clean.split(" ")[0], "i"),
+    }).lean();
     return fuzzy ? JSON.parse(JSON.stringify(fuzzy)) : null;
   } catch {
     return null;
@@ -98,8 +107,14 @@ export const getStateBySlug = cache(async (slug: string) => {
 });
 
 export const getStatePoliticians = cache(async (stateName: string) => {
-  await connectDB();
-  const regex = new RegExp(`^${escapeRegex(stateName)}$`, "i");
-  const list = await Politician.find({ state: regex }).sort({ name: 1 }).lean();
-  return JSON.parse(JSON.stringify(list));
+  try {
+    await connectDB();
+    const regex = new RegExp(`^${escapeRegex(stateName)}$`, "i");
+    const list = await Politician.find({ state: regex })
+      .sort({ name: 1 })
+      .lean();
+    return JSON.parse(JSON.stringify(list));
+  } catch {
+    return [];
+  }
 });
